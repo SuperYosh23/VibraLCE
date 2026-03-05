@@ -26,37 +26,47 @@
         </div>
     </div>
 
-    <div class="content-area">
-        <img src="minecraftlogo.png" class="mc-logo-img" alt="Minecraft Logo">
-
-        <div id="btn-play-main" class="btn-mc btn-play" onclick="launchGame()">PLAY</div>
-
-        <div class="version-row">
-            <span class="version-label">Version:</span>
-            <div class="version-select-box">
-                <span id="current-version-display">Loading...</span>
-                <div class="select-arrow">▼</div>
-                <select id="version-select" class="hidden-select" onchange="updateSelectedRelease()">
-                    <option>Loading...</option>
-                </select>
+    <div class="main-wrapper">
+        <div class="sidebar">
+            <div class="sidebar-title">PATCH NOTES</div>
+            <div id="updates-list">
+                <div class="update-item">Loading updates...</div>
             </div>
         </div>
 
-        <div class="flex gap-4 w-[500px] max-w-[90%]">
-            <div class="btn-mc flex-grow" id="btn-profile" onclick="toggleProfile(true)">PROFILE</div>
-            <div class="btn-mc flex-grow" id="btn-options" onclick="toggleOptions(true)">OPTIONS</div>
-        </div>
-
-        <!-- Progress Bar at bottom -->
-        <div class="progress-container" id="progress-container">
-            <div class="progress-text" id="progress-text">Downloading...</div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        <div class="content-area">
+            <img src="minecraftlogo.png" class="mc-logo-img" alt="Minecraft Logo">
+    
+            <div id="btn-play-main" class="btn-mc btn-play" onclick="launchGame()">PLAY</div>
+    
+            <div class="version-row">
+                <span class="version-label">Version:</span>
+                <div class="version-select-box">
+                    <span id="current-version-display">Loading...</span>
+                    <div class="select-arrow">▼</div>
+                    <select id="version-select" class="hidden-select" onchange="updateSelectedRelease()">
+                        <option>Loading...</option>
+                    </select>
+                </div>
+                <div id="btn-check-update" class="btn-mc btn-mini" onclick="checkForUpdatesManual()" title="Check for Updates">
+                    <img src="restart.png" alt="Update">
+                </div>
+            </div>
+    
+            <div class="flex gap-4 w-[500px] max-w-[90%]">
+                <div class="btn-mc flex-grow" id="btn-profile" onclick="toggleProfile(true)">PROFILE</div>
+                <div class="btn-mc flex-grow" id="btn-options" onclick="toggleOptions(true)">OPTIONS</div>
+            </div>
+    
+            <div class="progress-container" id="progress-container">
+                <div class="progress-text" id="progress-text">Downloading...</div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Options Modal -->
     <div class="modal-overlay" id="options-modal">
         <div class="modal-box">
             <div class="modal-title">LAUNCHER OPTIONS</div>
@@ -73,7 +83,7 @@
 
             <div id="compat-option-container" class="mc-input-group" style="display: none;">
                 <label class="mc-label">Compatibility Layer (Linux):</label>
-                <div class="version-select-box" style="width: 100%; height: 48px; margin-top: 8px;">
+                <div id="compat-select-box" class="version-select-box" style="width: 100%; height: 48px; margin-top: 8px;">
                     <span id="current-compat-display">Default (Direct)</span>
                     <div class="select-arrow" style="height: 44px;">▼</div>
                     <select id="compat-select" class="hidden-select" onchange="updateCompatDisplay()">
@@ -101,13 +111,12 @@
             </div>
 
             <div class="flex gap-4 w-full mt-4">
-                <div class="btn-mc flex-grow" onclick="saveOptions()">DONE</div>
-                <div class="btn-mc flex-grow" onclick="toggleOptions(false)">CANCEL</div>
+                <div id="btn-options-done" class="btn-mc flex-grow" onclick="saveOptions()">DONE</div>
+                <div id="btn-options-cancel" class="btn-mc flex-grow" onclick="toggleOptions(false)">CANCEL</div>
             </div>
         </div>
     </div>
 
-    <!-- Profile Modal -->
     <div class="modal-overlay" id="profile-modal">
         <div class="modal-box">
             <div class="modal-title">PLAYER PROFILE</div>
@@ -123,13 +132,12 @@
             </div>
 
             <div class="flex gap-4 w-full mt-4">
-                <div class="btn-mc flex-grow" onclick="saveProfile()">SAVE</div>
-                <div class="btn-mc flex-grow" onclick="toggleProfile(false)">CANCEL</div>
+                <div id="btn-profile-save" class="btn-mc flex-grow" onclick="saveProfile()">SAVE</div>
+                <div id="btn-profile-cancel" class="btn-mc flex-grow" onclick="toggleProfile(false)">CANCEL</div>
             </div>
         </div>
     </div>
 
-    <!-- Update Confirmation Modal -->
     <div class="modal-overlay" id="update-modal">
         <div class="modal-box">
             <div class="modal-title">UPDATE AVAILABLE</div>

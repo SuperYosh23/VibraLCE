@@ -1,10 +1,6 @@
 # LegacyLauncher
 
 A custom launcher for Minecraft Legacy Console Edition.
-<img width="1276" height="718" alt="image" src="https://github.com/user-attachments/assets/5ed5932c-c8a7-49db-a92a-261bdae6f551" />
-
-
-
 
 ## Features
 
@@ -74,6 +70,7 @@ The launcher supports several compatibility options for Linux:
 ## Dependencies
 
 - **Electron**: Cross-platform desktop app framework
+- **discord-rpc**: Discord Rich Presence integration
 - **extract-zip**: ZIP archive extraction
 - **Tailwind CSS**: UI styling (via CDN)
 

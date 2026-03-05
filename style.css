@@ -3,6 +3,20 @@
     src: url('Minecraft.ttf') format('truetype');
 }
 
+
+.btn-mini {
+    width: 56px !important;
+    height: 56px;
+    max-width: 56px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    margin-left: 8px !important;
+}
+.btn-mini img {
+    height: 24px;
+    width: auto;
+}
+
 :root {
     --mc-gui-bg: #c6c6c6;
     --mc-progress-bg: #313131;
@@ -34,7 +48,6 @@ body {
     border: 2px solid #000;
 }
 
-/* Title Bar */
 .title-bar {
     height: 32px;
     background: #222;
@@ -81,6 +94,153 @@ body {
     background: #c42b1c;
 }
 
+.main-wrapper {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.sidebar {
+    width: 380px;
+    background: rgba(0, 0, 0, 0.7);
+    border-right: 4px solid #000;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    overflow-y: auto;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+}
+
+.sidebar-title {
+    font-size: 32px;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 25px;
+    text-align: center;
+    border-bottom: 2px solid #555;
+    padding-bottom: 15px;
+}
+
+.commit-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.author-img {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid #555;
+}
+
+.commit-sha {
+    font-size: 16px !important;
+    color: #55ff55 !important;
+    font-family: monospace;
+    margin-bottom: 8px !important;
+}
+
+.commit-msg {
+    font-size: 15px !important;
+    color: #eee !important;
+    line-height: 1.4 !important;
+}
+
+#updates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.update-item.patch-note-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+    padding: 20px;
+    cursor: default;
+    transition: none;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.update-item.patch-note-card:hover {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.pn-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.pn-title {
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.pn-body {
+    color: #ccc;
+    font-size: 16px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.pn-body li {
+    margin-left: 15px;
+    list-style-type: disc;
+}
+
+.pn-h1 { font-size: 20px; color: #fff; margin-top: 10px; }
+.pn-h2 { font-size: 18px; color: #fff; margin-top: 8px; }
+.pn-h3 { font-size: 16px; color: #fff; margin-top: 6px; }
+
+.update-tag {
+    color: #55ff55;
+    font-size: 20px;
+    text-shadow: 1px 1px 0 #000;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.update-name {
+    color: #fff;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.update-date {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 10px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.3);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #555;
+    border: 2px solid #000;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
 .content-area {
     flex-grow: 1;
     background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('minecraft.jpg');
@@ -92,6 +252,7 @@ body {
     justify-content: center;
     position: relative;
     overflow: hidden;
+    height: 100%;
 }
 
 .mc-logo-img {
@@ -122,14 +283,18 @@ body {
     box-shadow: inset -3px -3px 0px #333, inset 3px 3px 0px #aaa;
     margin-bottom: 16px;
     position: relative;
-    transition: transform 0.05s;
+    transition: transform(0.05s);
 }
 
-.btn-mc:hover:not(.disabled) {
+.btn-mc:hover:not(.disabled), .btn-mc.focused:not(.disabled) {
     background-color: var(--mc-button-hover);
     color: #fff;
     outline: 2px solid #fff;
     z-index: 5;
+}
+
+.version-select-box:hover, .version-select-box.focused {
+    border-color: #fff;
 }
 
 .btn-mc:active:not(.disabled) {
@@ -207,7 +372,6 @@ body {
     right: 0;
 }
 
-/* Progress Bar Styling */
 .progress-container {
     position: absolute;
     bottom: 0;
@@ -253,7 +417,6 @@ body {
     text-align: center;
 }
 
-/* Settings Modal */
 .modal-overlay {
     position: absolute;
     inset: 0;
@@ -314,8 +477,12 @@ body {
     transition: border-color 0.2s;
 }
 
-.mc-input:focus {
+.mc-input:focus, .mc-input.focused {
     border-color: #fff;
+}
+
+#server-checkbox.focused {
+    outline: 2px solid #fff;
 }
 
 #loader {
@@ -386,7 +553,6 @@ select.hidden-select {
     width: 100%;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 12px;
 }

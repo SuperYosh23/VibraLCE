@@ -10,6 +10,7 @@ const DEFAULT_EXEC = "Minecraft.Client.exe";
 const TARGET_FILE = "LCEWindows64.zip";
 
 let releasesData = [];
+let commitsData = [];
 let currentReleaseIndex = 0;
 let isProcessing = false;
 let isGameRunning = false;
@@ -33,9 +34,12 @@ window.onload = async () => {
     document.getElementById('port-input').value = await Store.get('legacy_port', "");
     document.getElementById('server-checkbox').checked = await Store.get('legacy_is_server', false);
     
-    if (process.platform === 'linux') {
+    if (process.platform === 'linux' || process.platform === 'darwin') {
         document.getElementById('compat-option-container').style.display = 'block';
         scanCompatibilityLayers();
+    } else {
+        // Force Windows to direct mode if somehow changed
+        await Store.set('legacy_compat_layer', 'direct');
     }
 
     ipcRenderer.on('window-is-maximized', (event, isMaximized) => {
@@ -43,6 +47,7 @@ window.onload = async () => {
     });
 
     fetchGitHubData();
+    GamepadManager.init();
 };
 
 async function scanCompatibilityLayers() {
@@ -56,17 +61,26 @@ async function scanCompatibilityLayers() {
     ];
 
     const homeDir = require('os').homedir();
-    const steamPaths = [
-        path.join(homeDir, '.steam', 'steam', 'steamapps', 'common'),
-        path.join(homeDir, '.local', 'share', 'Steam', 'steamapps', 'common'),
-        path.join(homeDir, '.var', 'app', 'com.valvesoftware.Steam', 'data', 'Steam', 'steamapps', 'common')
-    ];
+    let steamPaths = [];
+    
+    if (process.platform === 'linux') {
+        steamPaths = [
+            path.join(homeDir, '.steam', 'steam', 'steamapps', 'common'),
+            path.join(homeDir, '.local', 'share', 'Steam', 'steamapps', 'common'),
+            path.join(homeDir, '.var', 'app', 'com.valvesoftware.Steam', 'data', 'Steam', 'steamapps', 'common')
+        ];
+    } else if (process.platform === 'darwin') {
+        steamPaths = [
+            path.join(homeDir, 'Library', 'Application Support', 'Steam', 'steamapps', 'common')
+        ];
+    }
 
     for (const steamPath of steamPaths) {
         if (fs.existsSync(steamPath)) {
             try {
                 const dirs = fs.readdirSync(steamPath);
-                dirs.filter(d => d.startsWith('Proton')).forEach(d => {
+                dirs.filter(d => d.startsWith('Proton') || d.includes('Wine') || d.includes('CrossOver')).forEach(d => {
+                    // Check for common Proton structure
                     const protonPath = path.join(steamPath, d, 'proton');
                     if (fs.existsSync(protonPath)) {
                         layers.push({ name: d, cmd: protonPath });
@@ -99,7 +113,7 @@ function updateCompatDisplay() {
 async function getInstalledPath() {
     const homeDir = require('os').homedir();
     const execPath = await Store.get('legacy_exec_path', DEFAULT_EXEC);
-    return path.join(homeDir, 'Downloads', 'LegacyClient', execPath);
+    return path.join(homeDir, 'Documents', 'LegacyClient', execPath);
 }
 
 async function checkIsInstalled(tag) {
@@ -138,28 +152,15 @@ async function updatePlayButtonText() {
     }
 }
 
-function updateRPC(details, state, startTime = null) {
-    ipcRenderer.send('update-rpc', { details, state, startTime });
-}
-
 function setGameRunning(running) {
     isGameRunning = running;
     updatePlayButtonText();
-    
-    if (!running) {
-        updateRPC('In Menus', 'Ready to Play');
-    }
 }
 
 async function monitorProcess(proc) {
     if (!proc) return;
     const sessionStart = Date.now();
     setGameRunning(true);
-
-    const release = releasesData[currentReleaseIndex];
-    const version = release ? release.tag_name : 'Unknown';
-    const isServer = await Store.get('legacy_is_server', false);
-    updateRPC(`Playing Legacy (${version})`, isServer ? 'Running Headless Server' : 'In Game', sessionStart);
 
     proc.on('exit', async () => {
         const sessionDuration = Math.floor((Date.now() - sessionStart) / 1000);
@@ -193,11 +194,18 @@ async function fetchGitHubData() {
     loaderText.textContent = "SYNCING: " + repo;
 
     try {
-        const response = await fetch(`https://api.github.com/repos/${repo}/releases`);
-        if (!response.ok) throw new Error("Rate Limited");
+        const [relRes, commRes] = await Promise.all([
+            fetch(`https://api.github.com/repos/${repo}/releases`),
+            fetch(`https://api.github.com/repos/${repo}/commits`)
+        ]);
 
-        releasesData = await response.json();
+        if (!relRes.ok || !commRes.ok) throw new Error("Rate Limited or API Error");
+
+        releasesData = await relRes.json();
+        commitsData = await commRes.json();
+
         populateVersions();
+        populateUpdatesSidebar();
 
         setTimeout(() => {
             loader.style.opacity = '0';
@@ -232,6 +240,35 @@ function populateVersions() {
     });
     currentReleaseIndex = 0;
     updatePlayButtonText();
+}
+
+function populateUpdatesSidebar() {
+    const list = document.getElementById('updates-list');
+    list.innerHTML = '';
+
+    if (commitsData.length === 0) {
+        list.innerHTML = '<div class="update-item">No recent activity found.</div>';
+        return;
+    }
+
+    // Show the last 20 commits
+    commitsData.slice(0, 20).forEach((c) => {
+        const item = document.createElement('div');
+        item.className = 'update-item patch-note-card commit-card';
+
+        const date = new Date(c.commit.author.date).toLocaleString();
+        const shortSha = c.sha.substring(0, 7);
+        const message = c.commit.message;
+
+        item.innerHTML = `
+            <div class="pn-header">
+                <span class="update-date">${date}</span>
+                <span class="commit-sha">#${shortSha}</span>
+            </div>
+            <div class="pn-body commit-msg">${message}</div>
+        `;
+        list.appendChild(item);
+    });
 }
 
 function updateSelectedRelease() {
@@ -311,6 +348,48 @@ async function promptUpdate(newTag) {
     });
 }
 
+// Manual trigger for checking updates via UI button
+async function checkForUpdatesManual() {
+    // If we have releases data loaded, allow reinstall/update flow regardless of current tag
+    const rel = releasesData[currentReleaseIndex];
+    if (!rel) {
+        showToast("No releases loaded yet");
+        return;
+    }
+
+    const asset = rel.assets.find(a => a.name === TARGET_FILE);
+    if (!asset) {
+        showToast("ZIP Asset missing in this version!");
+        return;
+    }
+
+    const installedTag = await Store.get('installed_version_tag', 'Unknown');
+    // Prompt user to update/install; Update path will reinstall (delete existing LegacyClient)
+    const choice = await promptUpdate(rel.tag_name);
+    if (choice === 'update') {
+        // Delete existing LegacyClient folder if present to ensure clean install
+        try {
+            const extractDir = require('path').join(require('os').homedir(), 'Documents', 'LegacyClient');
+            if (require('fs').existsSync(extractDir)) {
+                require('fs').rmSync(extractDir, { recursive: true, force: true });
+            }
+        } catch (e) {
+            // ignore cleanup errors
+        }
+        // Re-download and install (and launch, as install flow does)
+        setProcessingState(true);
+        await handleElectronFlow(asset.browser_download_url);
+        setProcessingState(false);
+    } else {
+        // User chose to launch existing/older version
+        setProcessingState(true);
+        updateProgress(100, "Launching Existing...");
+        await launchLocalClient();
+        setProcessingState(false);
+    }
+    updatePlayButtonText();
+}
+
 async function launchLocalClient() {
     const fullPath = await getInstalledPath();
     
@@ -343,7 +422,7 @@ async function launchLocalClient() {
         const argString = args.map(a => `"${a}"`).join(" ");
         let cmd = `"${fullPath}" ${argString}`;
         
-        if (process.platform === 'linux') {
+        if (process.platform === 'linux' || process.platform === 'darwin') {
             if (compat === 'wine64' || compat === 'wine') {
                 cmd = `${compat} "${fullPath}" ${argString}`;
             } else if (compat.includes('Proton')) {
@@ -396,9 +475,9 @@ function updateProgress(percent, text) {
 async function handleElectronFlow(url) {
     try {
         const homeDir = require('os').homedir();
-        const downloadDir = path.join(homeDir, 'Downloads');
-        const zipPath = path.join(downloadDir, TARGET_FILE);
-        const extractDir = path.join(downloadDir, 'LegacyClient');
+        const docDir = path.join(homeDir, 'Documents');
+        const zipPath = path.join(docDir, TARGET_FILE);
+        const extractDir = path.join(docDir, 'LegacyClient');
 
         updateProgress(5, "Downloading " + TARGET_FILE + "...");
         await downloadFile(url, zipPath);
@@ -434,6 +513,11 @@ function downloadFile(url, destPath) {
         const dir = path.dirname(destPath);
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
+        }
+
+        // Always re-download by removing any existing file first
+        if (fs.existsSync(destPath)) {
+            try { fs.unlinkSync(destPath); } catch (e) { /* ignore */ }
         }
 
         const file = fs.createWriteStream(destPath);
@@ -563,3 +647,185 @@ window.toggleOptions = toggleOptions;
 window.saveOptions = saveOptions;
 window.saveProfile = saveProfile;
 window.updateCompatDisplay = updateCompatDisplay;
+window.checkForUpdatesManual = checkForUpdatesManual;
+
+// Gamepad Controller Support
+const GamepadManager = {
+    active: false,
+    focusedIndex: 0,
+    currentGroup: 'main',
+    lastA: false,
+    lastUp: false,
+    lastDown: false,
+    lastLeft: false,
+    lastRight: false,
+    groups: {
+        main: ['btn-play-main', 'version-select-box', 'btn-profile', 'btn-options'],
+        options: ['repo-input', 'exec-input', 'compat-select-box', 'ip-input', 'port-input', 'server-checkbox', 'btn-options-done', 'btn-options-cancel'],
+        profile: ['username-input', 'btn-profile-save', 'btn-profile-cancel'],
+        update: ['btn-confirm-update', 'btn-skip-update']
+    },
+
+    init() {
+        window.addEventListener("gamepadconnected", (e) => {
+            console.log("Gamepad connected:", e.gamepad.id);
+            if (!this.active) {
+                this.active = true;
+                this.startLoop();
+                showToast("Controller Connected");
+            }
+        });
+
+        // Check for already connected gamepad
+        const gamepads = navigator.getGamepads();
+        if (gamepads[0]) {
+            this.active = true;
+            this.startLoop();
+        }
+    },
+
+    startLoop() {
+        const loop = () => {
+            this.poll();
+            requestAnimationFrame(loop);
+        };
+        loop();
+    },
+
+    poll() {
+        const gamepads = navigator.getGamepads();
+        const gp = gamepads[0]; // Use first controller
+        if (!gp) return;
+
+        // Determine current group based on visible modals
+        if (document.getElementById('update-modal').style.display === 'flex') {
+            if (this.currentGroup !== 'update') { this.currentGroup = 'update'; this.focusedIndex = 0; }
+        } else if (document.getElementById('options-modal').style.display === 'flex') {
+            if (this.currentGroup !== 'options') { this.currentGroup = 'options'; this.focusedIndex = 0; }
+        } else if (document.getElementById('profile-modal').style.display === 'flex') {
+            if (this.currentGroup !== 'profile') { this.currentGroup = 'profile'; this.focusedIndex = 0; }
+        } else {
+            if (this.currentGroup !== 'main') { this.currentGroup = 'main'; this.focusedIndex = 0; }
+        }
+
+        const buttons = gp.buttons;
+        const axes = gp.axes;
+
+        // A Button (Button 0)
+        const aPressed = buttons[0].pressed;
+        if (aPressed && !this.lastA) {
+            this.clickFocused();
+        }
+        this.lastA = aPressed;
+
+        // Navigation (D-Pad or Left Stick)
+        const up = buttons[12].pressed || axes[1] < -0.5;
+        const down = buttons[13].pressed || axes[1] > 0.5;
+        const left = buttons[14].pressed || axes[0] < -0.5;
+        const right = buttons[15].pressed || axes[0] > 0.5;
+
+        if (up && !this.lastUp) this.moveFocus(-1);
+        if (down && !this.lastDown) this.moveFocus(1);
+        
+        // Horizontal navigation for side-by-side buttons
+        if (this.currentGroup === 'main' && this.focusedIndex >= 2) {
+            if (left && !this.lastLeft) this.moveFocus(-1);
+            if (right && !this.lastRight) this.moveFocus(1);
+        } else if (this.currentGroup === 'options' && this.focusedIndex >= 6) {
+            if (left && !this.lastLeft) this.moveFocus(-1);
+            if (right && !this.lastRight) this.moveFocus(1);
+        } else if (this.currentGroup === 'profile' && this.focusedIndex >= 1) {
+            if (left && !this.lastLeft) this.moveFocus(-1);
+            if (right && !this.lastRight) this.moveFocus(1);
+        }
+
+        // Special case: Version selection cycling with Left/Right
+        if (this.currentGroup === 'main' && this.focusedIndex === 1) {
+            if (left && !this.lastLeft) this.cycleVersion(-1);
+            if (right && !this.lastRight) this.cycleVersion(1);
+        }
+
+        // Special case: Compatibility selection cycling with Left/Right
+        if (this.currentGroup === 'options' && this.focusedIndex === 2) {
+            if (left && !this.lastLeft) this.cycleCompat(-1);
+            if (right && !this.lastRight) this.cycleCompat(1);
+        }
+
+        this.lastUp = up;
+        this.lastDown = down;
+        this.lastLeft = left;
+        this.lastRight = right;
+
+        this.updateVisualFocus();
+    },
+
+    moveFocus(dir) {
+        const group = this.groups[this.currentGroup];
+        // Skip hidden elements (like compat-select-box on Windows)
+        let nextIndex = (this.focusedIndex + dir + group.length) % group.length;
+        let el = document.getElementById(group[nextIndex]);
+        
+        // Safety to prevent infinite loop if everything is hidden (unlikely)
+        let attempts = 0;
+        while ((!el || el.offsetParent === null) && attempts < group.length) {
+            nextIndex = (nextIndex + dir + group.length) % group.length;
+            el = document.getElementById(group[nextIndex]);
+            attempts++;
+        }
+        
+        this.focusedIndex = nextIndex;
+    },
+
+    cycleVersion(dir) {
+        const select = document.getElementById('version-select');
+        if (select && select.options.length > 0) {
+            let newIndex = select.selectedIndex + dir;
+            if (newIndex < 0) newIndex = select.options.length - 1;
+            if (newIndex >= select.options.length) newIndex = 0;
+            select.selectedIndex = newIndex;
+            updateSelectedRelease();
+        }
+    },
+
+    cycleCompat(dir) {
+        const select = document.getElementById('compat-select');
+        if (select && select.options.length > 0) {
+            let newIndex = select.selectedIndex + dir;
+            if (newIndex < 0) newIndex = select.options.length - 1;
+            if (newIndex >= select.options.length) newIndex = 0;
+            select.selectedIndex = newIndex;
+            updateCompatDisplay();
+        }
+    },
+
+    updateVisualFocus() {
+        const group = this.groups[this.currentGroup];
+        group.forEach((id, idx) => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (idx === this.focusedIndex) {
+                    el.classList.add('focused');
+                    if (el.tagName === 'INPUT') el.focus();
+                } else {
+                    el.classList.remove('focused');
+                    if (el.tagName === 'INPUT') el.blur();
+                }
+            }
+        });
+    },
+
+    clickFocused() {
+        const group = this.groups[this.currentGroup];
+        const id = group[this.focusedIndex];
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.tagName === 'INPUT' && el.type === 'checkbox') {
+                el.checked = !el.checked;
+            } else {
+                el.click();
+            }
+        }
+    }
+};
+
+GamepadManager.init();
