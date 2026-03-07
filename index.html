@@ -35,7 +35,10 @@
         </div>
 
         <div class="content-area">
-            <img src="minecraftlogo.png" class="mc-logo-img" alt="Minecraft Logo">
+            <div class="relative">
+                <img src="minecraftlogo.png" class="mc-logo-img" alt="Minecraft Logo">
+                <div id="splash-text" class="splash-text">Splash!</div>
+            </div>
     
             <div id="btn-play-main" class="btn-mc btn-play nav-item" onclick="launchGame()" tabindex="0">PLAY</div>
     
@@ -69,7 +72,7 @@
     </div>
 
     <div class="modal-overlay" id="servers-modal">
-        <div class="modal-box" style="width: 850px;">
+        <div class="modal-box">
             <div class="modal-title">CUSTOM SERVERS</div>
 
             <div id="servers-list-container" class="w-full max-h-[300px] overflow-y-auto mb-6 border-2 border-[#555] bg-black p-2">
@@ -103,6 +106,15 @@
     <div class="modal-overlay" id="options-modal">
         <div class="modal-box">
             <div class="modal-title">LAUNCHER OPTIONS</div>
+
+            <div class="mc-input-group">
+                <label class="mc-label">Installation Directory:</label>
+                <div class="flex gap-2 mb-2">
+                    <input type="text" id="install-path-input" class="mc-input nav-item !mb-0" placeholder="Default: Documents/LegacyClient" tabindex="0">
+                    <div class="btn-mc btn-mini nav-item !w-[60px] !h-[48px]" onclick="browseInstallDir()" tabindex="0">...</div>
+                </div>
+                <div class="btn-mc w-full !h-[40px] !text-lg !mb-0 nav-item" onclick="openGameDir()" tabindex="0">OPEN FOLDER</div>
+            </div>
 
             <div class="mc-input-group">
                 <label class="mc-label">GitHub Repository Source:</label>
@@ -174,10 +186,7 @@
     <div class="modal-overlay" id="update-modal">
         <div class="modal-box relative">
             <div class="modal-close-btn" id="btn-close-update">×</div>
-            <div class="modal-title">UPDATE AVAILABLE</div>
-            <div id="update-modal-text" class="modal-body-text">
-                A new version is available. Would you like to update now?
-            </div>
+            <div id="update-modal-text" class="modal-body-text" style="display: none; margin-bottom: 20px;"></div>
             <div class="flex gap-4 w-full">
                 <div class="btn-mc flex-grow nav-item" id="btn-confirm-update">UPDATE NOW</div>
                 <div class="btn-mc flex-grow nav-item" id="btn-skip-update">LATER</div>
@@ -186,6 +195,10 @@
     </div>
 
     <div id="toast">NOTIFICATION</div>
+
+    <div id="music-toggle" class="music-btn nav-item" onclick="toggleMusic()" title="Toggle Music" tabindex="0">
+        <span id="music-icon">♪</span>
+    </div>
 
     <script src="renderer.js"></script>
 </body>

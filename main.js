@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, ipcMain } = require('electron');
+const { app, BrowserWindow, shell, ipcMain, dialog } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
 const fs = require('fs');
@@ -41,6 +41,13 @@ function createWindow() {
 
   ipcMain.handle('store-get', (event, key) => store.get(key));
   ipcMain.handle('store-set', (event, key, value) => store.set(key, value));
+  
+  ipcMain.handle('select-directory', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory', 'createDirectory']
+    });
+    return result.filePaths[0];
+  });
  
   win.on('maximize', () => win.webContents.send('window-is-maximized', true));
   win.on('unmaximize', () => win.webContents.send('window-is-maximized', false));

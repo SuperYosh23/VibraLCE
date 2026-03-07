@@ -24,6 +24,9 @@ const Store = {
     },
     async set(key, value) {
         return await ipcRenderer.invoke('store-set', key, value);
+    },
+    async selectDirectory() {
+        return await ipcRenderer.invoke('select-directory');
     }
 };
 
@@ -293,6 +296,110 @@ const GamepadManager = {
     }
 };
 
+// Music Player logic
+const MusicManager = {
+    audio: new Audio(),
+    playlist: [],
+    currentIndex: -1,
+    enabled: false,
+
+    async init() {
+        this.enabled = await Store.get('legacy_music_enabled', true);
+        this.updateIcon();
+        this.audio.volume = 1.0;
+        this.audio.onended = () => this.playNext();
+        if (this.enabled) {
+            this.start();
+        }
+    },
+
+    async scan() {
+        try {
+            const installDir = await getInstallDir();
+            // Path provided by user: root of games folder in music/music
+            const musicPath = path.join(installDir, 'music', 'music');
+            
+            if (fs.existsSync(musicPath)) {
+                const files = fs.readdirSync(musicPath);
+                this.playlist = files
+                    .filter(f => f.toLowerCase().endsWith('.ogg'))
+                    .map(f => path.join(musicPath, f));
+                
+                // Shuffle playlist
+                for (let i = this.playlist.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.playlist[i], this.playlist[j]] = [this.playlist[j], this.playlist[i]];
+                }
+                console.log(`MusicManager: Loaded ${this.playlist.length} tracks.`);
+                return this.playlist.length > 0;
+            } else {
+                console.log("MusicManager: music/music folder not found yet.");
+            }
+        } catch (e) {
+            console.error("Music scan error:", e);
+        }
+        return false;
+    },
+
+    async start() {
+        if (this.playlist.length === 0) {
+            const success = await this.scan();
+            if (!success) return;
+        }
+        if (this.playlist.length > 0 && this.audio.paused) {
+            this.playNext();
+        }
+    },
+
+    playNext() {
+        if (!this.enabled || this.playlist.length === 0) return;
+        
+        let nextIndex;
+        if (this.playlist.length > 1) {
+            // Keep picking until we get a different track
+            do {
+                nextIndex = Math.floor(Math.random() * this.playlist.length);
+            } while (nextIndex === this.currentIndex);
+        } else {
+            nextIndex = 0;
+        }
+        
+        this.currentIndex = nextIndex;
+        this.audio.src = `file://${this.playlist[this.currentIndex]}`;
+        this.audio.play().catch(e => {
+            console.error("Audio playback error:", e);
+            // If failed, try next one
+            setTimeout(() => this.playNext(), 1000);
+        });
+    },
+
+    stop() {
+        this.audio.pause();
+        this.audio.currentTime = 0;
+    },
+
+    async toggle() {
+        this.enabled = !this.enabled;
+        await Store.set('legacy_music_enabled', this.enabled);
+        this.updateIcon();
+        if (this.enabled) {
+            this.start();
+        } else {
+            this.stop();
+        }
+    },
+
+    updateIcon() {
+        const btn = document.getElementById('music-toggle');
+        if (!btn) return;
+        if (this.enabled) {
+            btn.classList.remove('muted');
+        } else {
+            btn.classList.add('muted');
+        }
+    }
+};
+
 window.onload = async () => {
     document.getElementById('repo-input').value = await Store.get('legacy_repo', DEFAULT_REPO);
     document.getElementById('exec-input').value = await Store.get('legacy_exec_path', DEFAULT_EXEC);
@@ -300,6 +407,9 @@ window.onload = async () => {
     document.getElementById('ip-input').value = await Store.get('legacy_ip', "");
     document.getElementById('port-input').value = await Store.get('legacy_port', "");
     document.getElementById('server-checkbox').checked = await Store.get('legacy_is_server', false);
+    
+    const installDir = await getInstallDir();
+    document.getElementById('install-path-input').value = installDir;
     
     if (process.platform === 'linux' || process.platform === 'darwin') {
         document.getElementById('compat-option-container').style.display = 'block';
@@ -315,46 +425,99 @@ window.onload = async () => {
 
     fetchGitHubData();
     checkForLauncherUpdates();
+    loadSplashText();
+    MusicManager.init();
     GamepadManager.init();
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'F9') {
+            checkForLauncherUpdates(true);
+        }
+    });
 };
 
-async function checkForLauncherUpdates() {
+async function loadSplashText() {
+    const splashEl = document.getElementById('splash-text');
+    if (!splashEl) return;
+
+    try {
+        const filePath = path.join(__dirname, 'strings.txt');
+        if (fs.existsSync(filePath)) {
+            const content = fs.readFileSync(filePath, 'utf-8');
+            const lines = content.split('\n').map(l => l.trim()).filter(l => l !== '');
+            if (lines.length > 0) {
+                const randomSplash = lines[Math.floor(Math.random() * lines.length)];
+                splashEl.textContent = randomSplash;
+            }
+        }
+    } catch (e) {
+        console.error("Failed to load splash text:", e);
+        splashEl.textContent = "Welcome!";
+    }
+}
+
+function isNewerVersion(latest, current) {
+    const lParts = latest.split('.').map(Number);
+    const cParts = current.split('.').map(Number);
+    for (let i = 0; i < Math.max(lParts.length, cParts.length); i++) {
+        const l = lParts[i] || 0;
+        const c = cParts[i] || 0;
+        if (l > c) return true;
+        if (l < c) return false;
+    }
+    return false;
+}
+
+async function checkForLauncherUpdates(manual = false) {
     try {
         const currentVersion = require('./package.json').version;
         const res = await fetch(`https://api.github.com/repos/${LAUNCHER_REPO}/releases/latest`);
-        if (!res.ok) return;
+        if (!res.ok) {
+            if (manual) showToast("Could not check for updates.");
+            return;
+        }
         
         const latestRelease = await res.json();
         const latestVersion = latestRelease.tag_name.replace('v', '');
         
-        if (latestVersion !== currentVersion) {
-            const updateConfirmed = await promptLauncherUpdate(latestRelease.tag_name);
+        if (isNewerVersion(latestVersion, currentVersion)) {
+            const updateConfirmed = await promptLauncherUpdate(latestRelease.tag_name, latestRelease.body);
             if (updateConfirmed) {
                 downloadAndInstallLauncherUpdate(latestRelease);
             }
+        } else if (manual) {
+            showToast("Launcher is up to date!");
         }
     } catch (e) {
         console.error("Launcher update check failed:", e);
+        if (manual) showToast("Update check failed.");
     }
 }
 
-async function promptLauncherUpdate(version) {
+async function promptLauncherUpdate(version, changelog) {
     return new Promise((resolve) => {
         const modal = document.getElementById('update-modal');
         const confirmBtn = document.getElementById('btn-confirm-update');
         const skipBtn = document.getElementById('btn-skip-update');
         const closeBtn = document.getElementById('btn-close-update');
+        const modalText = document.getElementById('update-modal-text');
 
-        document.getElementById('update-modal-text').innerHTML = 
-            `A new Launcher version <b>${version}</b> is available.<br><br>` +
-            `Would you like to download and install it now?`;
+        if (modalText) {
+            modalText.innerHTML = `<span class="update-tag">NEW UPDATE: v${version}</span><br>` +
+                                 `<div class="pn-body" style="font-size: 16px; max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; margin-top: 5px;">${changelog || "No changelog provided."}</div>`;
+            modalText.style.display = 'block';
+        }
 
+        document.activeElement?.blur();
         modal.style.display = 'flex';
         modal.style.opacity = '1';
 
         const cleanup = (result) => {
             modal.style.opacity = '0';
-            setTimeout(() => modal.style.display = 'none', 300);
+            setTimeout(() => {
+                modal.style.display = 'none';
+                if (modalText) modalText.style.display = 'none';
+            }, 300);
             confirmBtn.onclick = null;
             skipBtn.onclick = null;
             closeBtn.onclick = null;
@@ -474,10 +637,32 @@ function updateCompatDisplay() {
     }
 }
 
-async function getInstalledPath() {
+async function getInstallDir() {
     const homeDir = require('os').homedir();
+    const defaultPath = path.join(homeDir, 'Documents', 'LegacyClient');
+    return await Store.get('legacy_install_path', defaultPath);
+}
+
+async function browseInstallDir() {
+    const dir = await Store.selectDirectory();
+    if (dir) {
+        document.getElementById('install-path-input').value = dir;
+    }
+}
+
+async function openGameDir() {
+    const dir = await getInstallDir();
+    if (fs.existsSync(dir)) {
+        shell.openPath(dir);
+    } else {
+        showToast("Directory does not exist yet!");
+    }
+}
+
+async function getInstalledPath() {
+    const installDir = await getInstallDir();
     const execPath = await Store.get('legacy_exec_path', DEFAULT_EXEC);
-    return path.join(homeDir, 'Documents', 'LegacyClient', execPath);
+    return path.join(installDir, execPath);
 }
 
 async function checkIsInstalled(tag) {
@@ -525,16 +710,19 @@ async function monitorProcess(proc) {
     if (!proc) return;
     const sessionStart = Date.now();
     setGameRunning(true);
+    MusicManager.stop();
 
     proc.on('exit', async () => {
         const sessionDuration = Math.floor((Date.now() - sessionStart) / 1000);
         const playtime = await Store.get('legacy_playtime', 0);
         await Store.set('legacy_playtime', playtime + sessionDuration);
         setGameRunning(false);
+        if (MusicManager.enabled) MusicManager.start();
     });
     proc.on('error', (err) => {
         console.error("Process error:", err);
         setGameRunning(false);
+        if (MusicManager.enabled) MusicManager.start();
     });
 }
 
@@ -691,19 +879,18 @@ async function promptUpdate(newTag) {
         const confirmBtn = document.getElementById('btn-confirm-update');
         const skipBtn = document.getElementById('btn-skip-update');
         const closeBtn = document.getElementById('btn-close-update');
-        const installedTag = await Store.get('installed_version_tag', "Unknown");
+        const modalText = document.getElementById('update-modal-text');
 
-        document.getElementById('update-modal-text').innerHTML = 
-            `New version <b>${newTag}</b> is available.<br><br>` +
-            `Currently installed: <b>${installedTag}</b>.<br><br>` +
-            `Would you like to update now?`;
-
+        document.activeElement?.blur();
         modal.style.display = 'flex';
         modal.style.opacity = '1';
 
         const cleanup = (result) => {
             modal.style.opacity = '0';
-            setTimeout(() => modal.style.display = 'none', 300);
+            setTimeout(() => {
+                modal.style.display = 'none';
+                if (modalText) modalText.style.display = 'none';
+            }, 300);
             confirmBtn.onclick = null;
             skipBtn.onclick = null;
             closeBtn.onclick = null;
@@ -836,10 +1023,10 @@ function updateProgress(percent, text) {
 async function handleElectronFlow(url) {
     try {
         const homeDir = require('os').homedir();
-        const docDir = path.join(homeDir, 'Documents');
-        const zipPath = path.join(docDir, TARGET_FILE);
-        const extractDir = path.join(docDir, 'LegacyClient');
-        const backupDir = path.join(docDir, 'LegacyClient_Backup');
+        const extractDir = await getInstallDir();
+        const parentDir = path.dirname(extractDir);
+        const zipPath = path.join(parentDir, TARGET_FILE);
+        const backupDir = path.join(parentDir, 'LegacyClient_Backup');
 
         updateProgress(5, "Downloading " + TARGET_FILE + "...");
         await downloadFile(url, zipPath);
@@ -882,6 +1069,10 @@ async function handleElectronFlow(url) {
         }
         
         await extractZip(zipPath, { dir: extractDir });
+
+        // Refresh music playlist if it was empty
+        await MusicManager.scan();
+        if (MusicManager.enabled) MusicManager.start();
 
         // Restore preserved files
         if (fs.existsSync(backupDir)) {
@@ -1144,6 +1335,48 @@ async function saveOptions() {
     const ip = document.getElementById('ip-input').value.trim();
     const port = document.getElementById('port-input').value.trim();
     const isServer = document.getElementById('server-checkbox').checked;
+    const newInstallPath = document.getElementById('install-path-input').value.trim();
+
+    const oldInstallPath = await getInstallDir();
+    if (newInstallPath && newInstallPath !== oldInstallPath) {
+        // Move preserved files to new directory if they exist in old but not in new
+        if (fs.existsSync(oldInstallPath)) {
+            const preserveList = [
+                'options.txt',
+                'servers.txt',
+                'username.txt',
+                'settings.dat',
+                'UID.dat',
+                path.join('Windows64', 'GameHDD')
+            ];
+
+            if (!fs.existsSync(newInstallPath)) {
+                fs.mkdirSync(newInstallPath, { recursive: true });
+            }
+
+            for (const item of preserveList) {
+                const src = path.join(oldInstallPath, item);
+                const dest = path.join(newInstallPath, item);
+                
+                if (fs.existsSync(src)) {
+                    const destDir = path.dirname(dest);
+                    if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
+                    
+                    // Simple move; if cross-device it might fail, but let's try
+                    try {
+                        if (!fs.existsSync(dest)) {
+                            fs.renameSync(src, dest);
+                        } else {
+                            console.log("Dest already exists, skipping move for: " + item);
+                        }
+                    } catch (e) {
+                        console.error("Migration error for " + item + ": " + e.message);
+                    }
+                }
+            }
+        }
+        await Store.set('legacy_install_path', newInstallPath);
+    }
 
     if (newRepo) await Store.set('legacy_repo', newRepo);
     if (newExec) await Store.set('legacy_exec_path', newExec);
@@ -1180,6 +1413,10 @@ function showToast(msg) {
     }, 3000);
 }
 
+async function toggleMusic() {
+    await MusicManager.toggle();
+}
+
 // Global functions for HTML onclick
 window.minimizeWindow = minimizeWindow;
 window.toggleMaximize = toggleMaximize;
@@ -1195,3 +1432,6 @@ window.saveOptions = saveOptions;
 window.saveProfile = saveProfile;
 window.updateCompatDisplay = updateCompatDisplay;
 window.checkForUpdatesManual = checkForUpdatesManual;
+window.browseInstallDir = browseInstallDir;
+window.openGameDir = openGameDir;
+window.toggleMusic = toggleMusic;

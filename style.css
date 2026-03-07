@@ -255,11 +255,33 @@ body {
     height: 100%;
 }
 
+.splash-text {
+    position: absolute;
+    top: 45%;
+    left: 90%;
+    width: fit-content;
+    color: #ffff00;
+    font-size: 20px;
+    text-shadow: 2px 2px 0 #3f3f00;
+    transform: translate(-50%, -50%) rotate(-20deg);
+    animation: splashBounce 0.2s infinite alternate ease-in-out;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 5;
+    text-align: center;
+}
+
+@keyframes splashBounce {
+    from { transform: translate(-50%, -50%) rotate(-20deg) scale(1); }
+    to { transform: translate(-50%, -50%) rotate(-20deg) scale(1.1); }
+}
+
 .mc-logo-img {
     width: 650px;
     max-width: 95%;
     filter: drop-shadow(6px 6px 0px rgba(0,0,0,0.6));
-    margin-bottom: 50px;
+    margin-top: -40px;
+    margin-bottom: 70px;
     transition: transform 0.3s ease;
 }
 
@@ -435,22 +457,38 @@ body {
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 150;
+    z-index: 2000;
     backdrop-filter: blur(4px);
 }
 
 .modal-box {
-    width: 750px;
-    max-width: 95%;
+    width: 60vw;
+    max-width: 850px;
+    min-width: 600px;
+    max-height: 85vh;
     background: var(--mc-gui-bg);
     border: 4px solid #000;
-    padding: 50px;
+    padding: clamp(20px, 4vw, 50px);
     display: flex;
     flex-direction: column;
     align-items: center;
     box-shadow: inset 4px 4px 0 #fff;
     animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
+    overflow-y: auto;
+}
+
+.modal-box::-webkit-scrollbar {
+    width: 10px;
+}
+
+.modal-box::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+}
+
+.modal-box::-webkit-scrollbar-thumb {
+    background: #888;
+    border: 2px solid var(--mc-gui-bg);
 }
 
 .modal-close-btn {
@@ -569,6 +607,39 @@ body {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+.music-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    background: var(--mc-button-bg);
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: inset -2px -2px 0 #333, inset 2px 2px 0 #aaa;
+    z-index: 1000;
+    color: #fff;
+    font-size: 24px;
+    padding-bottom: 4px;
+}
+
+.music-btn:hover:not(.disabled) {
+    background-color: var(--mc-button-hover);
+    outline: 2px solid #fff;
+}
+
+.music-btn.muted {
+    opacity: 0.6;
+    background: #444;
+}
+
+.music-btn.muted #music-icon {
+    text-decoration: line-through;
 }
 
 #toast {
