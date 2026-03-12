@@ -33,7 +33,6 @@ jobs:
           name: linux-dist
           path: dist/*.AppImage
           if-no-files-found: error
-
   build-windows:
     name: Build Windows Installer
     runs-on: windows-latest
@@ -59,7 +58,6 @@ jobs:
             dist/*.exe
             dist/*.msi
           if-no-files-found: error
-
   build-mac:
     name: Build macOS DMG (Apple Silicon)
     runs-on: macos-latest
@@ -83,10 +81,9 @@ jobs:
           name: mac-dist
           path: dist/*.dmg
           if-no-files-found: error
-
   build-mac-intel:
     name: Build macOS DMG (Intel)
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -98,7 +95,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build macOS DMG (Intel)
-        run: npm run dist:mac
+        run: npm run dist:mac -- --x64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload macOS Intel artifact
@@ -107,7 +104,6 @@ jobs:
           name: mac-intel-dist
           path: dist/*.dmg
           if-no-files-found: error
-
   release:
     name: Create GitHub Release
     needs: [build-linux, build-windows, build-mac, build-mac-intel]
