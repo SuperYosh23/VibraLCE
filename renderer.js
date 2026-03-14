@@ -566,6 +566,7 @@ async function migrateLegacyConfig() {
             ip: ip,
             port: port,
             isServer: isServer,
+            fullscreen: false,
             compatLayer: compat,
             installPath: installDir,
             installedTag: installedTag
@@ -694,6 +695,8 @@ window.onload = async () => {
         if (ipInput) ipInput.value = currentInstance.ip;
         if (portInput) portInput.value = currentInstance.port;
         if (serverCheck) serverCheck.checked = currentInstance.isServer;
+        const fullscreenCheck = document.getElementById('fullscreen-checkbox');
+        if (fullscreenCheck) fullscreenCheck.checked = currentInstance.fullscreen || false;
         if (installInput) installInput.value = currentInstance.installPath;
         if (controllerLayoutSelect) controllerLayoutSelect.value = await Store.get('legacy_controller_layout_mode', 'auto');
         initControllerLayoutPresets();
@@ -882,6 +885,7 @@ async function saveNewInstance() {
         ip: "",
         port: "",
         isServer: false,
+        fullscreen: false,
         compatLayer: 'direct',
         installPath: installPath,
         installedTag: null
@@ -907,6 +911,8 @@ async function switchInstance(id) {
     document.getElementById('ip-input').value = currentInstance.ip;
     document.getElementById('port-input').value = currentInstance.port;
     document.getElementById('server-checkbox').checked = currentInstance.isServer;
+    const fullscreenCheck = document.getElementById('fullscreen-checkbox');
+    if (fullscreenCheck) fullscreenCheck.checked = currentInstance.fullscreen || false;
     document.getElementById('install-path-input').value = currentInstance.installPath;
     
     if (process.platform === 'linux' || process.platform === 'darwin') {
@@ -1367,9 +1373,11 @@ async function launchLocalClient() {
         const ip = currentInstance.ip;
         const port = currentInstance.port;
         const isServer = currentInstance.isServer;
+        const fullscreen = currentInstance.fullscreen;
         let args = [];
         if (username) args.push("-name", username);
         if (isServer) args.push("-server");
+        if (fullscreen) args.push("-fullscreen");
         if (ip) args.push("-ip", ip);
         if (port) args.push("-port", port);
         const argString = args.map(a => `"${a}"`).join(" ");
@@ -1629,6 +1637,7 @@ async function saveOptions() {
     const ip = document.getElementById('ip-input').value.trim();
     const port = document.getElementById('port-input').value.trim();
     const isServer = document.getElementById('server-checkbox').checked;
+    const fullscreen = document.getElementById('fullscreen-checkbox')?.checked || false;
     const customProtonPath = document.getElementById('custom-proton-path').value.trim();
     const newInstallPath = document.getElementById('install-path-input').value.trim();
     const oldInstallPath = currentInstance.installPath;
@@ -1645,7 +1654,9 @@ async function saveOptions() {
     }
     if (newRepo) currentInstance.repo = newRepo;
     if (newExec) currentInstance.execPath = newExec;
-    currentInstance.ip = ip; currentInstance.port = port; currentInstance.isServer = isServer;
+    currentInstance.ip = ip; currentInstance.port = port; 
+    currentInstance.isServer = isServer;
+    currentInstance.fullscreen = fullscreen;
     if (compatSelect) {
         currentInstance.compatLayer = compatSelect.value;
         currentInstance.customCompatPath = customProtonPath;
