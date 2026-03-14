@@ -22,7 +22,7 @@
     <div id="loader">
         <div class="loader-content">
             <div class="loader-spinner"></div>
-            <div id="loader-text">CONNECTING...</div>
+            <div id="loader-text"><span id="loader-text-label">CONNECTING</span><span class="loading-dots animate" id="loader-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></div>
         </div>
     </div>
 
@@ -86,13 +86,19 @@
             <div class="skin-column" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; min-width: 300px; padding-right: 0px;">
                 <div id="main-skin-viewer" style="width: 100%; height: 500px; cursor: grab; display: flex; align-items: center; justify-content: center;"></div>
                 
-                <div class="btn-mc nav-item" onclick="openSkinManager()" style="width: 250px; height: 48px; font-size: 20px; margin-top: -20px; z-index: 10; margin-left: auto; margin-right: auto;" tabindex="0">
-                    CHANGE SKIN
+                <div class="skin-action-row" style="margin-top: -20px; z-index: 10; margin-left: auto; margin-right: auto;">
+                    <div class="btn-mc nav-item skin-action-btn skin-action-btn-main" onclick="openSkinManager()" tabindex="0">
+                        CHANGE SKIN
+                    </div>
+                    <div id="btn-skin-render-mode" class="btn-mc nav-item skin-action-btn skin-action-btn-mode" onclick="toggleMainSkinRenderMode()" tabindex="0">3D</div>
                 </div>
             </div>
             
             <div class="progress-container" id="progress-container">
-                <div class="progress-text" id="progress-text">Downloading...</div>
+                <div class="progress-text-wrap" id="progress-text-wrap">
+                    <span class="loader-spinner progress-spinner" id="progress-spinner" aria-hidden="true"></span>
+                    <div class="progress-text" id="progress-text"><span id="progress-text-label">Downloading</span><span class="loading-dots" id="progress-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span><span id="progress-text-suffix"></span></div>
+                </div>
                 <div class="progress-bar-bg">
                     <div class="progress-bar-fill" id="progress-bar-fill"></div>
                 </div>
