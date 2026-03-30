@@ -85,6 +85,9 @@ const GamepadManager = {
     },
 
     poll() {
+        // Disable controller input when game is running
+        if (isGameRunning) return;
+        
         const gamepads = navigator.getGamepads();
         let gp = null;
         for (let i = 0; i < gamepads.length; i++) {
@@ -252,23 +255,6 @@ const GamepadManager = {
             active.classList.add('active-bump');
             setTimeout(() => active.classList.remove('active-bump'), 100);
 
-            if (active.id === 'version-select-box') {
-                this.cycleActiveSelection(1);
-                return;
-            }
-            if (active.id === 'classic-version-select-box') {
-                const classicSelect = document.getElementById('classic-version-select');
-                if (classicSelect) {
-                    classicSelect.selectedIndex = (classicSelect.selectedIndex + 1) % classicSelect.options.length;
-                    syncVersionFromClassic();
-                }
-                return;
-            }
-            if (active.id === 'compat-select-box') {
-                this.cycleActiveSelection(1);
-                return;
-            }
-
             if (active.tagName === 'INPUT' && active.type === 'checkbox') {
                 active.checked = !active.checked;
                 active.dispatchEvent(new Event('change'));
@@ -303,16 +289,7 @@ const GamepadManager = {
 
     cycleActiveSelection(dir) {
         const active = document.activeElement;
-        if (active && active.id === 'version-select-box') {
-            const select = document.getElementById('version-select');
-            if (select) {
-                let newIdx = select.selectedIndex + dir;
-                if (newIdx < 0) newIdx = select.options.length - 1;
-                if (newIdx >= select.options.length) newIdx = 0;
-                select.selectedIndex = newIdx;
-                updateSelectedRelease();
-            }
-        } else if (active && active.id === 'compat-select-box') {
+        if (active && active.id === 'compat-select-box') {
             const select = document.getElementById('compat-select');
             if (select) {
                 let newIdx = select.selectedIndex + dir;
@@ -334,18 +311,12 @@ const GamepadManager = {
     },
 
     scrollActive(val) {
-        const serverList = document.getElementById('servers-list-container');
         const instanceList = document.getElementById('instances-list-container');
         const snapshotList = document.getElementById('snapshots-list-container');
-        if (this.getActiveModal()?.id === 'servers-modal' && serverList) {
-            serverList.scrollTop += val;
-        } else if (this.getActiveModal()?.id === 'instances-modal' && instanceList) {
+        if (this.getActiveModal()?.id === 'instances-modal' && instanceList) {
             instanceList.scrollTop += val;
         } else if (this.getActiveModal()?.id === 'snapshots-modal' && snapshotList) {
             snapshotList.scrollTop += val;
-        } else if (!this.getActiveModal()) {
-            const sidebar = document.getElementById('updates-list')?.parentElement;
-            if (sidebar) sidebar.scrollTop += val;
         }
     }
 };
@@ -599,14 +570,12 @@ function isSteamDeckEnvironment() {
 }
 
 function focusPrimaryPlayButton() {
-    const classicPlayBtn = document.getElementById('classic-btn-play');
     const mainPlayBtn = document.getElementById('btn-play-main');
-    const target = (classicPlayBtn && classicPlayBtn.offsetParent !== null) ? classicPlayBtn : mainPlayBtn;
-    if (!target) return;
+    if (!mainPlayBtn) return;
 
-    target.focus();
-    target.classList.add('controller-active');
-    setTimeout(() => target.classList.remove('controller-active'), 180);
+    mainPlayBtn.focus();
+    mainPlayBtn.classList.add('controller-active');
+    setTimeout(() => mainPlayBtn.classList.remove('controller-active'), 180);
 }
 
 function syncRepoPresetFromInput() {
@@ -719,7 +688,6 @@ window.onload = async () => {
         });
 
         // Initialize features
-        await loadTheme();
         await loadSteamDeckMode();
         await loadControllerLayoutMode();
         fetchGitHubData();
@@ -1048,7 +1016,6 @@ async function checkIsInstalled(tag) {
 
 async function updatePlayButtonText() {
     const btn = document.getElementById('btn-play-main');
-    const classicBtn = document.getElementById('classic-btn-play');
     if (!btn || isProcessing) return;
 
     let label, disabled, running;
@@ -1078,12 +1045,9 @@ async function updatePlayButtonText() {
         }
     }
 
-    [btn, classicBtn].forEach(b => {
-        if (!b) return;
-        b.textContent = label;
-        b.classList.toggle('running', running);
-        if (disabled) b.classList.add('disabled'); else b.classList.remove('disabled');
-    });
+    btn.textContent = label;
+    btn.classList.toggle('running', running);
+    if (disabled) btn.classList.add('disabled'); else btn.classList.remove('disabled');
 }
 
 function setGameRunning(running) {
@@ -1160,11 +1124,10 @@ async function fetchGitHubData() {
 
         if (!relRes.ok || !commRes.ok) throw new Error("Rate Limited or API Error");
 
-        releasesData = await relRes.json();
+        releasesData = (await relRes.json()).filter(rel => rel.tag_name !== 'nightly-dedicated-server');
         commitsData = await commRes.json();
 
         populateVersions();
-        populateUpdatesSidebar();
 
         setTimeout(hideLoader, 500);
     } catch (err) {
@@ -1184,7 +1147,6 @@ function handleOfflineData() {
     releasesData = [];
     commitsData = [];
     populateVersions();
-    populateUpdatesSidebar();
 }
 
 function populateVersions() {
@@ -1216,35 +1178,7 @@ function populateVersions() {
         if(index === 0 && display) display.textContent = opt.textContent;
     });
     currentReleaseIndex = 0;
-    syncClassicVersionSelect();
     updatePlayButtonText();
-}
-
-function populateUpdatesSidebar() {
-    const list = document.getElementById('updates-list');
-    if (!list) return;
-    list.innerHTML = '';
-
-    if (commitsData.length === 0) {
-        list.innerHTML = '<div class="update-item">No recent activity found.</div>';
-        return;
-    }
-
-    commitsData.slice(0, 20).forEach((c) => {
-        const item = document.createElement('div');
-        item.className = 'update-item patch-note-card commit-card';
-        const date = new Date(c.commit.author.date).toLocaleString();
-        const shortSha = c.sha.substring(0, 7);
-        const message = c.commit.message;
-        item.innerHTML = `
-            <div class="pn-header">
-                <span class="update-date">${date}</span>
-                <span class="commit-sha">#${shortSha}</span>
-            </div>
-            <div class="pn-body commit-msg">${message}</div>
-        `;
-        list.appendChild(item);
-    });
 }
 
 function updateSelectedRelease() {
@@ -1252,7 +1186,6 @@ function updateSelectedRelease() {
     if (!select) return;
     currentReleaseIndex = select.value;
     document.getElementById('current-version-display').textContent = select.options[select.selectedIndex].text;
-    syncClassicVersionSelect();
     updatePlayButtonText();
 }
 
@@ -1408,19 +1341,13 @@ async function launchLocalClient() {
 function setProcessingState(active) {
     isProcessing = active;
     const playBtn = document.getElementById('btn-play-main');
-    const classicPlayBtn = document.getElementById('classic-btn-play');
-    const optionsBtn = document.getElementById('btn-options');
     const progressContainer = document.getElementById('progress-container');
     if (active) {
         if (playBtn) playBtn.classList.add('disabled');
-        if (classicPlayBtn) classicPlayBtn.classList.add('disabled');
-        if (optionsBtn) optionsBtn.classList.add('disabled');
         if (progressContainer) progressContainer.style.display = 'flex';
         updateProgress(0, "Preparing...");
     } else {
         if (playBtn) playBtn.classList.remove('disabled');
-        if (classicPlayBtn) classicPlayBtn.classList.remove('disabled');
-        if (optionsBtn) optionsBtn.classList.remove('disabled');
         if (progressContainer) progressContainer.style.display = 'none';
     }
 }
@@ -1532,9 +1459,6 @@ async function toggleOptions(show) {
     if (isProcessing) return;
     const modal = document.getElementById('options-modal');
     if (show) {
-        // Sync classic theme checkbox to current state
-        const cb = document.getElementById('classic-theme-checkbox');
-        if (cb) cb.checked = document.body.classList.contains('classic-theme');
         const steamDeckCb = document.getElementById('steamdeck-mode-checkbox');
         if (steamDeckCb) steamDeckCb.checked = document.body.classList.contains('steamdeck-mode');
         const layoutSelect = document.getElementById('controller-layout-select');
@@ -1661,15 +1585,12 @@ async function saveOptions() {
         currentInstance.compatLayer = compatSelect.value;
         currentInstance.customCompatPath = customProtonPath;
     }
-    const isClassic = document.getElementById('classic-theme-checkbox')?.checked || false;
     const isSteamDeckMode = document.getElementById('steamdeck-mode-checkbox')?.checked || false;
     const controllerLayoutMode = document.getElementById('controller-layout-select')?.value || 'auto';
-    await Store.set('legacy_classic_theme', isClassic);
     await Store.set('legacy_steamdeck_mode', isSteamDeckMode);
     await Store.set('legacy_controller_layout_mode', controllerLayoutMode);
     GamepadManager.setControlLayoutMode(controllerLayoutMode);
     applyControllerLayoutPresetState(controllerLayoutMode);
-    applyTheme(isClassic);
     applySteamDeckMode(isSteamDeckMode);
     await saveInstancesToStore(); toggleOptions(false); fetchGitHubData(); updatePlayButtonText(); showToast("Settings Saved");
 }
@@ -1785,26 +1706,6 @@ function updateCompatDisplay() {
     }
 }
 
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    const toggleIcon = document.getElementById('sidebar-toggle-icon');
-    const list = document.getElementById('updates-list');
-
-    if (sidebar.classList.contains('collapsed')) {
-        list.style.display = 'flex';
-        requestAnimationFrame(() => {
-            sidebar.classList.remove('collapsed');
-            toggleIcon.textContent = '◀';
-            toggleIcon.title = 'Collapse Patch Notes';
-        });
-    } else {
-        list.style.display = '';
-        sidebar.classList.add('collapsed');
-        toggleIcon.textContent = '▶';
-        toggleIcon.title = 'Expand Patch Notes';
-    }
-}
-
 function isNewerVersion(latest, current) {
     const lParts = latest.split('.').map(Number); const cParts = current.split('.').map(Number);
     for (let i = 0; i < Math.max(lParts.length, cParts.length); i++) {
@@ -1883,23 +1784,7 @@ async function loadSplashText() {
         }
     } catch (e) {
         console.error("Failed to load splash text:", e);
-        splashEl.textContent = "Welcome!";
     }
-    // Also sync classic splash text
-    const classicSplash = document.getElementById('classic-splash-text');
-    if (classicSplash && splashEl) classicSplash.textContent = splashEl.textContent;
-}
-
-// ============================================================
-// CLASSIC LAUNCHER THEME FUNCTIONS
-// ============================================================
-
-async function loadTheme() {
-    // Force default UI on startup
-    const isClassic = false;
-    const cb = document.getElementById('classic-theme-checkbox');
-    if (cb) cb.checked = isClassic;
-    applyTheme(isClassic);
 }
 
 async function loadSteamDeckMode() {
@@ -1923,47 +1808,6 @@ async function loadControllerLayoutMode() {
 
 function applySteamDeckMode(enabled) {
     document.body.classList.toggle('steamdeck-mode', !!enabled);
-}
-
-function applyTheme(isClassic) {
-    document.body.classList.toggle('classic-theme', isClassic);
-    if (isClassic) {
-        syncClassicVersionSelect();
-        updateClassicUsername();
-    }
-}
-
-async function updateClassicUsername() {
-    const username = await Store.get('legacy_username', "Player");
-    const display = document.getElementById('classic-username-display');
-    const avatar = document.getElementById('classic-avatar');
-    if (display) display.textContent = username || "Player";
-    if (avatar) avatar.textContent = (username || "P")[0].toUpperCase();
-}
-
-function syncClassicVersionSelect() {
-    const mainSelect = document.getElementById('version-select');
-    const classicSelect = document.getElementById('classic-version-select');
-    const classicDisplay = document.getElementById('classic-version-display');
-    if (!mainSelect || !classicSelect) return;
-    // Copy options from main to classic
-    classicSelect.innerHTML = mainSelect.innerHTML;
-    classicSelect.selectedIndex = mainSelect.selectedIndex;
-    if (classicDisplay && classicSelect.selectedIndex >= 0) {
-        classicDisplay.textContent = classicSelect.options[classicSelect.selectedIndex]?.text || "Loading...";
-    }
-}
-
-function syncVersionFromClassic() {
-    const classicSelect = document.getElementById('classic-version-select');
-    const classicDisplay = document.getElementById('classic-version-display');
-    const mainSelect = document.getElementById('version-select');
-    if (!classicSelect || !mainSelect) return;
-    mainSelect.selectedIndex = classicSelect.selectedIndex;
-    if (classicDisplay && classicSelect.selectedIndex >= 0) {
-        classicDisplay.textContent = classicSelect.options[classicSelect.selectedIndex]?.text || "";
-    }
-    updateSelectedRelease();
 }
 
 async function toggleSnapshots(show, id = null) {
@@ -2117,7 +1961,6 @@ async function deleteSnapshot(snapId) {
 }
 
 // Global functions for HTML onclick
-window.toggleSidebar = toggleSidebar;
 window.minimizeWindow = minimizeWindow;
 window.toggleMaximize = toggleMaximize;
 window.closeWindow = closeWindow;
@@ -2149,7 +1992,6 @@ window.rollbackToSnapshot = rollbackToSnapshot;
 window.deleteSnapshot = deleteSnapshot;
 window.createSnapshotManual = createSnapshotManual;
 window.toggleSnapshots = toggleSnapshots;
-window.syncVersionFromClassic = syncVersionFromClassic;
 // Desktop shortcut for Linux AppImage
 function ensureDesktopShortcut() {
   if (typeof process === 'undefined' || process.platform !== 'linux') return;

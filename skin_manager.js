@@ -141,7 +141,12 @@ async function loadMainMenuSkin() {
 function toggleMainSkinRenderMode() {
     mainMenuSkinRenderMode = mainMenuSkinRenderMode === '3d' ? '2d' : '3d';
     const modeButton = document.getElementById('btn-skin-render-mode');
-    if (modeButton) modeButton.textContent = mainMenuSkinRenderMode.toUpperCase();
+    if (modeButton) {
+        const icon = modeButton.querySelector('i');
+        if (icon) {
+            icon.className = mainMenuSkinRenderMode === '3d' ? 'fas fa-cube' : 'fas fa-image';
+        }
+    }
 
     const container = document.getElementById('main-skin-viewer');
     if (container) {

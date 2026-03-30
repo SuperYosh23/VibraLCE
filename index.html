@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LegacyLauncher</title>
+    <title>Vibra</title>
     <link rel="icon" type="image/png" href="512x512.png">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
 
     <div class="title-bar">
-        <div class="title-bar-text">LegacyLauncher</div>
+        <div class="title-bar-text">Vibra</div>
         <div class="window-controls">
             <div class="win-btn nav-item" onclick="minimizeWindow()" tabindex="0" title="Minimize">−</div>
             <div class="win-btn nav-item" id="maximize-btn" onclick="toggleMaximize()" tabindex="0" title="Maximize / Restore">▢</div>
@@ -26,82 +27,87 @@
         </div>
     </div>
 
-    <div id="offline-indicator" style="display: none; position: fixed; top: 40px; left: 50%; transform: translateX(-50%); background: #c42b1c; color: #fff; padding: 5px 20px; border: 2px solid #000; z-index: 100; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+    <div id="offline-indicator" style="display: none;">
         OFFLINE MODE — UPDATES DISABLED
     </div>
 
-    <div class="main-wrapper">
-        <div class="sidebar collapsed" id="main-sidebar">
-            <div class="sidebar-title" onclick="toggleSidebar()">
-                <span id="sidebar-title-text">PATCH NOTES</span>
-                <span id="sidebar-toggle-icon" title="Expand Patch Notes">▶</span>
+    <!-- Main Content Area -->
+    <div class="main-content">
+        
+        <!-- Top Left: Version Selector -->
+        <div class="top-left-controls">
+            <div class="version-label">VERSION:</div>
+            <div id="version-select-box" class="version-select-box nav-item" tabindex="0">
+                <span id="current-version-display">Loading...</span>
+                <div class="select-arrow">▼</div>
+                <select id="version-select" class="hidden-select" onchange="updateSelectedRelease()">
+                    <option>Loading...</option>
+                </select>
             </div>
-            <div id="updates-list">
-                <div class="update-item">Loading updates...</div>
+            <div id="btn-check-update" class="refresh-btn nav-item" onclick="checkForUpdatesManual()" title="Check for Updates" tabindex="0">
+                <i class="fas fa-rotate"></i>
             </div>
         </div>
 
-        <div class="content-area" style="flex-direction: row; align-items: stretch; padding: 0;">
+        <!-- Right Side: Menu Buttons -->
+        <div class="right-menu">
+            <div class="menu-btn nav-item" onclick="toggleOptions(true)" tabindex="0">
+                <span>Options</span>
+                <i class="fas fa-gear"></i>
+            </div>
+            <div class="menu-btn nav-item" onclick="toggleServers(true)" tabindex="0">
+                <span>Servers</span>
+                <i class="fas fa-server"></i>
+            </div>
+            <div class="menu-btn nav-item" onclick="toggleProfile(true)" tabindex="0">
+                <span>Profile</span>
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="menu-btn nav-item" onclick="toggleInstances(true)" tabindex="0">
+                <span>Instances</span>
+                <i class="fas fa-layer-group"></i>
+            </div>
+        </div>
 
-            <!-- Classic Mode: Logo + Splash (only visible in classic theme) -->
-            <div class="classic-logo-area" id="classic-logo-area">
-                <div style="position: relative;">
-                    <img src="minecraftlogo.png" class="mc-logo-img" alt="Minecraft Logo" style="margin-bottom: 0; margin-top: 0;">
-                    <div id="classic-splash-text" class="splash-text">Splash!</div>
+        <!-- Center: Main Content -->
+        <div class="center-content">
+            <!-- Logo -->
+            <div class="logo-container">
+                <img src="minecraftlogo.png" class="mc-logo-img" alt="Minecraft Legacy Console Edition">
+                <div id="splash-text" class="splash-text">Splash!</div>
+            </div>
+
+            <!-- Skin Viewer -->
+            <div class="skin-section">
+                <div class="skin-viewer-container">
+                    <div id="main-skin-viewer"></div>
+                    <div class="skin-render-toggle" id="btn-skin-render-mode" onclick="toggleMainSkinRenderMode()" tabindex="0">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                </div>
+                <div class="change-skin-btn nav-item" onclick="openSkinManager()" tabindex="0">
+                    Change Skin
                 </div>
             </div>
 
-            <!-- Left Side: Main Menu -->
-            <div class="menu-column" style="flex: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 5;">
-                <div class="relative">
-                    <img src="minecraftlogo.png" class="mc-logo-img" alt="Minecraft Logo">
-                    <div id="splash-text" class="splash-text">Splash!</div>
-                </div>
-        
-                <div id="btn-play-main" class="btn-mc btn-play nav-item" onclick="launchGame()" tabindex="0">PLAY</div>
-        
-                <div class="version-row">
-                    <span class="version-label">Version:</span>
-                    <div id="version-select-box" class="version-select-box nav-item" tabindex="0">
-                        <span id="current-version-display">Loading...</span>
-                        <div class="select-arrow">▼</div>
-                        <select id="version-select" class="hidden-select" onchange="updateSelectedRelease()">
-                            <option>Loading...</option>
-                        </select>
-                    </div>
-                    <div id="btn-check-update" class="btn-mc btn-mini nav-item" onclick="checkForUpdatesManual()" title="Check for Updates" tabindex="0">
-                        <img src="restart.png" alt="Update">
-                    </div>
-                </div>
-        
-                <div class="flex gap-4 w-[500px] max-w-[90%]">
-                    <div class="btn-mc flex-grow nav-item" id="btn-instances" onclick="toggleInstances(true)" tabindex="0" style="font-size: 18px;">INSTANCES</div>
-                    <div class="btn-mc flex-grow nav-item" id="btn-profile" onclick="toggleProfile(true)" tabindex="0" style="font-size: 18px;">PROFILE</div>
-                    <div class="btn-mc flex-grow nav-item" id="btn-servers" onclick="toggleServers(true)" tabindex="0" style="font-size: 18px;">SERVERS</div>
-                    <div class="btn-mc flex-grow nav-item" id="btn-options" onclick="toggleOptions(true)" tabindex="0" style="font-size: 18px;">OPTIONS</div>
-                </div>
+            <!-- Play Button -->
+            <div id="btn-play-main" class="play-btn nav-item" onclick="launchGame()" tabindex="0">
+                PLAY
             </div>
+        </div>
 
-            <!-- Right Side: Skin Viewer -->
-            <div class="skin-column" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; min-width: 300px; padding-right: 0px;">
-                <div id="main-skin-viewer" style="width: 100%; height: 500px; cursor: grab; display: flex; align-items: center; justify-content: center;"></div>
-                
-                <div class="skin-action-row" style="margin-top: -20px; z-index: 10; margin-left: auto; margin-right: auto;">
-                    <div class="btn-mc nav-item skin-action-btn skin-action-btn-main" onclick="openSkinManager()" tabindex="0">
-                        CHANGE SKIN
-                    </div>
-                    <div id="btn-skin-render-mode" class="btn-mc nav-item skin-action-btn skin-action-btn-mode" onclick="toggleMainSkinRenderMode()" tabindex="0">3D</div>
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progress-container">
+            <div class="progress-text-wrap" id="progress-text-wrap">
+                <span class="loader-spinner progress-spinner" id="progress-spinner" aria-hidden="true"></span>
+                <div class="progress-text" id="progress-text">
+                    <span id="progress-text-label">Downloading</span>
+                    <span class="loading-dots" id="progress-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                    <span id="progress-text-suffix"></span>
                 </div>
             </div>
-            
-            <div class="progress-container" id="progress-container">
-                <div class="progress-text-wrap" id="progress-text-wrap">
-                    <span class="loader-spinner progress-spinner" id="progress-spinner" aria-hidden="true"></span>
-                    <div class="progress-text" id="progress-text"><span id="progress-text-label">Downloading</span><span class="loading-dots" id="progress-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span><span id="progress-text-suffix"></span></div>
-                </div>
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
-                </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
             </div>
         </div>
     </div>
@@ -396,7 +402,7 @@
                             </div>
                             <div style="display: flex; justify-content: space-between;">
                                 <span>TARGET:</span>
-                                <span style="color: #888; font-size: 14px;">Common/res/mob/char.png</span>
+                                <span style="color: #888; font-size: 14px;">VibraLCE Skin Folder</span>
                             </div>
                         </div>
                     </div>
@@ -407,47 +413,6 @@
 
             <div class="flex justify-center w-full mt-6">
                  <div id="btn-close-skin" class="btn-mc nav-item !mb-0" onclick="closeSkinManager()" tabindex="0">DONE</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Classic Launcher Bottom Bar (only shown when classic theme is active) -->
-    <div id="classic-bottom-bar" class="classic-bottom-bar">
-        <!-- Left: Profile Section -->
-        <div class="classic-profile-section">
-            <div class="classic-avatar" id="classic-avatar">S</div>
-            <div class="classic-profile-info">
-                <div class="classic-username-label">Logged in as</div>
-                <div class="classic-username-display" id="classic-username-display">Player</div>
-            </div>
-            <div class="classic-mini-btn" onclick="toggleProfile(true)" title="Edit Profile">Edit Profile</div>
-            <div class="classic-mini-btn" onclick="openSkinManager()" title="Change Skin">Skin</div>
-        </div>
-
-        <!-- Center: Play Button -->
-        <div class="classic-center-section">
-            <div class="btn-mc btn-play classic-play-btn nav-item" id="classic-btn-play" onclick="launchGame()" tabindex="0">PLAY</div>
-        </div>
-
-        <!-- Right: Version + Nav -->
-        <div class="classic-right-section">
-            <div class="classic-version-row">
-                <span class="version-label" style="font-size: 16px; white-space: nowrap;">Version:</span>
-                <div id="classic-version-select-box" class="version-select-box nav-item" tabindex="0" style="height: 40px; font-size: 16px; flex-grow: 1; padding-right: 51px;">
-                    <span id="classic-version-display">Loading...</span>
-                    <div class="select-arrow" style="width: 36px;">▼</div>
-                    <select id="classic-version-select" class="hidden-select" onchange="syncVersionFromClassic()">
-                        <option>Loading...</option>
-                    </select>
-                </div>
-                <div class="btn-mc btn-mini nav-item" onclick="checkForUpdatesManual()" title="Check for Updates" tabindex="0" style="width: 40px !important; height: 40px; max-width: 40px !important;">
-                    <img src="restart.png" alt="Update">
-                </div>
-            </div>
-            <div class="classic-nav-links">
-                <span class="classic-link nav-item" onclick="toggleInstances(true)" tabindex="0">Instances</span>
-                <span class="classic-link nav-item" onclick="toggleServers(true)" tabindex="0">Servers</span>
-                <span class="classic-link nav-item" onclick="toggleOptions(true)" tabindex="0">Options</span>
             </div>
         </div>
     </div>

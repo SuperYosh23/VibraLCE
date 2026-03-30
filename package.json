@@ -1,7 +1,7 @@
 {
-  "name": "legacylauncher",
+  "name": "vibralce",
   "version": "3.5.0",
-  "description": "A Minecraft: Legacy Console Edition launcher",
+  "description": "A Minecraft: Legacy Console Edition launcher - VibraLCE",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,8 +12,8 @@
     "dist:mac": "electron-builder --mac dmg"
   },
   "build": {
-    "appId": "com.legacylauncher.app",
-    "productName": "LegacyLauncher",
+    "appId": "com.vibralce.app",
+    "productName": "VibraLCE",
     "win": {
       "target": [
         "nsis"
@@ -33,14 +33,14 @@
       "icon": "512x512.png",
       "desktop": {
         "entry": {
-          "Name": "Minecraft LCE Launcher",
-          "GenericName": "Minecraft Launcher",
-          "Comment": "A Minecraft: Legacy Console Edition launcher",
+          "Name": "VibraLCE",
+          "GenericName": "Minecraft LCE Launcher",
+          "Comment": "A modern Minecraft: Legacy Console Edition launcher",
           "Categories": "Game;Emulation;",
           "StartupNotify": "true"
         }
       },
-      "executableName": "legacylauncher"
+      "executableName": "vibralce"
     },
     "mac": {
       "target": [
