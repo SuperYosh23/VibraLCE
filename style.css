@@ -100,7 +100,7 @@ body::before {
     align-items: center;
     padding: 0 16px;
     -webkit-app-region: drag;
-    z-index: 1000;
+    z-index: 10000;
     position: relative;
 }
 
@@ -1445,3 +1445,196 @@ select.mc-input option {
     margin-left: -2px;
 }
 
+/* =============================================
+   TABBED OPTIONS INTERFACE
+   ============================================= */
+
+.options-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    animation: fadeIn 0.3s ease;
+}
+
+.options-overlay.active {
+    display: flex;
+}
+
+.options-container {
+    width: 80vw;
+    max-width: 900px;
+    height: 75vh;
+    max-height: 700px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.05);
+    overflow: hidden;
+}
+
+/* Header */
+.options-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.options-title {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--vibra-text-primary);
+}
+
+.options-title::before {
+    content: '◆';
+    color: var(--vibra-accent);
+    font-size: 10px;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+.options-close {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--vibra-text-muted);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+}
+
+.options-close:hover {
+    color: var(--vibra-red);
+    background: rgba(248, 81, 73, 0.1);
+}
+
+/* Tabs Navigation */
+.options-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 12px 24px 0;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.options-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    color: var(--vibra-text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: all var(--transition-fast);
+    background: transparent;
+}
+
+.options-tab:hover {
+    color: var(--vibra-text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.options-tab.active {
+    color: var(--vibra-accent);
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    border-bottom: 1px solid var(--glass-bg);
+    margin-bottom: -1px;
+}
+
+.options-tab i {
+    font-size: 14px;
+}
+
+/* Tab Content */
+.options-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.options-panel {
+    display: none;
+    animation: fadeIn 0.2s ease;
+}
+
+.options-panel.active {
+    display: block;
+}
+
+/* Footer */
+.options-footer {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Checkbox label styling */
+.mc-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    color: var(--vibra-text-primary);
+    font-size: 14px;
+    padding: 8px 0;
+}
+
+.mc-checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--glass-border);
+    border-radius: 4px;
+    background: var(--vibra-surface);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    transition: all var(--transition-fast);
+}
+
+.mc-checkbox-label input[type="checkbox"]:checked {
+    background: var(--vibra-accent);
+    border-color: var(--vibra-accent);
+}
+
+.mc-checkbox-label input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.mc-checkbox-label input[type="checkbox"]:focus {
+    box-shadow: 0 0 0 3px var(--vibra-accent-glow);
+}

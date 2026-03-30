@@ -1437,7 +1437,7 @@ function downloadFile(url, destPath) {
 
 async function toggleOptions(show) {
     if (isProcessing) return;
-    const modal = document.getElementById('options-modal');
+    const overlay = document.getElementById('options-overlay');
     if (show) {
         const select = document.getElementById('controller-layout-select');
         if (select) {
@@ -1447,10 +1447,27 @@ async function toggleOptions(show) {
             applyControllerLayoutPresetState(savedLayoutMode);
         }
         syncRepoPresetFromInput();
-        document.activeElement?.blur(); modal.style.display = 'flex'; modal.style.opacity = '1';
+        document.activeElement?.blur();
+        overlay.classList.add('active');
+        // Default to first tab
+        switchOptionsTab('general');
         UiSoundManager.play('popupOpen');
+    } else {
+        overlay.classList.remove('active');
+        UiSoundManager.play('popupClose');
     }
-    else { modal.style.opacity = '0'; UiSoundManager.play('popupClose'); setTimeout(() => modal.style.display = 'none', 300); }
+}
+
+function switchOptionsTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.options-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
+    
+    // Update panels
+    document.querySelectorAll('.options-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === 'tab-' + tabName);
+    });
 }
 
 async function toggleProfile(show) {
@@ -1954,6 +1971,8 @@ window.rollbackToSnapshot = rollbackToSnapshot;
 window.deleteSnapshot = deleteSnapshot;
 window.createSnapshotManual = createSnapshotManual;
 window.toggleSnapshots = toggleSnapshots;
+window.switchOptionsTab = switchOptionsTab;
+
 // Desktop shortcut for Linux AppImage
 function ensureDesktopShortcut() {
   if (typeof process === 'undefined' || process.platform !== 'linux') return;

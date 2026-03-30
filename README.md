@@ -1,19 +1,22 @@
-# LegacyLauncher
+# VibraLCE
 
-A custom launcher for Minecraft Legacy Console Edition.
-
-<img width="1277" height="717" alt="image" src="https://github.com/user-attachments/assets/eaa9bae6-3b3b-4e39-a3c1-156e34abf3cc" />
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/gradengnostic)
-
+A modern launcher for Minecraft Legacy Console Edition.
 
 ## Features
 
-- **Minecraft-style GUI**: Authentic pixelated interface with Minecraft font and styling
+- **Modern Glassmorphism UI**: Clean, translucent interface with blur effects and modern styling
+- **Tabbed Options Menu**: Organized settings with tabs for General, Repository, Launch, Controls, and Audio
+- **3D Skin Preview**: Interactive skin viewer with 3D/2D toggle mode
+- **Skin Uploader**: Upload and convert skins to legacy 64x32 format
+- **Icon-Based Navigation**: Clean icon-only menu buttons with tooltips
+- **Instance Management**: Create and manage multiple game instances with different configurations
+- **Snapshots/Rollback**: Create backups of your game installation and rollback when needed
+- **Screenshot Gallery**: Built-in gallery for viewing and managing screenshots
 - **Automatic Updates**: Fetches latest releases from GitHub repositories
 - **Cross-platform Support**: Works on Windows and Linux
-- **Profiles**: Save your username and track playtime
-- **Custom Launch Options**: Configure IP, port, and server mode
+- **Profile System**: Save your username and track playtime
+- **Custom Launch Options**: Configure IP, port, fullscreen, and server mode
+- **Controller Support**: Choose between Xbox and Nintendo controller layouts
 
 ## Installation
 
@@ -27,7 +30,6 @@ A custom launcher for Minecraft Legacy Console Edition.
    ```bash
    npm start
    ```
-
 
 ## Building
 
@@ -44,15 +46,19 @@ npm run dist:win
 ## Configuration
 
 ### Repository Source
-By default, the launcher fetches releases from `smartcmd/MinecraftConsoles`. You can change this in the Options menu.
+By default, the launcher fetches releases from `smartcmd/MinecraftConsoles`. You can change this in the Options > Repository tab.
 
-### Launch Options
+### Launch Options (Options > Launch)
 - **GitHub Repository**: Source repository for game releases
 - **Client Executable**: Name of the executable file (default: `Minecraft.Client.exe`)
 - **Compatibility Layer**: For Linux users - choose between direct execution, Wine, or Proton
 - **Connect/Bind IP**: Optional IP address for multiplayer
 - **Port**: Optional port number
+- **Fullscreen Mode**: Launch game in fullscreen
 - **Server Mode**: Launch as headless server
+
+### Controls (Options > Controls)
+- **Controller Layout**: Choose between Xbox Style (A=Confirm, B=Cancel) or Nintendo Style (B=Confirm, A=Cancel)
 
 ### Profile Settings
 - **Username**: Your in-game player name
@@ -77,6 +83,8 @@ The launcher supports several compatibility options for Linux:
 - **Electron**: Cross-platform desktop app framework
 - **discord-rpc**: Discord Rich Presence integration
 - **extract-zip**: ZIP archive extraction
+- **Three.js**: 3D skin preview rendering
+- **Font Awesome**: UI icons
 - **Tailwind CSS**: UI styling (via CDN)
 
 ## Assets
@@ -89,14 +97,15 @@ The launcher supports several compatibility options for Linux:
 The launcher is built with:
 - **Frontend**: HTML, CSS, JavaScript
 - **Backend**: Electron with Node.js
-- **Styling**: Custom CSS with Minecraft theme + Tailwind CSS
+- **3D Rendering**: Three.js for skin preview
+- **Styling**: Custom CSS with glassmorphism theme + Tailwind CSS
 - **Build**: Electron Builder
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Repository not found**: Check the repository name in Options
+1. **Repository not found**: Check the repository name in Options > Repository
 2. **Executable not found**: Verify the executable name matches the downloaded file
 3. **Launch failures**: Try different compatibility layers on Linux
 4. **Discord RPC issues**: Ensure Discord is running and RPC is enabled
@@ -104,18 +113,21 @@ The launcher is built with:
 ### Linux Specific
 - Install Wine: `sudo apt install wine` (Ubuntu/Debian)
 - For Proton: Requires Steam installation
-- AppImage permissions: `chmod +x LegacyLauncher-*.AppImage`
+- AppImage permissions: `chmod +x VibraLCE-*.AppImage`
 
 ## Contributing
 
-Feel free to submit issues and pull requests for improvements.</content>
+Feel free to submit issues and pull requests for improvements.
 
-## Star History
+---
 
-<a href="https://www.star-history.com/?repos=gradenGnostic%2FLegacyLauncher&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=gradenGnostic/LegacyLauncher&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=gradenGnostic/LegacyLauncher&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=gradenGnostic/LegacyLauncher&type=date&legend=top-left" />
- </picture>
-</a>
+## Disclaimer
+
+**Important Notice**: The code for this software was heavily generated and assisted by artificial intelligence (AI) systems. While functional, AI-generated code may contain bugs, inefficiencies, or edge cases that have not been thoroughly tested or reviewed. Users should be aware that:
+
+- Code quality and best practices may vary throughout the codebase
+- Some implementations may not follow traditional software engineering patterns
+- Thorough testing is recommended before relying on this software for critical tasks
+- The AI-assisted development process may have introduced unforeseen issues
+
+Use this software at your own discretion and report any issues you encounter.
