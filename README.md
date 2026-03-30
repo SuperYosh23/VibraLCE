@@ -11,7 +11,6 @@ A modern launcher for Minecraft Legacy Console Edition.
 - **Icon-Based Navigation**: Clean icon-only menu buttons with tooltips
 - **Instance Management**: Create and manage multiple game instances with different configurations
 - **Snapshots/Rollback**: Create backups of your game installation and rollback when needed
-- **Screenshot Gallery**: Built-in gallery for viewing and managing screenshots
 - **Automatic Updates**: Fetches latest releases from GitHub repositories
 - **Cross-platform Support**: Works on Windows and Linux
 - **Profile System**: Save your username and track playtime

@@ -10,6 +10,11 @@ let isSkinDragging = false;
 let previousSkinMousePosition = { x: 0, y: 0 };
 let processedSkinDataUrl = null;
 
+// Profile skin variables
+let profileSkinScene, profileSkinCamera, profileSkinRenderer, profileSkinPlayerGroup;
+let isProfileSkinDragging = false;
+let processedProfileSkinDataUrl = null;
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     const skinInput = document.getElementById('skin-input');
@@ -46,6 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeSkinBtn) {
         closeSkinBtn.addEventListener('click', closeSkinManager);
     }
+
+    // Initialize Profile Skin Section
+    initProfileSkinSection();
 
     // Initialize Main Menu Viewer
     initMainMenuSkinViewer();
@@ -467,8 +475,207 @@ async function saveSkinToDisk() {
     }
 }
 
+// Profile Skin Section Functions
+function initProfileSkinSection() {
+    const skinInput = document.getElementById('profile-skin-input');
+    const dropZone = document.getElementById('profile-drop-zone');
+    const saveBtn = document.getElementById('profile-save-skin-btn');
+
+    if (skinInput) {
+        skinInput.addEventListener('change', (e) => handleProfileSkinFile(e.target.files[0]));
+    }
+
+    if (dropZone) {
+        dropZone.addEventListener('click', (e) => {
+            if (e.target === dropZone || e.target.closest('.text-center')) {
+                skinInput?.click();
+            }
+        });
+        dropZone.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                skinInput?.click();
+            }
+        });
+        dropZone.addEventListener('dragover', (e) => { 
+            e.preventDefault(); 
+            dropZone.style.borderColor = '#4ade80';
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#555';
+        });
+        dropZone.addEventListener('drop', (e) => { 
+            e.preventDefault(); 
+            dropZone.style.borderColor = '#555';
+            handleProfileSkinFile(e.dataTransfer.files[0]); 
+        });
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveProfileSkinToDisk);
+    }
+}
+
+function handleProfileSkinFile(file) {
+    if (!file || !file.type.includes('png')) return window.showToast("Only PNG files are supported!");
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            processProfileSkinImage(img, e.target.result);
+        };
+        img.onerror = () => {
+             window.showToast("Failed to load image");
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function processProfileSkinImage(img, srcUrl) {
+    const canvas = document.getElementById('profile-skin-canvas');
+    const ctx = canvas.getContext('2d');
+    const statusMessage = document.getElementById('profile-status-message');
+    const previewContainer = document.getElementById('profile-preview-container');
+    const saveBtn = document.getElementById('profile-save-skin-btn');
+
+    if (img.width !== 64) {
+        if(previewContainer) previewContainer.classList.add('hidden');
+        return window.showToast("Invalid skin width. Must be 64px.");
+    }
+
+    const isLegacy = img.height === 32;
+    
+    ctx.clearRect(0, 0, 64, 32);
+    ctx.drawImage(img, 0, 0, 64, 32, 0, 0, 64, 32);
+    processedProfileSkinDataUrl = canvas.toDataURL('image/png');
+    
+    if (previewContainer) previewContainer.classList.remove('hidden');
+    
+    if (isLegacy) {
+        if(statusMessage) statusMessage.innerHTML = "<span style='color: #4ade80; font-weight: bold;'>LEGACY READY</span>";
+    } else {
+        if(statusMessage) statusMessage.innerHTML = "<span style='color: #facc15; font-weight: bold;'>CONVERTED TO 64x32</span>";
+    }
+    
+    if (saveBtn) {
+        saveBtn.textContent = "SAVE SKIN";
+        saveBtn.classList.remove('disabled');
+    }
+    
+    if (!profileSkinScene) initProfilePreviewEngine();
+    updateSkinModel(srcUrl, isLegacy, profileSkinPlayerGroup, '3d');
+}
+
+function initProfilePreviewEngine() {
+    const container = document.getElementById('profile-skin-viewer-container');
+    if (!container) return;
+    
+    profileSkinScene = new THREE.Scene();
+    profileSkinCamera = new THREE.PerspectiveCamera(35, container.offsetWidth / container.offsetHeight, 0.1, 1000);
+    profileSkinCamera.position.set(0, 0, 50); 
+
+    profileSkinRenderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+    profileSkinRenderer.setSize(container.offsetWidth, container.offsetHeight);
+    profileSkinRenderer.setPixelRatio(window.devicePixelRatio);
+    profileSkinRenderer.outputEncoding = THREE.sRGBEncoding;
+    container.appendChild(profileSkinRenderer.domElement);
+
+    profileSkinScene.add(new THREE.AmbientLight(0xffffff, 0.9));
+    const dl = new THREE.DirectionalLight(0xffffff, 0.35);
+    dl.position.set(10, 20, 15);
+    profileSkinScene.add(dl);
+
+    profileSkinPlayerGroup = new THREE.Group();
+    profileSkinScene.add(profileSkinPlayerGroup);
+
+    container.addEventListener('mousedown', () => isProfileSkinDragging = true);
+    window.addEventListener('mouseup', () => isProfileSkinDragging = false);
+    window.addEventListener('mousemove', (e) => {
+        if (isProfileSkinDragging && profileSkinPlayerGroup) {
+            profileSkinPlayerGroup.rotation.y += (e.movementX) * 0.01;
+        }
+    });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        if (!isProfileSkinDragging && profileSkinPlayerGroup) profileSkinPlayerGroup.rotation.y += 0.008;
+        if (profileSkinRenderer && profileSkinScene && profileSkinCamera) {
+            profileSkinRenderer.render(profileSkinScene, profileSkinCamera);
+        }
+    }
+    animate();
+}
+
+async function saveProfileSkinToDisk() {
+    if (!processedProfileSkinDataUrl) return;
+
+    try {
+        const installDir = await window.getInstallDir();
+        const savePath = path.join(installDir, 'Common', 'res', 'mob', 'char.png');
+        const dir = path.dirname(savePath);
+
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        const base64Data = processedProfileSkinDataUrl.replace(/^data:image\/png;base64,/, "");
+        fs.writeFileSync(savePath, base64Data, 'base64');
+        
+        window.showToast("Skin Saved Successfully!");
+        
+        const saveBtn = document.getElementById('profile-save-skin-btn');
+        if(saveBtn) {
+            saveBtn.textContent = "SAVED!";
+            saveBtn.classList.add('disabled');
+        }
+
+        // Refresh main menu skin
+        loadMainMenuSkin();
+
+    } catch (e) {
+        window.showToast("Error Saving Skin: " + e.message);
+        console.error(e);
+    }
+}
+
+async function loadCurrentSkinToProfile() {
+    try {
+        const installDir = await window.getInstallDir();
+        if (!installDir) return;
+        
+        const skinPath = path.join(installDir, 'Common', 'res', 'mob', 'char.png');
+        
+        if (fs.existsSync(skinPath)) {
+            const skinData = fs.readFileSync(skinPath);
+            const blob = new Blob([skinData]);
+            const url = URL.createObjectURL(blob);
+            
+            const img = new Image();
+            img.onload = () => {
+                processProfileSkinImage(img, url);
+                const statusMsg = document.getElementById('profile-status-message');
+                if (statusMsg) statusMsg.innerHTML = "<span style='color: #60a5fa; font-weight: bold;'>CURRENT SKIN</span>";
+                const saveBtn = document.getElementById('profile-save-skin-btn');
+                if (saveBtn) {
+                    saveBtn.textContent = "SAVED";
+                    saveBtn.classList.add('disabled');
+                }
+            };
+            img.src = url;
+        }
+    } catch (e) {
+        console.warn("Could not load current skin to profile:", e);
+    }
+}
+
 // Global Export
 window.openSkinManager = openSkinManager;
 window.initMainMenuSkinViewer = initMainMenuSkinViewer;
 window.loadMainMenuSkin = loadMainMenuSkin;
 window.toggleMainSkinRenderMode = toggleMainSkinRenderMode;
+window.initProfileSkinSection = initProfileSkinSection;
+window.handleProfileSkinFile = handleProfileSkinFile;
+window.saveProfileSkinToDisk = saveProfileSkinToDisk;
+window.loadCurrentSkinToProfile = loadCurrentSkinToProfile;

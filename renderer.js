@@ -670,7 +670,12 @@ window.onload = async () => {
 
         ipcRenderer.on('window-is-maximized', (event, isMaximized) => {
             const btn = document.getElementById('maximize-btn');
-            if (btn) btn.textContent = isMaximized ? '❐' : '▢';
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    icon.className = isMaximized ? 'far fa-clone' : 'far fa-square';
+                }
+            }
         });
 
         // Initialize features
@@ -1473,7 +1478,17 @@ function switchOptionsTab(tabName) {
 async function toggleProfile(show) {
     if (isProcessing) return;
     const modal = document.getElementById('profile-modal');
-    if (show) { await updatePlaytimeDisplay(); document.activeElement?.blur(); modal.style.display = 'flex'; modal.style.opacity = '1'; UiSoundManager.play('popupOpen'); }
+    if (show) {
+        await updatePlaytimeDisplay();
+        // Load current skin into profile preview
+        if (window.loadCurrentSkinToProfile) {
+            window.loadCurrentSkinToProfile();
+        }
+        document.activeElement?.blur();
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        UiSoundManager.play('popupOpen');
+    }
     else { modal.style.opacity = '0'; UiSoundManager.play('popupClose'); setTimeout(() => modal.style.display = 'none', 300); }
 }
 

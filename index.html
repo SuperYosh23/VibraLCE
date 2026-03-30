@@ -14,9 +14,9 @@
     <div class="title-bar">
         <div class="title-bar-text">Vibra</div>
         <div class="window-controls">
-            <div class="win-btn nav-item" onclick="minimizeWindow()" tabindex="0" title="Minimize">−</div>
-            <div class="win-btn nav-item" id="maximize-btn" onclick="toggleMaximize()" tabindex="0" title="Maximize / Restore">▢</div>
-            <div class="win-btn close nav-item" onclick="closeWindow()" tabindex="0" title="Close">×</div>
+            <div class="win-btn nav-item" onclick="minimizeWindow()" tabindex="0" title="Minimize"><i class="fas fa-minus"></i></div>
+            <div class="win-btn nav-item" id="maximize-btn" onclick="toggleMaximize()" tabindex="0" title="Maximize / Restore"><i class="far fa-square"></i></div>
+            <div class="win-btn close nav-item" onclick="closeWindow()" tabindex="0" title="Close"><i class="fas fa-times"></i></div>
         </div>
     </div>
 
@@ -80,9 +80,6 @@
                     <div class="skin-render-toggle" id="btn-skin-render-mode" onclick="toggleMainSkinRenderMode()" tabindex="0">
                         <i class="fas fa-cube"></i>
                     </div>
-                </div>
-                <div class="change-skin-btn nav-item" onclick="openSkinManager()" tabindex="0">
-                    Change Skin
                 </div>
             </div>
 
@@ -359,7 +356,7 @@
     </div>
 
     <div class="modal-overlay" id="profile-modal">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 800px;">
             <div class="modal-title">PLAYER PROFILE</div>
 
             <div class="mc-input-group">
@@ -372,7 +369,38 @@
                 <div id="playtime-display" style="color: #222; font-size: 26px; text-shadow: 1px 1px 0 #fff;">0h 0m 0s</div>
             </div>
 
-            <div class="flex gap-4 w-full mt-4">
+            <!-- Skin Section -->
+            <div class="profile-skin-section mt-6">
+                <label class="mc-label">Player Skin:</label>
+                
+                <div id="profile-drop-zone" style="width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; background: #000; border: 2px solid #555; cursor: pointer; margin-bottom: 15px; position: relative;" tabindex="0">
+                    <input type="file" id="profile-skin-input" accept=".png" style="position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 1;" />
+                    <div class="text-center" style="pointer-events: none;">
+                        <p class="text-lg text-white" style="text-shadow: 2px 2px 0 #000;">CLICK OR DRAG SKIN HERE</p>
+                        <p class="text-xs text-gray-400 mt-1 uppercase font-bold" style="letter-spacing: 2px;">64x32 or 64x64 PNG</p>
+                    </div>
+                </div>
+
+                <div id="profile-preview-container" class="hidden flex flex-col items-center w-full">
+                    <div class="flex flex-row gap-4 items-stretch w-full justify-center mb-4" style="height: 200px;">
+                        <!-- 3D Preview Panel -->
+                        <div class="relative bg-black rounded-none border-2 border-[#555] flex flex-col items-center overflow-hidden" style="width: 150px;">
+                            <div id="profile-skin-viewer-container" style="width: 100%; height: 100%;"></div>
+                            <div style="position: absolute; bottom: 5px; left: 5px; color: #55ff55; font-size: 10px; text-shadow: 1px 1px 0 #000; z-index: 5;">3D</div>
+                        </div>
+
+                        <!-- 2D Panel -->
+                        <div class="bg-black p-2 border-2 border-[#555] flex flex-col items-center justify-center" style="width: 150px;">
+                            <canvas id="profile-skin-canvas" width="64" height="32" class="pixelated" style="width: 128px; height: 64px; image-rendering: pixelated; border: 1px solid #555;"></canvas>
+                            <div id="profile-status-message" style="margin-top: 5px; font-size: 12px; color: #fff;"></div>
+                        </div>
+                    </div>
+
+                    <div id="profile-save-skin-btn" class="btn-mc w-full nav-item" tabindex="0" style="height: 40px; font-size: 14px;">SAVE SKIN</div>
+                </div>
+            </div>
+
+            <div class="flex gap-4 w-full mt-6">
                 <div id="btn-profile-save" class="btn-mc flex-grow nav-item" onclick="saveProfile()" tabindex="0">SAVE</div>
                 <div id="btn-profile-cancel" class="btn-mc flex-grow nav-item" onclick="toggleProfile(false)" tabindex="0">CANCEL</div>
             </div>
