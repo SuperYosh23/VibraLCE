@@ -555,20 +555,6 @@ async function migrateLegacyConfig() {
     currentInstance = instances.find(i => i.id === currentInstanceId) || instances[0];
 }
 
-function isSteamDeckEnvironment() {
-    if (process.platform !== 'linux') return false;
-
-    const env = process.env || {};
-    if (env.STEAMDECK === '1' || env.SteamDeck === '1') return true;
-
-    try {
-        const osRelease = fs.readFileSync('/etc/os-release', 'utf8').toLowerCase();
-        if (osRelease.includes('steamos') || osRelease.includes('steam deck')) return true;
-    } catch (_) {}
-
-    return false;
-}
-
 function focusPrimaryPlayButton() {
     const mainPlayBtn = document.getElementById('btn-play-main');
     if (!mainPlayBtn) return;
@@ -688,7 +674,6 @@ window.onload = async () => {
         });
 
         // Initialize features
-        await loadSteamDeckMode();
         await loadControllerLayoutMode();
         fetchGitHubData();
         checkForLauncherUpdates();
@@ -696,11 +681,6 @@ window.onload = async () => {
         MusicManager.init();
         GamepadManager.init();
         UiSoundManager.init();
-
-        if (isSteamDeckEnvironment()) {
-            ipcRenderer.send('window-set-fullscreen', true);
-            setTimeout(() => focusPrimaryPlayButton(), 150);
-        }
 
         async function takeScreenshot() {
             try {
@@ -1459,12 +1439,10 @@ async function toggleOptions(show) {
     if (isProcessing) return;
     const modal = document.getElementById('options-modal');
     if (show) {
-        const steamDeckCb = document.getElementById('steamdeck-mode-checkbox');
-        if (steamDeckCb) steamDeckCb.checked = document.body.classList.contains('steamdeck-mode');
-        const layoutSelect = document.getElementById('controller-layout-select');
-        if (layoutSelect) {
+        const select = document.getElementById('controller-layout-select');
+        if (select) {
             const savedLayoutMode = await Store.get('legacy_controller_layout_mode', 'auto');
-            layoutSelect.value = savedLayoutMode;
+            select.value = savedLayoutMode;
             GamepadManager.setControlLayoutMode(savedLayoutMode);
             applyControllerLayoutPresetState(savedLayoutMode);
         }
@@ -1585,13 +1563,10 @@ async function saveOptions() {
         currentInstance.compatLayer = compatSelect.value;
         currentInstance.customCompatPath = customProtonPath;
     }
-    const isSteamDeckMode = document.getElementById('steamdeck-mode-checkbox')?.checked || false;
     const controllerLayoutMode = document.getElementById('controller-layout-select')?.value || 'auto';
-    await Store.set('legacy_steamdeck_mode', isSteamDeckMode);
     await Store.set('legacy_controller_layout_mode', controllerLayoutMode);
     GamepadManager.setControlLayoutMode(controllerLayoutMode);
     applyControllerLayoutPresetState(controllerLayoutMode);
-    applySteamDeckMode(isSteamDeckMode);
     await saveInstancesToStore(); toggleOptions(false); fetchGitHubData(); updatePlayButtonText(); showToast("Settings Saved");
 }
 
@@ -1787,15 +1762,6 @@ async function loadSplashText() {
     }
 }
 
-async function loadSteamDeckMode() {
-    const autoSteamDeck = isSteamDeckEnvironment();
-    const saved = await Store.get('legacy_steamdeck_mode', null);
-    const enabled = saved === null ? autoSteamDeck : saved;
-    const cb = document.getElementById('steamdeck-mode-checkbox');
-    if (cb) cb.checked = enabled;
-    applySteamDeckMode(enabled);
-}
-
 async function loadControllerLayoutMode() {
     const mode = await Store.get('legacy_controller_layout_mode', 'auto');
     GamepadManager.setControlLayoutMode(mode);
@@ -1804,10 +1770,6 @@ async function loadControllerLayoutMode() {
         select.value = mode;
         applyControllerLayoutPresetState(mode);
     }
-}
-
-function applySteamDeckMode(enabled) {
-    document.body.classList.toggle('steamdeck-mode', !!enabled);
 }
 
 async function toggleSnapshots(show, id = null) {

@@ -57,7 +57,7 @@ function initMainMenuSkinViewer() {
 
     mainMenuScene = new THREE.Scene();
     mainMenuCamera = new THREE.PerspectiveCamera(45, container.offsetWidth / container.offsetHeight, 0.1, 1000);
-    mainMenuCamera.position.set(0, 5, 60); 
+    mainMenuCamera.position.set(0, 0, 60); 
 
     mainMenuRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     mainMenuRenderer.setSize(container.offsetWidth, container.offsetHeight);
@@ -400,7 +400,7 @@ function initPreviewEngine() {
     
     skinScene = new THREE.Scene();
     skinCamera = new THREE.PerspectiveCamera(35, container.offsetWidth / container.offsetHeight, 0.1, 1000);
-    skinCamera.position.set(0, 5, 70); 
+    skinCamera.position.set(0, 0, 70); 
 
     skinRenderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
     skinRenderer.setSize(container.offsetWidth, container.offsetHeight);
