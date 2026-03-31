@@ -125,8 +125,12 @@ body.fullscreen-mode .title-bar,
     pointer-events: none;
 }
 
-.title-bar.show,
-.title-bar:hover {
+.title-bar.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.title-bar:not(.hidden):hover {
     opacity: 1;
     transform: translateY(0);
 }
@@ -743,9 +747,9 @@ body.fullscreen-mode .title-bar,
     margin-bottom: 8px;
 }
 
-.progress-spinner {
-    width: 14px;
-    height: 14px;
+#progress-spinner {
+    width: 40px;
+    height: 40px;
     border: 2px solid var(--glass-border);
     border-top-color: var(--vibra-accent);
     border-radius: 50%;
@@ -1984,4 +1988,576 @@ select.mc-input option {
 /* Custom CSS Style element (injected at runtime) */
 #custom-theme-style {
     display: none;
+}
+
+/* =============================================
+   THEME SYSTEM - LEGACY MINECRAFT THEME
+   Light gray aesthetic like old Minecraft launcher
+   ============================================= */
+
+[data-theme="legacy"] {
+    --vibra-bg-primary: #c6c6c6;
+    --vibra-bg-secondary: #b0b0b0;
+    --vibra-bg-tertiary: #a0a0a0;
+    --vibra-surface: rgba(198, 198, 198, 0.95);
+    --vibra-accent: #55ff55;
+    --vibra-accent-dim: #44cc44;
+    --vibra-accent-glow: rgba(85, 255, 85, 0.4);
+    --vibra-gold: #ffaa00;
+    --vibra-red: #c42b1c;
+    --vibra-text-primary: #000000;
+    --vibra-text-secondary: #333333;
+    --vibra-text-muted: #555555;
+    --glass-bg: rgba(198, 198, 198, 0.95);
+    --glass-border: #555555;
+    --mc-progress-fill: #55ff55;
+    --mc-progress-bg: #313131;
+    --mc-gui-bg: #c6c6c6;
+    --vibra-font: 'Minecraft', monospace;
+}
+
+[data-theme="legacy"] body {
+    font-family: 'Minecraft', monospace;
+    image-rendering: pixelated;
+    border: 2px solid #000;
+}
+
+[data-theme="legacy"] body::before {
+    background: 
+        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+        url('minecraft.jpg');
+    background-size: cover, cover;
+    background-position: center, center;
+    animation: none;
+}
+
+/* Legacy Theme - Title bar */
+[data-theme="legacy"] .title-bar {
+    height: 32px;
+    background: #222;
+    border-bottom: 2px solid #000;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+[data-theme="legacy"] .title-bar-text {
+    color: #aaa;
+    font-size: 16px;
+    text-shadow: 1px 1px 0 #000;
+}
+
+[data-theme="legacy"] .title-bar-text::before {
+    display: none;
+}
+
+[data-theme="legacy"] .win-btn {
+    width: 24px;
+    height: 24px;
+    color: #aaa;
+    font-size: 18px;
+    border-radius: 0;
+    background: transparent;
+}
+
+[data-theme="legacy"] .win-btn:hover {
+    background: #444;
+    color: #fff;
+    transform: none;
+}
+
+[data-theme="legacy"] .win-btn.close:hover {
+    background: #c42b1c;
+}
+
+/* Legacy Theme - Blocky beveled buttons */
+[data-theme="legacy"] .btn-mc {
+    background: linear-gradient(to bottom, #7e7e7e, #6e6e6e);
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: inset -3px -3px 0px #333, inset 3px 3px 0px #aaa, 0 4px 6px rgba(0,0,0,0.3);
+    color: #e0e0e0;
+    text-shadow: 2px 2px 0 #333;
+    font-family: 'Minecraft', monospace;
+    image-rendering: pixelated;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+[data-theme="legacy"] .btn-mc:hover:not(.disabled) {
+    background: linear-gradient(to bottom, #8e8e8e, #7e7e7e);
+    color: #fff;
+    outline: 2px solid rgba(255,255,255,0.95);
+    box-shadow: inset -3px -3px 0px #333, inset 3px 3px 0px #aaa, 0 0 12px rgba(255,255,255,0.25);
+    transform: none;
+}
+
+[data-theme="legacy"] .btn-mc.nav-item:focus {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 2px #fff, 0 0 10px rgba(255,255,255,0.62);
+    filter: brightness(1.1);
+}
+
+[data-theme="legacy"] .btn-mc.disabled,
+[data-theme="legacy"] .btn-mc.running {
+    background: #4e4e4e;
+    color: #888;
+    box-shadow: inset -3px -3px 0px #222, inset 3px 3px 0px #666;
+    opacity: 0.8;
+}
+
+[data-theme="legacy"] .btn-mc.running {
+    color: #55ff55;
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* Legacy Theme - Play button */
+[data-theme="legacy"] .play-btn {
+    height: 96px;
+    font-size: 44px;
+    color: #fff;
+    background: linear-gradient(to bottom, #55aa55, #449944);
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: inset -3px -3px 0px #338833, inset 3px 3px 0px #77cc77;
+    text-shadow: 2px 2px 0 #000;
+}
+
+[data-theme="legacy"] .play-btn:hover:not(.disabled) {
+    background: linear-gradient(to bottom, #66bb66, #55aa55);
+    box-shadow: inset -3px -3px 0px #449944, inset 3px 3px 0px #88dd88;
+    transform: none;
+}
+
+/* Legacy Theme - Menu buttons */
+[data-theme="legacy"] .menu-btn {
+    background: linear-gradient(to bottom, #7e7e7e, #6e6e6e);
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: inset -2px -2px 0 #3b3b3b, inset 2px 2px 0 #9b9b9b;
+    color: #e0e0e0;
+}
+
+[data-theme="legacy"] .menu-btn:hover {
+    background: linear-gradient(to bottom, #8e8e8e, #7e7e7e);
+    border-color: #000;
+    box-shadow: inset -2px -2px 0 #4b4b4b, inset 2px 2px 0 #ababab;
+    transform: translateX(-4px);
+    color: #fff;
+}
+
+[data-theme="legacy"] .menu-btn svg,
+[data-theme="legacy"] .menu-btn i {
+    color: #ddd;
+}
+
+/* Legacy Theme - Version selector */
+[data-theme="legacy"] .top-left-controls .version-select-box {
+    background: #000;
+    border: 2px solid #555;
+    border-radius: 0;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+    color: #fff;
+}
+
+[data-theme="legacy"] .top-left-controls .version-select-box:hover {
+    border-color: #fff;
+    background: #000;
+}
+
+[data-theme="legacy"] .refresh-btn {
+    background: #6e6e6e;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: inset -2px -2px 0 #3b3b3b, inset 2px 2px 0 #9b9b9b;
+    color: #fff;
+}
+
+[data-theme="legacy"] .refresh-btn:hover {
+    background: #7e7e7e;
+    border-color: #000;
+    box-shadow: inset -2px -2px 0 #4b4b4b, inset 2px 2px 0 #ababab;
+    transform: none;
+}
+
+/* Legacy Theme - Inputs */
+[data-theme="legacy"] .mc-input {
+    background: #000;
+    border: 2px solid #555;
+    border-radius: 0;
+    color: #fff;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+[data-theme="legacy"] .mc-input:focus,
+[data-theme="legacy"] .mc-input.focused {
+    border-color: #fff;
+    background: #111;
+    box-shadow: 0 0 10px rgba(255,255,255,0.2), inset 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+[data-theme="legacy"] .mc-label {
+    color: #444;
+    text-transform: none;
+    font-size: 16px;
+}
+
+/* Legacy Theme - Checkboxes */
+[data-theme="legacy"] input[type="checkbox"].nav-item,
+[data-theme="legacy"] .mc-checkbox-label input[type="checkbox"] {
+    background: #1a1a1a;
+    border: 2px solid #555;
+    border-radius: 0;
+    box-shadow: inset 2px 2px 0 #000;
+}
+
+[data-theme="legacy"] input[type="checkbox"].nav-item:checked,
+[data-theme="legacy"] .mc-checkbox-label input[type="checkbox"]:checked {
+    background: #55aa55;
+    border-color: #000;
+    box-shadow: inset -2px -2px 0 #338833, inset 2px 2px 0 #77cc77;
+}
+
+[data-theme="legacy"] input[type="checkbox"].nav-item:checked::after,
+[data-theme="legacy"] .mc-checkbox-label input[type="checkbox"]:checked::after {
+    content: '✓';
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+    font-family: 'Minecraft', monospace;
+}
+
+/* Legacy Theme - Modal boxes */
+[data-theme="legacy"] .modal-overlay {
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(4px);
+}
+
+[data-theme="legacy"] .modal-box {
+    background: #c6c6c6;
+    border: 4px solid #000;
+    border-radius: 0;
+    box-shadow: inset 4px 4px 0 #fff, inset -4px -4px 0 #555, 0 20px 50px rgba(0,0,0,0.8);
+}
+
+[data-theme="legacy"] .modal-title {
+    color: #333;
+    text-shadow: 2px 2px 0 #fff;
+    font-size: 28px;
+}
+
+[data-theme="legacy"] .modal-title::before,
+[data-theme="legacy"] .modal-title::after {
+    display: none;
+}
+
+[data-theme="legacy"] .modal-body-text {
+    color: #333;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+[data-theme="legacy"] .modal-close-btn {
+    color: #444;
+}
+
+[data-theme="legacy"] .modal-close-btn:hover {
+    color: #c42b1c;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+/* Legacy Theme - Options overlay */
+[data-theme="legacy"] .options-container {
+    background: #c6c6c6;
+    border: 4px solid #000;
+    border-radius: 0;
+    box-shadow: inset 4px 4px 0 #fff, inset -4px -4px 0 #555;
+}
+
+[data-theme="legacy"] .options-header {
+    background: rgba(0,0,0,0.1);
+    border-bottom: 2px solid #555;
+}
+
+[data-theme="legacy"] .options-title {
+    color: #333;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+[data-theme="legacy"] .options-title::before {
+    color: #55aa55;
+}
+
+[data-theme="legacy"] .options-tabs {
+    background: rgba(0,0,0,0.1);
+    border-bottom: 2px solid #555;
+}
+
+[data-theme="legacy"] .options-tab {
+    color: #444;
+    border: 2px solid transparent;
+    border-radius: 0;
+}
+
+[data-theme="legacy"] .options-tab:hover {
+    background: rgba(255,255,255,0.3);
+    color: #000;
+}
+
+[data-theme="legacy"] .options-tab.active {
+    color: #55aa55;
+    background: rgba(0,0,0,0.2);
+    border: 2px solid #55aa55;
+    border-bottom: 2px solid rgba(0,0,0,0.2);
+}
+
+[data-theme="legacy"] .options-footer {
+    background: rgba(0,0,0,0.1);
+    border-top: 2px solid #555;
+}
+
+/* Legacy Theme - Progress bar */
+[data-theme="legacy"] .progress-container {
+    background: rgba(0,0,0,0.9);
+    border-top: 4px solid #000;
+    backdrop-filter: none;
+}
+
+[data-theme="legacy"] .progress-bar-bg {
+    background: var(--mc-progress-bg);
+    border: 2px solid #000;
+    border-radius: 0;
+}
+
+[data-theme="legacy"] .progress-bar-fill {
+    background: var(--mc-progress-fill);
+    border-radius: 0;
+    box-shadow: inset 0 3px 0 rgba(255,255,255,0.4);
+}
+
+[data-theme="legacy"] .progress-text {
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    font-size: 16px;
+}
+
+[data-theme="legacy"] #progress-spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #333;
+    border-top-color: var(--mc-progress-fill);
+}
+
+/* Legacy Theme - Skin viewer */
+[data-theme="legacy"] .skin-viewer-container {
+    background: #1a1a1a;
+    border: 3px solid #555;
+    border-radius: 0;
+    box-shadow: inset 2px 2px 0 #000;
+}
+
+[data-theme="legacy"] .skin-render-toggle {
+    background: #6e6e6e;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: inset -2px -2px 0 #3b3b3b, inset 2px 2px 0 #9b9b9b;
+    color: #fff;
+}
+
+[data-theme="legacy"] .skin-render-toggle:hover {
+    background: #7e7e7e;
+    border-color: #000;
+}
+
+/* Legacy Theme - Sliders */
+[data-theme="legacy"] .mc-slider-container {
+    background: #000;
+    border: 2px solid #555;
+    border-radius: 0;
+}
+
+[data-theme="legacy"] .mc-slider::-webkit-slider-thumb {
+    background: #6e6e6e;
+    border: 2px solid #fff;
+    border-radius: 0;
+    box-shadow: inset -2px -2px 0 #333, inset 2px 2px 0 #aaa;
+}
+
+[data-theme="legacy"] .mc-slider:focus::-webkit-slider-thumb {
+    background: #7e7e7e;
+    box-shadow: inset -2px -2px 0 #333, inset 2px 2px 0 #aaa, 0 0 8px #fff;
+}
+
+[data-theme="legacy"] .mc-slider-percent {
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    font-size: 18px;
+}
+
+/* Legacy Theme - Scrollbars */
+[data-theme="legacy"] ::-webkit-scrollbar {
+    width: 12px;
+}
+
+[data-theme="legacy"] ::-webkit-scrollbar-track {
+    background: #333;
+    border-left: 2px solid #000;
+}
+
+[data-theme="legacy"] ::-webkit-scrollbar-thumb {
+    background: #6e6e6e;
+    border: 2px solid #000;
+    box-shadow: inset -2px -2px 0 #333, inset 2px 2px 0 #aaa;
+}
+
+[data-theme="legacy"] ::-webkit-scrollbar-thumb:hover {
+    background: #7e7e7e;
+}
+
+/* Legacy Theme - Toast */
+[data-theme="legacy"] #toast {
+    background: rgba(0,0,0,0.95);
+    border: 3px solid #fff;
+    border-radius: 0;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* Legacy Theme - Music button */
+[data-theme="legacy"] .music-btn {
+    background: #6e6e6e;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: inset -2px -2px 0 #333, inset 2px 2px 0 #aaa;
+    color: #fff;
+    backdrop-filter: none;
+}
+
+[data-theme="legacy"] .music-btn:hover:not(.disabled) {
+    background-color: #7e7e7e;
+    outline: 2px solid #fff;
+    transform: none;
+    box-shadow: inset -2px -2px 0 #333, inset 2px 2px 0 #aaa;
+}
+
+[data-theme="legacy"] .music-btn.muted {
+    opacity: 0.6;
+    background: #444;
+    color: #aaa;
+}
+
+/* Legacy Theme - Loader */
+[data-theme="legacy"] #loader {
+    background-image: url('minecraft.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+[data-theme="legacy"] #loader::before {
+    background: rgba(0,0,0,0.8);
+    animation: none;
+}
+
+[data-theme="legacy"] .loader-spinner {
+    width: 80px;
+    height: 80px;
+    border: 8px solid #333;
+    border-top: 8px solid var(--mc-progress-fill);
+}
+
+[data-theme="legacy"] #loader-text {
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+/* Legacy Theme - Logo and Splash */
+[data-theme="legacy"] .mc-logo-img {
+    filter: drop-shadow(6px 6px 0px rgba(0,0,0,0.6));
+    animation: none;
+}
+
+[data-theme="legacy"] .splash-text {
+    color: #ffff00;
+    text-shadow: 2px 2px 0 #3f3f00;
+    font-size: 18px;
+    right: -40px;
+    animation: splashBounce 0.2s infinite alternate ease-in-out;
+}
+
+@keyframes splashBounce {
+    from { transform: translateY(-50%) rotate(-15deg) scale(1); }
+    to { transform: translateY(-50%) rotate(-15deg) scale(1.1); }
+}
+
+/* Legacy Theme - Gallery */
+[data-theme="legacy"] .gallery-item {
+    background: #111;
+    border: 2px solid #444;
+    border-radius: 0;
+}
+
+[data-theme="legacy"] .gallery-item:hover,
+[data-theme="legacy"] .gallery-item:focus {
+    border-color: #fff;
+    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+}
+
+[data-theme="legacy"] .gallery-action-btn:hover {
+    color: #55ff55;
+    text-shadow: 0 0 5px rgba(85,255,85,0.5);
+}
+
+[data-theme="legacy"] .gallery-action-btn.delete:hover {
+    color: #ff5555;
+    text-shadow: 0 0 5px rgba(255,85,85,0.5);
+}
+
+/* Legacy Theme - Controller layouts */
+[data-theme="legacy"] .controller-layout-preset {
+    background: #0a0a0a;
+    border: 2px solid #555;
+    color: #fff;
+}
+
+[data-theme="legacy"] .controller-layout-preset:hover,
+[data-theme="legacy"] .controller-layout-preset:focus {
+    border-color: #fff;
+}
+
+[data-theme="legacy"] .controller-layout-preset.active {
+    border-color: #55ff55;
+    box-shadow: inset 0 0 0 1px #55ff55;
+    background: #111;
+}
+
+/* Legacy Theme - Fix username display above skin viewer */
+[data-theme="legacy"] #username-display {
+    color: #fff !important;
+    text-shadow: 2px 2px 0 #000 !important;
+}
+
+/* Legacy Theme - Fix tooltips - use OreUI style */
+[data-theme="legacy"] .menu-btn[data-tooltip]::after {
+    background: #2a2a2a;
+    color: #fff;
+    border: 2px solid #55aa55;
+    border-radius: 0;
+    box-shadow: inset -2px -2px 0 #1a1a1a, inset 2px 2px 0 #4a4a4a;
+    font-family: 'Minecraft', monospace;
+    font-size: 14px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-theme="legacy"] .menu-btn[data-tooltip]:hover::after,
+[data-theme="legacy"] .menu-btn[data-tooltip]:focus::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+[data-theme="legacy"] .menu-btn[data-tooltip]::before {
+    border-left-color: #2a2a2a;
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-theme="legacy"] .menu-btn[data-tooltip]:hover::before,
+[data-theme="legacy"] .menu-btn[data-tooltip]:focus::before {
+    opacity: 1;
+    visibility: visible;
 }
