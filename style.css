@@ -102,6 +102,30 @@ body::before {
     -webkit-app-region: drag;
     z-index: 10000;
     position: relative;
+    opacity: 1;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* In fullscreen, title bar overlays content */
+body.fullscreen-mode .title-bar,
+.title-bar.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+}
+
+.title-bar.hidden {
+    opacity: 0;
+    transform: translateY(-5px);
+    pointer-events: none;
+}
+
+.title-bar.show,
+.title-bar:hover {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .title-bar-text {
@@ -118,7 +142,6 @@ body::before {
     content: '◆';
     color: var(--vibra-accent);
     font-size: 10px;
-    animation: diamondPulse 2s ease-in-out infinite;
 }
 
 @keyframes diamondPulse {
@@ -1533,6 +1556,23 @@ select.mc-input option {
     padding: 12px 24px 0;
     border-bottom: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.2);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--glass-border) transparent;
+}
+
+.options-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.options-tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.options-tabs::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 2px;
 }
 
 .options-tab {

@@ -8,7 +8,7 @@ const childProcess = require('child_process');
 const DEFAULT_REPO = "smartcmd/MinecraftConsoles";
 const DEFAULT_EXEC = "Minecraft.Client.exe";
 const TARGET_FILE = "LCEWindows64.zip";
-const LAUNCHER_REPO = "gradenGnostic/LegacyLauncher";
+const LAUNCHER_REPO = "SuperYosh23/VibraLCE";
 const REPO_PRESETS = {
     default: 'smartcmd/MinecraftConsoles',
     noWatermark: 'cath0degaytube/MinecraftConsoles'
@@ -175,14 +175,18 @@ const GamepadManager = {
     },
 
     getVisibleNavItems() {
-        const modals = ['update-modal', 'options-modal', 'profile-modal', 'servers-modal', 'instances-modal', 'add-instance-modal', 'skin-modal', 'snapshots-modal'];
+        const modals = ['update-modal', 'options-overlay', 'profile-modal', 'servers-modal', 'instances-modal', 'add-instance-modal', 'skin-modal', 'snapshots-modal', 'gallery-modal'];
         let activeModal = null;
         for (const id of modals) {
             const m = document.getElementById(id);
-            if (m && m.style.display === 'flex') {
-                activeModal = m;
-                break;
+            if (!m) continue;
+            // options-overlay uses CSS class 'active' instead of inline display
+            if (id === 'options-overlay') {
+                if (m.classList.contains('active')) activeModal = m;
+            } else {
+                if (m.style.display === 'flex') activeModal = m;
             }
+            if (activeModal) break;
         }
 
         const allItems = Array.from(document.querySelectorAll('.nav-item'));
@@ -267,7 +271,7 @@ const GamepadManager = {
     cancelCurrent() {
         const activeModal = this.getActiveModal();
         if (activeModal) {
-            if (activeModal.id === 'options-modal') toggleOptions(false);
+            if (activeModal.id === 'options-overlay') toggleOptions(false);
             else if (activeModal.id === 'profile-modal') toggleProfile(false);
             else if (activeModal.id === 'servers-modal') toggleServers(false);
             else if (activeModal.id === 'instances-modal') toggleInstances(false);
@@ -275,20 +279,46 @@ const GamepadManager = {
             else if (activeModal.id === 'update-modal') document.getElementById('btn-skip-update')?.click();
             else if (activeModal.id === 'skin-modal') closeSkinManager();
             else if (activeModal.id === 'snapshots-modal') toggleSnapshots(false);
+            else if (activeModal.id === 'gallery-modal') toggleGallery(false);
         }
     },
 
     getActiveModal() {
-        const modals = ['update-modal', 'options-modal', 'profile-modal', 'servers-modal', 'instances-modal', 'add-instance-modal', 'skin-modal', 'snapshots-modal'];
+        const modals = ['update-modal', 'options-overlay', 'profile-modal', 'servers-modal', 'instances-modal', 'add-instance-modal', 'skin-modal', 'snapshots-modal', 'gallery-modal'];
         for (const id of modals) {
             const m = document.getElementById(id);
-            if (m && m.style.display === 'flex') return m;
+            if (!m) continue;
+            // options-overlay uses CSS class 'active' instead of inline display
+            if (id === 'options-overlay') {
+                if (m.classList.contains('active')) return m;
+            } else {
+                if (m.style.display === 'flex') return m;
+            }
         }
         return null;
     },
 
     cycleActiveSelection(dir) {
         const active = document.activeElement;
+        const activeModal = this.getActiveModal();
+        
+        // Handle options menu tabs with L/R when options overlay is active
+        if (activeModal?.id === 'options-overlay') {
+            const tabs = Array.from(document.querySelectorAll('.options-tab'));
+            const activeTab = document.querySelector('.options-tab.active');
+            const currentIndex = activeTab ? tabs.indexOf(activeTab) : 0;
+            let newIndex = currentIndex + dir;
+            if (newIndex < 0) newIndex = tabs.length - 1;
+            if (newIndex >= tabs.length) newIndex = 0;
+            if (tabs[newIndex]) {
+                const tabName = tabs[newIndex].dataset.tab;
+                switchOptionsTab(tabName);
+                // Focus the newly selected tab for visual feedback
+                tabs[newIndex].focus();
+            }
+            return;
+        }
+        
         if (active && active.id === 'compat-select-box') {
             const select = document.getElementById('compat-select');
             if (select) {
@@ -298,7 +328,7 @@ const GamepadManager = {
                 select.selectedIndex = newIdx;
                 updateCompatDisplay();
             }
-        } else if (!this.getActiveModal()) {
+        } else if (!activeModal) {
             const select = document.getElementById('version-select');
             if (select) {
                 let newIdx = select.selectedIndex + dir;
@@ -704,6 +734,60 @@ window.onload = async () => {
             }
         });
 
+        // Fullscreen title bar auto-hide logic
+        const titleBar = document.querySelector('.title-bar');
+        let fullscreenHideTimeout = null;
+        
+        ipcRenderer.on('fullscreen-changed', (event, isFullscreen) => {
+            if (titleBar) {
+                if (isFullscreen) {
+                    titleBar.classList.add('hidden', 'overlay');
+                } else {
+                    titleBar.classList.remove('hidden', 'overlay');
+                }
+            }
+        });
+        
+        // Show title bar when mouse is at top of screen in fullscreen
+        document.addEventListener('mousemove', (e) => {
+            if (!titleBar) return;
+            
+            const isFullscreen = document.fullscreenElement || 
+                                 document.webkitFullscreenElement || 
+                                 (window.innerHeight === screen.height);
+            
+            if (e.clientY <= 5 && titleBar.classList.contains('hidden')) {
+                titleBar.classList.remove('hidden');
+                
+                // Hide again after 2 seconds if mouse leaves title bar area
+                if (fullscreenHideTimeout) clearTimeout(fullscreenHideTimeout);
+                fullscreenHideTimeout = setTimeout(() => {
+                    if (!titleBar.matches(':hover')) {
+                        titleBar.classList.add('hidden');
+                    }
+                }, 2000);
+            }
+        });
+        
+        // Hide title bar when mouse leaves it (in fullscreen)
+        if (titleBar) {
+            titleBar.addEventListener('mouseleave', () => {
+                const isFullscreen = document.fullscreenElement || 
+                                     document.webkitFullscreenElement || 
+                                     (window.innerHeight === screen.height);
+                if (isFullscreen && !titleBar.classList.contains('hidden')) {
+                    if (fullscreenHideTimeout) clearTimeout(fullscreenHideTimeout);
+                    fullscreenHideTimeout = setTimeout(() => {
+                        titleBar.classList.add('hidden');
+                    }, 500);
+                }
+            });
+            
+            titleBar.addEventListener('mouseenter', () => {
+                if (fullscreenHideTimeout) clearTimeout(fullscreenHideTimeout);
+            });
+        }
+
         // Initialize features
         await loadControllerLayoutMode();
         fetchGitHubData();
@@ -713,6 +797,19 @@ window.onload = async () => {
         GamepadManager.init();
         UiSoundManager.init();
         updateMainMenuUsername();
+        initUiScaleSlider();
+        
+        // Apply start in fullscreen setting
+        const startFullscreen = await Store.get('start_in_fullscreen', false);
+        if (startFullscreen) {
+            ipcRenderer.send('window-set-fullscreen', true);
+        }
+        
+        // Set initial checkbox state for start fullscreen
+        const startFullscreenCheck = document.getElementById('start-fullscreen-checkbox');
+        if (startFullscreenCheck) {
+            startFullscreenCheck.checked = startFullscreen;
+        }
 
         async function takeScreenshot() {
             try {
@@ -1502,6 +1599,31 @@ function switchOptionsTab(tabName) {
     });
 }
 
+// Add wheel scroll support for tabs (horizontal scroll when overflowing)
+document.addEventListener('wheel', (e) => {
+    const optionsOverlay = document.getElementById('options-overlay');
+    if (!optionsOverlay || !optionsOverlay.classList.contains('active')) return;
+    
+    const tabsContainer = document.querySelector('.options-tabs');
+    if (!tabsContainer) return;
+    
+    // Check if hovering over tabs area
+    const rect = tabsContainer.getBoundingClientRect();
+    const isOverTabs = e.clientX >= rect.left && e.clientX <= rect.right && 
+                       e.clientY >= rect.top && e.clientY <= rect.bottom;
+    
+    if (!isOverTabs) return;
+    
+    // Only handle horizontal scrolling when tabs overflow
+    const canScrollLeft = tabsContainer.scrollLeft > 0;
+    const canScrollRight = tabsContainer.scrollLeft < (tabsContainer.scrollWidth - tabsContainer.clientWidth);
+    
+    if ((e.deltaY < 0 && canScrollLeft) || (e.deltaY > 0 && canScrollRight)) {
+        e.preventDefault();
+        tabsContainer.scrollLeft += e.deltaY;
+    }
+}, { passive: false });
+
 async function toggleProfile(show) {
     if (isProcessing) return;
     const modal = document.getElementById('profile-modal');
@@ -1601,6 +1723,7 @@ async function saveOptions() {
     const fullscreen = document.getElementById('fullscreen-checkbox')?.checked || false;
     const customProtonPath = document.getElementById('custom-proton-path').value.trim();
     const newInstallPath = document.getElementById('install-path-input').value.trim();
+    const startFullscreen = document.getElementById('start-fullscreen-checkbox')?.checked || false;
     const oldInstallPath = currentInstance.installPath;
     if (newInstallPath && newInstallPath !== oldInstallPath) {
         if (fs.existsSync(oldInstallPath)) {
@@ -1624,6 +1747,7 @@ async function saveOptions() {
     }
     const controllerLayoutMode = document.getElementById('controller-layout-select')?.value || 'auto';
     await Store.set('legacy_controller_layout_mode', controllerLayoutMode);
+    await Store.set('start_in_fullscreen', startFullscreen);
     GamepadManager.setControlLayoutMode(controllerLayoutMode);
     applyControllerLayoutPresetState(controllerLayoutMode);
     await saveInstancesToStore(); toggleOptions(false); fetchGitHubData(); updatePlayButtonText(); showToast("Settings Saved");
@@ -1653,6 +1777,31 @@ function updateMainMenuUsername() {
             display.textContent = name || 'Player';
         });
     }
+}
+
+async function initUiScaleSlider() {
+    const slider = document.getElementById('ui-scale-slider');
+    const percentText = document.getElementById('ui-scale-percent');
+    
+    if (!slider) return;
+    
+    const savedZoom = await Store.get('ui_scale', 1.0);
+    slider.value = savedZoom;
+    
+    const updatePercent = () => {
+        if (percentText) {
+            percentText.textContent = Math.round(parseFloat(slider.value) * 100) + '%';
+        }
+    };
+    
+    updatePercent();
+    
+    slider.oninput = async () => {
+        const factor = parseFloat(slider.value);
+        updatePercent();
+        await ipcRenderer.invoke('set-zoom-factor', factor);
+        await Store.set('ui_scale', factor);
+    };
 }
 
 function showToast(msg) {

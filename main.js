@@ -143,6 +143,11 @@ function createWindow() {
   ipcMain.handle('store-get', (event, key) => store.get(key));
   ipcMain.handle('store-set', (event, key, value) => store.set(key, value));
   
+  // UI Zoom/Scale handler
+  ipcMain.handle('set-zoom-factor', (event, factor) => {
+    mainWindow.webContents.setZoomFactor(factor);
+  });
+  
   ipcMain.handle('select-directory', async () => {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory', 'createDirectory']
@@ -150,8 +155,20 @@ function createWindow() {
     return result.filePaths[0];
   });
  
+  // Apply saved zoom factor on load
+  const savedZoom = store.get('ui_scale', 1.0);
+  mainWindow.webContents.setZoomFactor(savedZoom);
+
   mainWindow.on('maximize', () => mainWindow.webContents.send('window-is-maximized', true));
   mainWindow.on('unmaximize', () => mainWindow.webContents.send('window-is-maximized', false));
+
+  mainWindow.on('enter-full-screen', () => {
+    mainWindow.webContents.send('fullscreen-changed', true);
+  });
+  
+  mainWindow.on('leave-full-screen', () => {
+    mainWindow.webContents.send('fullscreen-changed', false);
+  });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);

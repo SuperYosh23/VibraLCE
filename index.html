@@ -199,24 +199,27 @@
             <!-- Header -->
             <div class="options-header">
                 <div class="options-title">LAUNCHER OPTIONS</div>
-                <div class="options-close" onclick="toggleOptions(false)" tabindex="0">×</div>
+                <div class="options-close nav-item" onclick="toggleOptions(false)" tabindex="0">×</div>
             </div>
 
             <!-- Tab Navigation -->
             <div class="options-tabs">
-                <div class="options-tab active" data-tab="general" onclick="switchOptionsTab('general')" tabindex="0">
+                <div class="options-tab active nav-item" data-tab="general" onclick="switchOptionsTab('general')" tabindex="0">
                     <i class="fas fa-folder"></i> General
                 </div>
-                <div class="options-tab" data-tab="repository" onclick="switchOptionsTab('repository')" tabindex="0">
+                <div class="options-tab nav-item" data-tab="interface" onclick="switchOptionsTab('interface')" tabindex="0">
+                    <i class="fas fa-desktop"></i> Interface
+                </div>
+                <div class="options-tab nav-item" data-tab="repository" onclick="switchOptionsTab('repository')" tabindex="0">
                     <i class="fas fa-code-branch"></i> Repository
                 </div>
-                <div class="options-tab" data-tab="launch" onclick="switchOptionsTab('launch')" tabindex="0">
+                <div class="options-tab nav-item" data-tab="launch" onclick="switchOptionsTab('launch')" tabindex="0">
                     <i class="fas fa-play"></i> Launch
                 </div>
-                <div class="options-tab" data-tab="controls" onclick="switchOptionsTab('controls')" tabindex="0">
+                <div class="options-tab nav-item" data-tab="controls" onclick="switchOptionsTab('controls')" tabindex="0">
                     <i class="fas fa-gamepad"></i> Controls
                 </div>
-                <div class="options-tab" data-tab="audio" onclick="switchOptionsTab('audio')" tabindex="0">
+                <div class="options-tab nav-item" data-tab="audio" onclick="switchOptionsTab('audio')" tabindex="0">
                     <i class="fas fa-volume-high"></i> Audio
                 </div>
             </div>
@@ -236,6 +239,23 @@
                         <div class="btn-mc flex-grow !h-[48px] !text-lg nav-item" onclick="openGameDir()" tabindex="0">
                             <i class="fas fa-folder-open mr-2"></i> GAME FOLDER
                         </div>
+                    </div>
+                </div>
+
+                <!-- Interface Tab -->
+                <div class="options-panel" id="tab-interface">
+                    <div class="mc-input-group">
+                        <label class="mc-label">UI Scale:</label>
+                        <div class="mc-slider-container">
+                            <input type="range" id="ui-scale-slider" min="0.5" max="2.0" step="0.05" value="1" class="mc-slider nav-item w-full" tabindex="0">
+                            <div id="ui-scale-percent" class="mc-slider-percent">100%</div>
+                        </div>
+                    </div>
+                    <div class="mc-input-group mt-4">
+                        <label class="mc-checkbox-label">
+                            <input type="checkbox" id="start-fullscreen-checkbox" class="nav-item" tabindex="0">
+                            <span>Start launcher in fullscreen</span>
+                        </label>
                     </div>
                 </div>
 
