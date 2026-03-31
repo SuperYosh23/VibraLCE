@@ -1785,6 +1785,9 @@ async function initUiScaleSlider() {
     const savedZoom = await Store.get('ui_scale', 1.0);
     slider.value = savedZoom;
     
+    // Apply saved zoom on startup
+    await ipcRenderer.invoke('set-zoom-factor', savedZoom);
+    
     const updatePercent = () => {
         if (percentText) {
             percentText.textContent = Math.round(parseFloat(slider.value) * 100) + '%';
@@ -1804,6 +1807,8 @@ async function initUiScaleSlider() {
 // Theme Management
 async function initTheme() {
     const themeSelect = document.getElementById('theme-select');
+    const customCssContainer = document.getElementById('custom-css-container');
+    const customCssInput = document.getElementById('custom-css-input');
     if (!themeSelect) return;
     
     // Load saved theme
@@ -1811,13 +1816,173 @@ async function initTheme() {
     document.body.setAttribute('data-theme', savedTheme);
     themeSelect.value = savedTheme;
     
+    // Load custom CSS if exists, otherwise use default template
+    let savedCustomCss = await Store.get('launcher_custom_css', '');
+    if (!savedCustomCss) {
+        savedCustomCss = `/* Default Custom CSS Template */
+/* Modify these variables or add your own CSS below */
+
+:root {
+  /* Core background colors */
+  --vibra-bg-primary: #0d1117;
+  --vibra-bg-secondary: #161b22;
+  --vibra-bg-tertiary: #21262d;
+  --vibra-surface: rgba(22, 27, 34, 0.85);
+  
+  /* Accent colors */
+  --vibra-accent: #3ddc84;
+  --vibra-accent-dim: #2ea043;
+  --vibra-accent-glow: rgba(61, 220, 132, 0.4);
+  --vibra-gold: #ffd700;
+  --vibra-red: #f85149;
+  
+  /* Text colors */
+  --vibra-text-primary: #f0f6fc;
+  --vibra-text-secondary: #8b949e;
+  --vibra-text-muted: #6e7681;
+  
+  /* Effects */
+  --glass-bg: rgba(13, 17, 23, 0.75);
+  --glass-border: rgba(48, 54, 61, 0.6);
+}
+
+/* Add your custom styles below this line */`;
+    }
+    if (customCssInput) {
+        customCssInput.value = savedCustomCss;
+    }
+    
+    // Show/hide custom CSS textarea based on theme
+    updateCustomCssVisibility(savedTheme);
+    
+    // Apply custom CSS if custom theme is selected
+    if (savedTheme === 'custom') {
+        applyCustomCssStyles(savedCustomCss);
+    }
+    
     // Handle theme change
     themeSelect.onchange = async () => {
         const newTheme = themeSelect.value;
         document.body.setAttribute('data-theme', newTheme);
         await Store.set('launcher_theme', newTheme);
-        showToast(`Theme changed to ${newTheme === 'vibra' ? 'Vibra' : 'Classic'}`);
+        
+        // Show/hide custom CSS textarea
+        updateCustomCssVisibility(newTheme);
+        
+        // Apply or remove custom CSS
+        if (newTheme === 'custom') {
+            let customCss = await Store.get('launcher_custom_css', '');
+            if (!customCss) {
+                customCss = `/* Default Custom CSS Template */
+/* Modify these variables or add your own CSS below */
+
+:root {
+  /* Core background colors */
+  --vibra-bg-primary: #0d1117;
+  --vibra-bg-secondary: #161b22;
+  --vibra-bg-tertiary: #21262d;
+  --vibra-surface: rgba(22, 27, 34, 0.85);
+  
+  /* Accent colors */
+  --vibra-accent: #3ddc84;
+  --vibra-accent-dim: #2ea043;
+  --vibra-accent-glow: rgba(61, 220, 132, 0.4);
+  --vibra-gold: #ffd700;
+  --vibra-red: #f85149;
+  
+  /* Text colors */
+  --vibra-text-primary: #f0f6fc;
+  --vibra-text-secondary: #8b949e;
+  --vibra-text-muted: #6e7681;
+  
+  /* Effects */
+  --glass-bg: rgba(13, 17, 23, 0.75);
+  --glass-border: rgba(48, 54, 61, 0.6);
+}
+
+/* Add your custom styles below this line */`;
+            }
+            if (customCssInput) customCssInput.value = customCss;
+            applyCustomCssStyles(customCss);
+        } else {
+            removeCustomCssStyles();
+        }
+        
+        showToast(`Theme changed to ${newTheme === 'vibra' ? 'Vibra' : newTheme === 'classic' ? 'OreUI' : 'Custom CSS'}`);
     };
+}
+
+function updateCustomCssVisibility(theme) {
+    const customCssContainer = document.getElementById('custom-css-container');
+    if (customCssContainer) {
+        customCssContainer.style.display = theme === 'custom' ? 'block' : 'none';
+    }
+}
+
+async function applyCustomCss() {
+    const customCssInput = document.getElementById('custom-css-input');
+    if (!customCssInput) return;
+    
+    const css = customCssInput.value;
+    await Store.set('launcher_custom_css', css);
+    applyCustomCssStyles(css);
+    showToast('Custom CSS applied!');
+}
+
+async function resetCustomCss() {
+    const customCssInput = document.getElementById('custom-css-input');
+    if (!customCssInput) return;
+    
+    const defaultCss = `/* Default Custom CSS Template */
+/* Modify these variables or add your own CSS below */
+
+:root {
+  /* Core background colors */
+  --vibra-bg-primary: #0d1117;
+  --vibra-bg-secondary: #161b22;
+  --vibra-bg-tertiary: #21262d;
+  --vibra-surface: rgba(22, 27, 34, 0.85);
+  
+  /* Accent colors */
+  --vibra-accent: #3ddc84;
+  --vibra-accent-dim: #2ea043;
+  --vibra-accent-glow: rgba(61, 220, 132, 0.4);
+  --vibra-gold: #ffd700;
+  --vibra-red: #f85149;
+  
+  /* Text colors */
+  --vibra-text-primary: #f0f6fc;
+  --vibra-text-secondary: #8b949e;
+  --vibra-text-muted: #6e7681;
+  
+  /* Effects */
+  --glass-bg: rgba(13, 17, 23, 0.75);
+  --glass-border: rgba(48, 54, 61, 0.6);
+}
+
+/* Add your custom styles below this line */`;
+    
+    customCssInput.value = defaultCss;
+    await Store.set('launcher_custom_css', defaultCss);
+    applyCustomCssStyles(defaultCss);
+    showToast('Custom CSS reset to default template');
+}
+
+function applyCustomCssStyles(css) {
+    let styleEl = document.getElementById('custom-theme-style');
+    if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'custom-theme-style';
+        document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = css;
+}
+
+function removeCustomCssStyles() {
+    const styleEl = document.getElementById('custom-theme-style');
+    if (styleEl) {
+        styleEl.textContent = '';
+    }
 }
 
 function showToast(msg) {
@@ -2196,6 +2361,8 @@ window.deleteSnapshot = deleteSnapshot;
 window.createSnapshotManual = createSnapshotManual;
 window.toggleSnapshots = toggleSnapshots;
 window.switchOptionsTab = switchOptionsTab;
+window.applyCustomCss = applyCustomCss;
+window.resetCustomCss = resetCustomCss;
 
 // Desktop shortcut for Linux AppImage
 function ensureDesktopShortcut() {

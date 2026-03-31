@@ -254,9 +254,18 @@
                     <div class="mc-input-group mt-4">
                         <label class="mc-label">Theme:</label>
                         <select id="theme-select" class="mc-input nav-item" tabindex="0" style="height: 48px;">
-                            <option value="vibra">Vibra (Modern)</option>
-                            <option value="classic">Classic (Minecraft)</option>
+                            <option value="vibra">Vibra</option>
+                            <option value="classic">OreUI</option>
+                            <option value="custom">Custom CSS</option>
                         </select>
+                    </div>
+                    <div class="mc-input-group mt-4" id="custom-css-container" style="display: none;">
+                        <label class="mc-label">Custom CSS:</label>
+                        <textarea id="custom-css-input" class="mc-input nav-item" placeholder="Enter your custom CSS here..." rows="10" style="font-family: monospace; font-size: 12px; resize: vertical;"></textarea>
+                        <div class="flex gap-2 mt-2">
+                            <div class="btn-mc btn-mini nav-item" onclick="applyCustomCss()" tabindex="0">Apply CSS</div>
+                            <div class="btn-mc btn-mini nav-item" onclick="resetCustomCss()" tabindex="0">Reset to Default</div>
+                        </div>
                     </div>
                     <div class="mc-input-group mt-4">
                         <label class="mc-checkbox-label">

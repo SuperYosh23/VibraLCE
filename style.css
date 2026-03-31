@@ -46,6 +46,9 @@
     --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --ui-scale: 1;
+    
+    /* Vibra theme font */
+    --vibra-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -62,7 +65,7 @@ body {
     display: flex;
     flex-direction: column;
     background: var(--vibra-bg-primary);
-    font-family: 'Minecraft', system-ui, -apple-system, sans-serif;
+    font-family: var(--vibra-font);
     overflow: hidden;
     -webkit-user-select: none;
     user-select: none;
@@ -1359,7 +1362,7 @@ select.mc-input option {
     font-size: 13px;
     font-weight: 600;
     pointer-events: none;
-    z-index: 1;
+    z-index: 3;
 }
 
 /* --- Screenshots Gallery --- */
@@ -1699,6 +1702,11 @@ select.mc-input option {
     --vibra-text-muted: #888888;
     --glass-bg: rgba(60, 60, 60, 0.95);
     --glass-border: #555555;
+    --vibra-font: 'Minecraft', monospace;
+}
+
+[data-theme="classic"] body {
+    font-family: 'Minecraft', monospace;
 }
 
 /* Classic Theme - Blocky Minecraft-style buttons */
@@ -1777,6 +1785,44 @@ select.mc-input option {
 [data-theme="classic"] .mc-input:focus {
     border-color: #55aa55;
     box-shadow: inset 2px 2px 0 #000, 0 0 0 2px rgba(85, 170, 85, 0.3);
+}
+
+/* Classic Theme - Checkboxes */
+[data-theme="classic"] input[type="checkbox"].nav-item,
+[data-theme="classic"] .mc-checkbox-label input[type="checkbox"] {
+    background: #1a1a1a;
+    border: 2px solid #555;
+    border-radius: 0;
+    box-shadow: inset 2px 2px 0 #000;
+}
+
+[data-theme="classic"] input[type="checkbox"].nav-item:checked,
+[data-theme="classic"] .mc-checkbox-label input[type="checkbox"]:checked {
+    background: #55aa55;
+    border-color: #000;
+    box-shadow: 
+        inset -2px -2px 0 #338833,
+        inset 2px 2px 0 #77cc77;
+}
+
+[data-theme="classic"] input[type="checkbox"].nav-item:focus,
+[data-theme="classic"] .mc-checkbox-label input[type="checkbox"]:focus {
+    box-shadow: inset 2px 2px 0 #000, 0 0 0 2px rgba(85, 170, 85, 0.5);
+}
+
+[data-theme="classic"] input[type="checkbox"].nav-item:checked::after,
+[data-theme="classic"] .mc-checkbox-label input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+    font-family: 'Minecraft', monospace;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 /* Classic Theme - Modal boxes */
@@ -1919,7 +1965,23 @@ select.mc-input option {
         inset 2px 2px 0 #77cc77;
 }
 
-[data-theme="classic"] .mc-slider::-webkit-slider-thumb:hover {
-    background: #66bb66;
-    transform: none;
+/* Custom Theme - Textarea styling */
+#custom-css-input {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    tab-size: 2;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+}
+
+#custom-css-input:focus {
+    border-color: var(--vibra-accent);
+    box-shadow: 0 0 0 3px var(--vibra-accent-glow);
+}
+
+/* Custom CSS Style element (injected at runtime) */
+#custom-theme-style {
+    display: none;
 }
