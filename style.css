@@ -1678,3 +1678,248 @@ select.mc-input option {
 .mc-checkbox-label input[type="checkbox"]:focus {
     box-shadow: 0 0 0 3px var(--vibra-accent-glow);
 }
+
+/* =============================================
+   THEME SYSTEM - CLASSIC MINECRAFT THEME
+   ============================================= */
+
+/* Classic Theme - Minecraft-style UI */
+[data-theme="classic"] {
+    --vibra-bg-primary: #1a1a1a;
+    --vibra-bg-secondary: #2a2a2a;
+    --vibra-bg-tertiary: #3a3a3a;
+    --vibra-surface: rgba(60, 60, 60, 0.9);
+    --vibra-accent: #55aa55;
+    --vibra-accent-dim: #449944;
+    --vibra-accent-glow: rgba(85, 170, 85, 0.3);
+    --vibra-gold: #ffaa00;
+    --vibra-red: #aa3333;
+    --vibra-text-primary: #ffffff;
+    --vibra-text-secondary: #aaaaaa;
+    --vibra-text-muted: #888888;
+    --glass-bg: rgba(60, 60, 60, 0.95);
+    --glass-border: #555555;
+}
+
+/* Classic Theme - Blocky Minecraft-style buttons */
+[data-theme="classic"] .btn-mc {
+    background: #6b6b6b;
+    border: 3px solid #000;
+    border-radius: 0;
+    box-shadow: 
+        inset -3px -3px 0 #3b3b3b,
+        inset 3px 3px 0 #9b9b9b;
+    text-shadow: 2px 2px 0 #000;
+    font-family: 'Minecraft', monospace;
+    image-rendering: pixelated;
+}
+
+[data-theme="classic"] .btn-mc:hover {
+    background: #7b7b7b;
+    border-color: #000;
+    box-shadow: 
+        inset -3px -3px 0 #4b4b4b,
+        inset 3px 3px 0 #ababab;
+    transform: none;
+}
+
+[data-theme="classic"] .btn-mc:active {
+    box-shadow: 
+        inset 3px 3px 0 #3b3b3b,
+        inset -3px -3px 0 #9b9b9b;
+}
+
+/* Classic Theme - Play button */
+[data-theme="classic"] .play-btn {
+    background: #55aa55;
+    border: 3px solid #000;
+    border-radius: 0;
+    box-shadow: 
+        inset -3px -3px 0 #338833,
+        inset 3px 3px 0 #77cc77;
+    text-shadow: 2px 2px 0 #000;
+}
+
+[data-theme="classic"] .play-btn:hover:not(.disabled) {
+    background: #66bb66;
+    box-shadow: 
+        inset -3px -3px 0 #449944,
+        inset 3px 3px 0 #88dd88;
+    transform: none;
+}
+
+/* Classic Theme - Menu buttons */
+[data-theme="classic"] .menu-btn {
+    background: #6b6b6b;
+    border: 3px solid #000;
+    border-radius: 0;
+    box-shadow: 
+        inset -2px -2px 0 #3b3b3b,
+        inset 2px 2px 0 #9b9b9b;
+}
+
+[data-theme="classic"] .menu-btn:hover {
+    background: #7b7b7b;
+    box-shadow: 
+        inset -2px -2px 0 #4b4b4b,
+        inset 2px 2px 0 #ababab;
+    transform: none;
+}
+
+/* Classic Theme - Inputs */
+[data-theme="classic"] .mc-input {
+    background: #1a1a1a;
+    border: 2px solid #555;
+    border-radius: 0;
+    box-shadow: inset 2px 2px 0 #000;
+}
+
+[data-theme="classic"] .mc-input:focus {
+    border-color: #55aa55;
+    box-shadow: inset 2px 2px 0 #000, 0 0 0 2px rgba(85, 170, 85, 0.3);
+}
+
+/* Classic Theme - Modal boxes */
+[data-theme="classic"] .modal-box {
+    background: #2a2a2a;
+    border: 3px solid #000;
+    border-radius: 0;
+    box-shadow: 
+        inset -3px -3px 0 #1a1a1a,
+        inset 3px 3px 0 #4a4a4a;
+}
+
+/* Classic Theme - Options overlay */
+[data-theme="classic"] .options-container {
+    border: 3px solid #000;
+    border-radius: 0;
+    box-shadow: 
+        inset -3px -3px 0 #1a1a1a,
+        inset 3px 3px 0 #4a4a4a;
+}
+
+/* Classic Theme - Tabs */
+[data-theme="classic"] .options-tab {
+    border: 2px solid transparent;
+    border-radius: 0;
+}
+
+[data-theme="classic"] .options-tab.active {
+    background: #3a3a3a;
+    border: 2px solid #55aa55;
+    border-bottom: 2px solid #3a3a3a;
+}
+
+/* Classic Theme - Title bar */
+[data-theme="classic"] .title-bar {
+    background: #2a2a2a;
+    border-bottom: 3px solid #000;
+    box-shadow: 
+        inset 0 -2px 0 #1a1a1a,
+        inset 0 2px 0 #4a4a4a;
+}
+
+/* Classic Theme - Progress bar */
+[data-theme="classic"] .progress-bar-fill {
+    background: #55aa55;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+[data-theme="classic"] .progress-bar-bg {
+    border-radius: 0;
+    border: 2px solid #555;
+}
+
+/* Classic Theme - Window buttons */
+[data-theme="classic"] .win-btn {
+    background: #6b6b6b;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 
+        inset -2px -2px 0 #3b3b3b,
+        inset 2px 2px 0 #9b9b9b;
+}
+
+[data-theme="classic"] .win-btn:hover {
+    background: #7b7b7b;
+}
+
+[data-theme="classic"] .win-btn.close:hover {
+    background: #aa3333;
+}
+
+/* Classic Theme - Version selector and refresh button */
+[data-theme="classic"] .top-left-controls .version-select-box {
+    background: #1a1a1a;
+    border: 2px solid #555;
+    border-radius: 0;
+    box-shadow: inset 2px 2px 0 #000;
+}
+
+[data-theme="classic"] .top-left-controls .version-select-box:hover {
+    background: #2a2a2a;
+    border-color: #55aa55;
+}
+
+[data-theme="classic"] .refresh-btn {
+    background: #6b6b6b;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 
+        inset -2px -2px 0 #3b3b3b,
+        inset 2px 2px 0 #9b9b9b;
+}
+
+[data-theme="classic"] .refresh-btn:hover {
+    background: #7b7b7b;
+    border-color: #000;
+    box-shadow: 
+        inset -2px -2px 0 #4b4b4b,
+        inset 2px 2px 0 #ababab;
+    transform: none;
+}
+
+/* Classic Theme - Skin viewer container */
+[data-theme="classic"] .skin-viewer-container {
+    background: #1a1a1a;
+    border: 3px solid #555;
+    border-radius: 0;
+    box-shadow: inset 2px 2px 0 #000;
+}
+
+[data-theme="classic"] .skin-render-toggle {
+    background: #6b6b6b;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 
+        inset -2px -2px 0 #3b3b3b,
+        inset 2px 2px 0 #9b9b9b;
+}
+
+[data-theme="classic"] .skin-render-toggle:hover {
+    background: #7b7b7b;
+    border-color: #000;
+}
+
+/* Classic Theme - Sliders */
+[data-theme="classic"] .mc-slider-container {
+    background: #1a1a1a;
+    border: 2px solid #555;
+    border-radius: 0;
+    box-shadow: inset 2px 2px 0 #000;
+}
+
+[data-theme="classic"] .mc-slider::-webkit-slider-thumb {
+    background: #55aa55;
+    border: 2px solid #000;
+    border-radius: 0;
+    box-shadow: 
+        inset -2px -2px 0 #338833,
+        inset 2px 2px 0 #77cc77;
+}
+
+[data-theme="classic"] .mc-slider::-webkit-slider-thumb:hover {
+    background: #66bb66;
+    transform: none;
+}

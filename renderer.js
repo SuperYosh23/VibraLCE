@@ -798,6 +798,7 @@ window.onload = async () => {
         UiSoundManager.init();
         updateMainMenuUsername();
         initUiScaleSlider();
+        initTheme();
         
         // Apply start in fullscreen setting
         const startFullscreen = await Store.get('start_in_fullscreen', false);
@@ -1801,6 +1802,25 @@ async function initUiScaleSlider() {
         updatePercent();
         await ipcRenderer.invoke('set-zoom-factor', factor);
         await Store.set('ui_scale', factor);
+    };
+}
+
+// Theme Management
+async function initTheme() {
+    const themeSelect = document.getElementById('theme-select');
+    if (!themeSelect) return;
+    
+    // Load saved theme
+    const savedTheme = await Store.get('launcher_theme', 'vibra');
+    document.body.setAttribute('data-theme', savedTheme);
+    themeSelect.value = savedTheme;
+    
+    // Handle theme change
+    themeSelect.onchange = async () => {
+        const newTheme = themeSelect.value;
+        document.body.setAttribute('data-theme', newTheme);
+        await Store.set('launcher_theme', newTheme);
+        showToast(`Theme changed to ${newTheme === 'vibra' ? 'Vibra' : 'Classic'}`);
     };
 }
 
