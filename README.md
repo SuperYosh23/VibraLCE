@@ -13,6 +13,7 @@ A modern launcher for Minecraft Legacy Console Edition.
 - **Snapshots/Rollback**: Create backups of your game installation and rollback when needed
 - **Automatic Updates**: Fetches latest releases from GitHub repositories
 - **Cross-platform Support**: Works on Windows and Linux
+- **Screenshot Gallery**: Built-in gallery for viewing and managing screenshots
 - **Profile System**: Save your username and track playtime
 - **Custom Launch Options**: Configure IP, port, fullscreen, and server mode
 - **Controller Support**: Choose between Xbox and Nintendo controller layouts
@@ -126,7 +127,6 @@ Feel free to submit issues and pull requests for improvements.
 
 - Code quality and best practices may vary throughout the codebase
 - Some implementations may not follow traditional software engineering patterns
-- Thorough testing is recommended before relying on this software for critical tasks
 - The AI-assisted development process may have introduced unforeseen issues
 
-Use this software at your own discretion and report any issues you encounter.
+Please report any issues you encounter.

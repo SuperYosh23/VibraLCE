@@ -1,6 +1,6 @@
 {
   "name": "vibralce",
-  "version": "3.5.0",
+  "version": "1.0.0",
   "description": "A Minecraft: Legacy Console Edition launcher - VibraLCE",
   "main": "main.js",
   "scripts": {

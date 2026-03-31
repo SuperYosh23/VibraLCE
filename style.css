@@ -77,16 +77,16 @@ body::before {
     background: 
         radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%),
         url('pano/pano.png');
-    background-size: cover, cover;
+    background-size: cover, auto 100%;
     background-position: center, 0% center;
     background-repeat: no-repeat, repeat-x;
     z-index: 0;
-    animation: panoramaScroll 120s linear infinite;
+    animation: panoramaScroll 180s linear infinite;
 }
 
 @keyframes panoramaScroll {
-    0% { background-position: center, 0% center; }
-    100% { background-position: center, 100% center; }
+    0% { background-position: center, 0 center; }
+    100% { background-position: center, -4096px center; }
 }
 
 .title-bar {

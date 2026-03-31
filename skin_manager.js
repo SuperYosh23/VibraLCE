@@ -479,7 +479,6 @@ async function saveSkinToDisk() {
 function initProfileSkinSection() {
     const skinInput = document.getElementById('profile-skin-input');
     const dropZone = document.getElementById('profile-drop-zone');
-    const saveBtn = document.getElementById('profile-save-skin-btn');
 
     if (skinInput) {
         skinInput.addEventListener('change', (e) => handleProfileSkinFile(e.target.files[0]));
@@ -510,10 +509,6 @@ function initProfileSkinSection() {
             handleProfileSkinFile(e.dataTransfer.files[0]); 
         });
     }
-
-    if (saveBtn) {
-        saveBtn.addEventListener('click', saveProfileSkinToDisk);
-    }
 }
 
 function handleProfileSkinFile(file) {
@@ -538,7 +533,6 @@ function processProfileSkinImage(img, srcUrl) {
     const ctx = canvas.getContext('2d');
     const statusMessage = document.getElementById('profile-status-message');
     const previewContainer = document.getElementById('profile-preview-container');
-    const saveBtn = document.getElementById('profile-save-skin-btn');
 
     if (img.width !== 64) {
         if(previewContainer) previewContainer.classList.add('hidden');
@@ -557,11 +551,6 @@ function processProfileSkinImage(img, srcUrl) {
         if(statusMessage) statusMessage.innerHTML = "<span style='color: #4ade80; font-weight: bold;'>LEGACY READY</span>";
     } else {
         if(statusMessage) statusMessage.innerHTML = "<span style='color: #facc15; font-weight: bold;'>CONVERTED TO 64x32</span>";
-    }
-    
-    if (saveBtn) {
-        saveBtn.textContent = "SAVE SKIN";
-        saveBtn.classList.remove('disabled');
     }
     
     if (!profileSkinScene) initProfilePreviewEngine();
@@ -657,11 +646,6 @@ async function loadCurrentSkinToProfile() {
                 processProfileSkinImage(img, url);
                 const statusMsg = document.getElementById('profile-status-message');
                 if (statusMsg) statusMsg.innerHTML = "<span style='color: #60a5fa; font-weight: bold;'>CURRENT SKIN</span>";
-                const saveBtn = document.getElementById('profile-save-skin-btn');
-                if (saveBtn) {
-                    saveBtn.textContent = "SAVED";
-                    saveBtn.classList.add('disabled');
-                }
             };
             img.src = url;
         }

@@ -335,6 +335,7 @@ const UiSoundManager = {
     cooldownMs: 70,
     lastHoverItem: null,
     inputSource: 'mouse',
+    sfxVolume: 1.0,
 
     setInputSource(source) {
         this.inputSource = source;
@@ -344,11 +345,13 @@ const UiSoundManager = {
         return true; // Play sounds for both controller and mouse/keyboard
     },
 
-    init() {
+    async init() {
+        this.sfxVolume = await Store.get('legacy_sfx_volume', 1.0);
+        
         Object.entries(this.files).forEach(([key, file]) => {
             this.cache[key] = new Audio(file);
             this.cache[key].preload = 'auto';
-            this.cache[key].volume = key === 'cursor' ? 0.45 : 0.6;
+            this.cache[key].volume = key === 'cursor' ? 0.45 * this.sfxVolume : 0.6 * this.sfxVolume;
         });
 
         const markMouseInput = () => this.setInputSource('mouse');
@@ -381,6 +384,29 @@ const UiSoundManager = {
             }
             this.play('select');
         });
+
+        // Initialize SFX volume slider
+        const sfxSlider = document.getElementById('sfx-volume-slider');
+        const sfxPercentText = document.getElementById('sfx-volume-percent');
+        const updateSfxPercent = () => {
+            if (sfxPercentText) {
+                sfxPercentText.textContent = Math.round(this.sfxVolume * 100) + "%";
+            }
+        };
+
+        if (sfxSlider) {
+            sfxSlider.value = this.sfxVolume;
+            updateSfxPercent();
+            sfxSlider.oninput = async () => {
+                this.sfxVolume = parseFloat(sfxSlider.value);
+                updateSfxPercent();
+                await Store.set('legacy_sfx_volume', this.sfxVolume);
+                // Update all cached audio volumes
+                Object.keys(this.cache).forEach(key => {
+                    this.cache[key].volume = key === 'cursor' ? 0.45 * this.sfxVolume : 0.6 * this.sfxVolume;
+                });
+            };
+        }
     },
 
     play(name) {
@@ -686,6 +712,7 @@ window.onload = async () => {
         MusicManager.init();
         GamepadManager.init();
         UiSoundManager.init();
+        updateMainMenuUsername();
 
         async function takeScreenshot() {
             try {
@@ -1608,8 +1635,24 @@ async function saveProfile() {
         username = username.substring(0, 16);
     }
     await Store.set('legacy_username', username);
-    updateClassicUsername();
-    toggleProfile(false); showToast("Profile Updated");
+    updateMainMenuUsername();
+    
+    // Also save skin if one was uploaded
+    if (window.saveProfileSkinToDisk) {
+        await window.saveProfileSkinToDisk();
+    }
+    
+    toggleProfile(false);
+    showToast("Profile Updated");
+}
+
+function updateMainMenuUsername() {
+    const display = document.getElementById('username-display');
+    if (display) {
+        Store.get('legacy_username', 'Player').then(name => {
+            display.textContent = name || 'Player';
+        });
+    }
 }
 
 function showToast(msg) {
@@ -1967,6 +2010,7 @@ window.removeServer = removeServer;
 window.toggleOptions = toggleOptions;
 window.saveOptions = saveOptions;
 window.saveProfile = saveProfile;
+window.updateMainMenuUsername = updateMainMenuUsername;
 window.updateCompatDisplay = updateCompatDisplay;
 window.checkForUpdatesManual = checkForUpdatesManual;
 window.browseInstallDir = browseInstallDir;
