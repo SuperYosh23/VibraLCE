@@ -1,10 +1,14 @@
-# VibraLCE
+<div style="text-align: center;">
 
-A modern launcher for Minecraft Legacy Console Edition.
+![Vibra Logo](https://github.com/SuperYosh23/VibraLCE/blob/main/minecraftlogo.png?raw=true "Vibra Logo")
 
+</div>
+
+
+<p  style="text-align: center;">A modern launcher for Minecraft Legacy Console Edition.</p>
 ## Features
 
-- **Modern Glassmorphism UI**: Clean, translucent interface with blur effects and modern styling
+- **Modern Glassmorphism UI**: Clean, translucent interface with blur effects and modern styling. There is also a classic Minecraft style UI option if you want to use that.
 - **Tabbed Options Menu**: Organized settings with tabs for General, Interface, Repository, Launch, Controls, and Audio
 - **3D Skin Preview**: Interactive skin viewer with 3D/2D toggle mode
 - **Skin Uploader**: Upload and convert skins to legacy 64x32 format
