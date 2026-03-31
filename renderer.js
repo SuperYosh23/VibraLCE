@@ -791,7 +791,6 @@ window.onload = async () => {
         // Initialize features
         await loadControllerLayoutMode();
         fetchGitHubData();
-        checkForLauncherUpdates();
         loadSplashText();
         MusicManager.init();
         GamepadManager.init();
@@ -836,9 +835,6 @@ window.onload = async () => {
         window.addEventListener('keydown', async (e) => {
             if (e.key === 'F2') {
                 takeScreenshot();
-            }
-            if (e.key === 'F9') {
-                checkForLauncherUpdates(true);
             }
             if (e.key === 'F11') {
                 e.preventDefault();
