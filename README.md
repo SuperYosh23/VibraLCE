@@ -5,7 +5,7 @@ A modern launcher for Minecraft Legacy Console Edition.
 ## Features
 
 - **Modern Glassmorphism UI**: Clean, translucent interface with blur effects and modern styling
-- **Tabbed Options Menu**: Organized settings with tabs for General, Repository, Launch, Controls, and Audio
+- **Tabbed Options Menu**: Organized settings with tabs for General, Interface, Repository, Launch, Controls, and Audio
 - **3D Skin Preview**: Interactive skin viewer with 3D/2D toggle mode
 - **Skin Uploader**: Upload and convert skins to legacy 64x32 format
 - **Icon-Based Navigation**: Clean icon-only menu buttons with tooltips
@@ -38,6 +38,16 @@ A modern launcher for Minecraft Legacy Console Edition.
 npm run dist
 ```
 
+### macOS DMG
+```bash
+npm run dist:mac
+```
+
+### Flatpak (Linux)
+```bash
+npm run dist:flatpak
+```
+
 ### Windows Installer
 ```bash
 npm run dist:win
@@ -57,12 +67,13 @@ By default, the launcher fetches releases from `smartcmd/MinecraftConsoles`. You
 - **Fullscreen Mode**: Launch game in fullscreen
 - **Server Mode**: Launch as headless server
 
-### Controls (Options > Controls)
-- **Controller Layout**: Choose between Xbox Style (A=Confirm, B=Cancel) or Nintendo Style (B=Confirm, A=Cancel)
+### Interface (Options > Interface)
+- **UI Scale**: Adjust the launcher interface scaling (50% - 200%)
+- **Theme**: Choose between Vibra (Modern) or Classic (Minecraft) themes
+- **Start in Fullscreen**: Launch the launcher in fullscreen mode
 
-### Profile Settings
-- **Username**: Your in-game player name
-- **Playtime Tracking**: Automatically tracks total playtime
+### Controls (Options > Controls)
+- **Controller Layout**: Choose between Auto Detect, Xbox Style (A=Confirm, B=Cancel), or Nintendo Style (B=Confirm, A=Cancel)
 
 ## System Requirements
 
@@ -81,10 +92,10 @@ The launcher supports several compatibility options for Linux:
 ## Dependencies
 
 - **Electron**: Cross-platform desktop app framework
-- **discord-rpc**: Discord Rich Presence integration
+- **electron-store**: Persistent settings storage
 - **extract-zip**: ZIP archive extraction
-- **Three.js**: 3D skin preview rendering
-- **Font Awesome**: UI icons
+- **Three.js**: 3D skin preview rendering (via CDN)
+- **Font Awesome**: UI icons (via CDN)
 - **Tailwind CSS**: UI styling (via CDN)
 
 ## Assets
@@ -108,7 +119,6 @@ The launcher is built with:
 1. **Repository not found**: Check the repository name in Options > Repository
 2. **Executable not found**: Verify the executable name matches the downloaded file
 3. **Launch failures**: Try different compatibility layers on Linux
-4. **Discord RPC issues**: Ensure Discord is running and RPC is enabled
 
 ### Linux Specific
 - Install Wine: `sudo apt install wine` (Ubuntu/Debian)
