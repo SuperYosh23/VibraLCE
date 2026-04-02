@@ -87,6 +87,17 @@ body::before {
     animation: panoramaScroll 180s linear infinite;
 }
 
+/* Static background when panorama is disabled */
+body.static-bg::before {
+    background: 
+        radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%),
+        url('minecraft.jpg');
+    background-size: cover, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    animation: none;
+}
+
 @keyframes panoramaScroll {
     0% { background-position: center, 0 center; }
     100% { background-position: center, -4096px center; }
@@ -1010,8 +1021,21 @@ input[type="checkbox"].nav-item:checked::after {
     font-weight: bold;
 }
 
+.mc-checkbox-label.nav-item:focus {
+    outline: none;
+    background: rgba(61, 220, 132, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 0 0 2px var(--vibra-accent-glow);
+}
+
+.mc-checkbox-label.nav-item:focus span {
+    color: var(--vibra-accent);
+}
+
 input[type="checkbox"].nav-item:focus {
-    box-shadow: 0 0 0 3px var(--vibra-accent-glow);
+    box-shadow: 0 0 0 3px var(--vibra-accent-glow), 0 0 0 5px var(--vibra-accent);
+    border-color: var(--vibra-accent);
+    background: var(--vibra-bg-tertiary);
 }
 
 select.mc-input {
@@ -1355,6 +1379,24 @@ select.mc-input option {
 
 .mc-slider:focus::-webkit-slider-thumb {
     box-shadow: 0 0 0 3px var(--vibra-accent-glow), 0 0 15px var(--vibra-accent-glow);
+}
+
+/* Controller navigation focus styles for sliders */
+.mc-slider.nav-item:focus {
+    outline: none;
+}
+
+.mc-slider-container:focus-within {
+    box-shadow: 0 0 0 3px var(--vibra-accent-glow);
+    border-radius: 8px;
+    border-color: var(--vibra-accent);
+}
+
+/* Controller navigation focus styles for selects */
+select.mc-input.nav-item:focus {
+    box-shadow: 0 0 0 3px var(--vibra-accent-glow), 0 0 15px var(--vibra-accent-glow);
+    border-color: var(--vibra-accent);
+    outline: none;
 }
 
 .mc-slider-percent {
@@ -1969,6 +2011,17 @@ select.mc-input option {
         inset 2px 2px 0 #77cc77;
 }
 
+/* Classic Theme - Slider/Select focus for controller navigation */
+[data-theme="classic"] .mc-slider-container:focus-within {
+    box-shadow: 0 0 0 3px rgba(85, 170, 85, 0.5);
+    border-color: #55aa55;
+}
+
+[data-theme="classic"] select.mc-input.nav-item:focus {
+    box-shadow: 0 0 0 3px rgba(85, 170, 85, 0.5);
+    border-color: #55aa55;
+}
+
 /* Custom Theme - Textarea styling */
 #custom-css-input {
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -2382,6 +2435,17 @@ select.mc-input option {
 [data-theme="legacy"] .mc-slider:focus::-webkit-slider-thumb {
     background: #7e7e7e;
     box-shadow: inset -2px -2px 0 #333, inset 2px 2px 0 #aaa, 0 0 8px #fff;
+}
+
+/* Legacy Theme - Slider/Select focus for controller navigation */
+[data-theme="legacy"] .mc-slider-container:focus-within {
+    box-shadow: 0 0 0 3px rgba(85, 255, 85, 0.5);
+    border-color: #55ff55;
+}
+
+[data-theme="legacy"] select.mc-input.nav-item:focus {
+    box-shadow: 0 0 0 3px rgba(85, 255, 85, 0.5);
+    border-color: #55ff55;
 }
 
 [data-theme="legacy"] .mc-slider-percent {

@@ -269,9 +269,15 @@
                         </div>
                     </div>
                     <div class="mc-input-group mt-4">
-                        <label class="mc-checkbox-label">
-                            <input type="checkbox" id="start-fullscreen-checkbox" class="nav-item" tabindex="0">
+                        <label class="mc-checkbox-label nav-item" tabindex="0">
+                            <input type="checkbox" id="start-fullscreen-checkbox" class="nav-item" tabindex="-1">
                             <span>Start launcher in fullscreen</span>
+                        </label>
+                    </div>
+                    <div class="mc-input-group mt-4">
+                        <label class="mc-checkbox-label nav-item" tabindex="0">
+                            <input type="checkbox" id="disable-panorama-checkbox" class="nav-item" tabindex="-1">
+                            <span>Disable Panorama (Static Background)</span>
                         </label>
                     </div>
                 </div>
@@ -322,15 +328,15 @@
                     </div>
 
                     <div class="mc-input-group mt-4">
-                        <label class="mc-checkbox-label">
-                            <input type="checkbox" id="fullscreen-checkbox" class="nav-item" tabindex="0">
+                        <label class="mc-checkbox-label nav-item" tabindex="0">
+                            <input type="checkbox" id="fullscreen-checkbox" class="nav-item" tabindex="-1">
                             <span>Launch in Fullscreen (-fullscreen)</span>
                         </label>
                     </div>
 
-                    <div class="mc-input-group">
-                        <label class="mc-checkbox-label">
-                            <input type="checkbox" id="server-checkbox" class="nav-item" tabindex="0">
+                    <div class="mc-input-group mt-4">
+                        <label class="mc-checkbox-label nav-item" tabindex="0">
+                            <input type="checkbox" id="server-checkbox" class="nav-item" tabindex="-1">
                             <span>Launch as Headless Server (-server)</span>
                         </label>
                     </div>
@@ -499,6 +505,17 @@
 
             <div class="flex justify-center w-full mt-6">
                  <div id="btn-close-skin" class="btn-mc nav-item !mb-0" onclick="closeSkinManager()" tabindex="0">DONE</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="quit-modal">
+        <div class="modal-box">
+            <div class="modal-title">QUIT GAME?</div>
+            <div class="modal-body-text">Are you sure you want to quit Vibra?</div>
+            <div class="flex gap-4 w-full">
+                <div class="btn-mc flex-grow nav-item" id="btn-quit-yes" tabindex="0">YES</div>
+                <div class="btn-mc flex-grow nav-item" id="btn-quit-no" tabindex="0">NO</div>
             </div>
         </div>
     </div>

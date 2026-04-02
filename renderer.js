@@ -145,12 +145,27 @@ const GamepadManager = {
 
             if (up) { UiSoundManager.setInputSource('controller'); this.navigate('up'); this.lastInputTime = now; }
             else if (down) { UiSoundManager.setInputSource('controller'); this.navigate('down'); this.lastInputTime = now; }
-            else if (left) { UiSoundManager.setInputSource('controller'); this.navigate('left'); this.lastInputTime = now; }
-            else if (right) { UiSoundManager.setInputSource('controller'); this.navigate('right'); this.lastInputTime = now; }
+            else if (left) { 
+                UiSoundManager.setInputSource('controller'); 
+                // Try to adjust slider/dropdown first, otherwise navigate
+                if (!this.adjustActiveElement(-1)) {
+                    this.navigate('left'); 
+                }
+                this.lastInputTime = now; 
+            }
+            else if (right) { 
+                UiSoundManager.setInputSource('controller'); 
+                // Try to adjust slider/dropdown first, otherwise navigate
+                if (!this.adjustActiveElement(1)) {
+                    this.navigate('right'); 
+                }
+                this.lastInputTime = now; 
+            }
             
-            else if (isPressed(4)) { UiSoundManager.setInputSource('controller'); this.cycleActiveSelection(-1); this.lastInputTime = now; }
-            else if (isPressed(5)) { UiSoundManager.setInputSource('controller'); this.cycleActiveSelection(1); this.lastInputTime = now; }
-            
+            // LB/RB always change tabs in options, cycle version otherwise
+            else if (isPressed(4)) { UiSoundManager.setInputSource('controller'); this.cycleTabOrVersion(-1); this.lastInputTime = now; }
+            else if (isPressed(5)) { UiSoundManager.setInputSource('controller'); this.cycleTabOrVersion(1); this.lastInputTime = now; }
+
             else if (isPressed(cancelButton)) { UiSoundManager.setInputSource('controller'); this.cancelCurrent(); this.lastInputTime = now; }
 
             else if (isPressed(2)) { UiSoundManager.setInputSource('controller'); checkForUpdatesManual(); this.lastInputTime = now; }
@@ -166,6 +181,36 @@ const GamepadManager = {
         const rStickY = getAxis(3) || getAxis(2) || getAxis(5);
         if (Math.abs(rStickY) > 0.1) {
             this.scrollActive(rStickY * 15);
+        }
+
+        // Right stick horizontal axis - spin main menu skin preview
+        const rStickX = getAxis(2);
+        if (Math.abs(rStickX) > 0.1) {
+            this.spinSkinPreview(rStickX);
+        }
+
+        // Right stick click (R3) - toggle skin render mode
+        const r3Pressed = isPressed(11);
+        if (r3Pressed && !this.lastR3Pressed) {
+            this.toggleSkinRenderMode();
+        }
+        this.lastR3Pressed = r3Pressed;
+    },
+
+    lastR3Pressed: false,
+
+    spinSkinPreview(axisValue) {
+        // Only spin if main menu skin viewer is in 3d mode
+        if (typeof mainMenuPlayerGroup !== 'undefined' && mainMenuPlayerGroup && 
+            typeof mainMenuSkinRenderMode !== 'undefined' && mainMenuSkinRenderMode === '3d') {
+            mainMenuPlayerGroup.rotation.y += axisValue * 0.05;
+        }
+    },
+
+    toggleSkinRenderMode() {
+        // Call the global function if it exists
+        if (typeof toggleMainSkinRenderMode === 'function') {
+            toggleMainSkinRenderMode();
         }
     },
 
@@ -191,12 +236,37 @@ const GamepadManager = {
 
         const allItems = Array.from(document.querySelectorAll('.nav-item'));
         return allItems.filter(item => {
+            // Skip checkboxes that are inside a nav-item label (the label handles navigation)
+            if (item.tagName === 'INPUT' && item.type === 'checkbox') {
+                const parentLabel = item.closest('.mc-checkbox-label');
+                if (parentLabel && parentLabel.classList.contains('nav-item')) {
+                    return false;
+                }
+            }
+            
             if (activeModal) {
+                // For options overlay, only include items in the active panel
+                if (activeModal.id === 'options-overlay') {
+                    const activePanel = activeModal.querySelector('.options-panel.active');
+                    if (activePanel && activePanel.contains(item)) {
+                        return true;
+                    }
+                    // Also allow tabs and footer buttons
+                    const tabs = activeModal.querySelector('.options-tabs');
+                    const footer = activeModal.querySelector('.options-footer');
+                    if ((tabs && tabs.contains(item)) || (footer && footer.contains(item))) {
+                        return true;
+                    }
+                    return false;
+                }
                 return activeModal.contains(item) && item.offsetParent !== null;
             }
+            
+            // For non-modal contexts, check if any parent modal/panel is hidden
             let parent = item.parentElement;
             while (parent) {
                 if (parent.classList?.contains('modal-overlay') && parent.style.display !== 'flex') return false;
+                if (parent.classList?.contains('options-panel') && !parent.classList?.contains('active')) return false;
                 parent = parent.parentElement;
             }
             return item.offsetParent !== null;
@@ -210,6 +280,24 @@ const GamepadManager = {
         if (!items.includes(current)) {
             items[0]?.focus();
             return;
+        }
+
+        // Special handling for Options overlay: when navigating down from tabs,
+        // focus the first element in the active panel content instead of footer
+        const activeModal = this.getActiveModal();
+        if (activeModal?.id === 'options-overlay' && direction === 'down') {
+            const currentTab = document.querySelector('.options-tab.active');
+            if (current === currentTab || current?.classList?.contains('options-tab')) {
+                const activePanel = document.querySelector('.options-panel.active');
+                if (activePanel) {
+                    const firstInput = activePanel.querySelector('.nav-item');
+                    if (firstInput && items.includes(firstInput)) {
+                        firstInput.focus();
+                        firstInput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        return;
+                    }
+                }
+            }
         }
 
         const currentRect = current.getBoundingClientRect();
@@ -230,14 +318,15 @@ const GamepadManager = {
             const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
             let inDirection = false;
-            if (direction === 'right' && angle >= -45 && angle <= 45) inDirection = true;
-            if (direction === 'left' && (angle >= 135 || angle <= -135)) inDirection = true;
-            if (direction === 'down' && angle > 45 && angle < 135) inDirection = true;
-            if (direction === 'up' && angle < -45 && angle > -135) inDirection = true;
+            // Wider angle tolerance (60 degrees instead of 45) for better coverage
+            if (direction === 'right' && angle >= -60 && angle <= 60) inDirection = true;
+            if (direction === 'left' && (angle >= 120 || angle <= -120)) inDirection = true;
+            if (direction === 'down' && angle > 30 && angle < 150) inDirection = true;
+            if (direction === 'up' && angle < -30 && angle > -150) inDirection = true;
 
             if (inDirection) {
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                const penalty = (direction === 'left' || direction === 'right') ? Math.abs(dy) * 2.5 : Math.abs(dx) * 2.5;
+                const penalty = (direction === 'left' || direction === 'right') ? Math.abs(dy) * 2 : Math.abs(dx) * 2;
                 const score = distance + penalty;
 
                 if (score < minScore) {
@@ -246,6 +335,16 @@ const GamepadManager = {
                 }
             }
         });
+
+        // Fallback: if no geometric match, try to find next/prev in DOM order
+        if (!bestMatch) {
+            const currentIdx = items.indexOf(current);
+            if (direction === 'down' || direction === 'right') {
+                bestMatch = items[currentIdx + 1] || null;
+            } else {
+                bestMatch = items[currentIdx - 1] || null;
+            }
+        }
 
         if (bestMatch) {
             bestMatch.focus();
@@ -261,7 +360,32 @@ const GamepadManager = {
 
             if (active.tagName === 'INPUT' && active.type === 'checkbox') {
                 active.checked = !active.checked;
-                active.dispatchEvent(new Event('change'));
+                active.dispatchEvent(new Event('change', { bubbles: true }));
+            } else if (active.tagName === 'LABEL' && active.classList.contains('mc-checkbox-label')) {
+                // Handle checkbox label click - toggle the checkbox inside
+                const checkbox = active.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            } else if (active.tagName === 'INPUT' && active.type === 'range') {
+                // Sliders are already focused, just add visual feedback
+                // The bump animation above provides feedback
+                // Left/right bumpers adjust the value via cycleActiveSelection
+            } else if (active.tagName === 'SELECT') {
+                // For selects, simulate keyboard to open the dropdown
+                // This is more reliable than .click() in Electron
+                const keyEvent = new KeyboardEvent('keydown', {
+                    key: 'Space',
+                    code: 'Space',
+                    keyCode: 32,
+                    which: 32,
+                    bubbles: true,
+                    cancelable: true
+                });
+                active.dispatchEvent(keyEvent);
+                // Also try the focus method to ensure it opens
+                active.focus();
             } else {
                 active.click();
             }
@@ -280,11 +404,15 @@ const GamepadManager = {
             else if (activeModal.id === 'skin-modal') closeSkinManager();
             else if (activeModal.id === 'snapshots-modal') toggleSnapshots(false);
             else if (activeModal.id === 'gallery-modal') toggleGallery(false);
+            else if (activeModal.id === 'quit-modal') toggleQuitModal(false);
+        } else {
+            // On main screen, show quit confirmation
+            toggleQuitModal(true);
         }
     },
 
     getActiveModal() {
-        const modals = ['update-modal', 'options-overlay', 'profile-modal', 'servers-modal', 'instances-modal', 'add-instance-modal', 'skin-modal', 'snapshots-modal', 'gallery-modal'];
+        const modals = ['update-modal', 'options-overlay', 'profile-modal', 'servers-modal', 'instances-modal', 'add-instance-modal', 'skin-modal', 'snapshots-modal', 'gallery-modal', 'quit-modal'];
         for (const id of modals) {
             const m = document.getElementById(id);
             if (!m) continue;
@@ -298,8 +426,38 @@ const GamepadManager = {
         return null;
     },
 
-    cycleActiveSelection(dir) {
+    adjustActiveElement(dir) {
         const active = document.activeElement;
+        
+        // Handle sliders when focused - left/right adjusts value
+        if (active && active.tagName === 'INPUT' && active.type === 'range') {
+            const step = parseFloat(active.step) || 0.01;
+            const min = parseFloat(active.min) || 0;
+            const max = parseFloat(active.max) || 1;
+            let newValue = parseFloat(active.value) + (step * dir);
+            newValue = Math.max(min, Math.min(max, newValue));
+            const decimals = step.toString().split('.')[1]?.length || 2;
+            newValue = parseFloat(newValue.toFixed(decimals));
+            active.value = String(newValue);
+            active.dispatchEvent(new Event('input', { bubbles: true }));
+            active.dispatchEvent(new Event('change', { bubbles: true }));
+            return true; // Handled
+        }
+        
+        // Handle select dropdowns when focused - left/right cycles options
+        if (active && active.tagName === 'SELECT') {
+            let newIdx = active.selectedIndex + dir;
+            if (newIdx < 0) newIdx = active.options.length - 1;
+            if (newIdx >= active.options.length) newIdx = 0;
+            active.selectedIndex = newIdx;
+            active.dispatchEvent(new Event('change', { bubbles: true }));
+            return true; // Handled
+        }
+        
+        return false; // Not handled, fall back to navigation
+    },
+
+    cycleTabOrVersion(dir) {
         const activeModal = this.getActiveModal();
         
         // Handle options menu tabs with L/R when options overlay is active
@@ -319,6 +477,8 @@ const GamepadManager = {
             return;
         }
         
+        // Handle compat-select-box if focused
+        const active = document.activeElement;
         if (active && active.id === 'compat-select-box') {
             const select = document.getElementById('compat-select');
             if (select) {
@@ -329,6 +489,7 @@ const GamepadManager = {
                 updateCompatDisplay();
             }
         } else if (!activeModal) {
+            // Main screen - cycle version
             const select = document.getElementById('version-select');
             if (select) {
                 let newIdx = select.selectedIndex + dir;
@@ -810,6 +971,14 @@ window.onload = async () => {
         if (startFullscreenCheck) {
             startFullscreenCheck.checked = startFullscreen;
         }
+        
+        // Load and apply disable panorama setting
+        const disablePanorama = await Store.get('disable_panorama', false);
+        const disablePanoramaCheck = document.getElementById('disable-panorama-checkbox');
+        if (disablePanoramaCheck) {
+            disablePanoramaCheck.checked = disablePanorama;
+        }
+        applyPanoramaSetting(disablePanorama);
 
         async function takeScreenshot() {
             try {
@@ -1721,6 +1890,7 @@ async function saveOptions() {
     const customProtonPath = document.getElementById('custom-proton-path').value.trim();
     const newInstallPath = document.getElementById('install-path-input').value.trim();
     const startFullscreen = document.getElementById('start-fullscreen-checkbox')?.checked || false;
+    const disablePanorama = document.getElementById('disable-panorama-checkbox')?.checked || false;
     const oldInstallPath = currentInstance.installPath;
     if (newInstallPath && newInstallPath !== oldInstallPath) {
         if (fs.existsSync(oldInstallPath)) {
@@ -1745,6 +1915,8 @@ async function saveOptions() {
     const controllerLayoutMode = document.getElementById('controller-layout-select')?.value || 'auto';
     await Store.set('legacy_controller_layout_mode', controllerLayoutMode);
     await Store.set('start_in_fullscreen', startFullscreen);
+    await Store.set('disable_panorama', disablePanorama);
+    applyPanoramaSetting(disablePanorama);
     GamepadManager.setControlLayoutMode(controllerLayoutMode);
     applyControllerLayoutPresetState(controllerLayoutMode);
     await saveInstancesToStore(); toggleOptions(false); fetchGitHubData(); updatePlayButtonText(); showToast("Settings Saved");
@@ -1765,6 +1937,14 @@ async function saveProfile() {
     
     toggleProfile(false);
     showToast("Profile Updated");
+}
+
+function applyPanoramaSetting(disabled) {
+    if (disabled) {
+        document.body.classList.add('static-bg');
+    } else {
+        document.body.classList.remove('static-bg');
+    }
 }
 
 function updateMainMenuUsername() {
@@ -2327,6 +2507,36 @@ async function deleteSnapshot(snapId) {
     }
 }
 
+function toggleQuitModal(show) {
+    const modal = document.getElementById('quit-modal');
+    const yesBtn = document.getElementById('btn-quit-yes');
+    const noBtn = document.getElementById('btn-quit-no');
+    
+    if (show) {
+        document.activeElement?.blur();
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        UiSoundManager.play('popupOpen');
+        
+        yesBtn.onclick = () => {
+            UiSoundManager.play('select');
+            ipcRenderer.send('window-close');
+        };
+        noBtn.onclick = () => {
+            toggleQuitModal(false);
+        };
+        setTimeout(() => noBtn.focus(), 100);
+    } else {
+        modal.style.opacity = '0';
+        UiSoundManager.play('popupClose');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            yesBtn.onclick = null;
+            noBtn.onclick = null;
+        }, 300);
+    }
+}
+
 // Global functions for HTML onclick
 window.minimizeWindow = minimizeWindow;
 window.toggleMaximize = toggleMaximize;
@@ -2363,6 +2573,7 @@ window.toggleSnapshots = toggleSnapshots;
 window.switchOptionsTab = switchOptionsTab;
 window.applyCustomCss = applyCustomCss;
 window.resetCustomCss = resetCustomCss;
+window.toggleQuitModal = toggleQuitModal;
 
 // Desktop shortcut for Linux AppImage
 function ensureDesktopShortcut() {
