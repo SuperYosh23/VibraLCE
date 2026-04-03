@@ -143,6 +143,44 @@ function createWindow() {
   ipcMain.handle('store-get', (event, key) => store.get(key));
   ipcMain.handle('store-set', (event, key, value) => store.set(key, value));
   
+  // Export/Import Settings handlers
+  ipcMain.handle('export-settings', async (event, data) => {
+    try {
+      const { filePath } = await dialog.showSaveDialog({
+        title: 'Export VibraLCE Settings',
+        defaultPath: 'vibralce-settings.json',
+        filters: [{ name: 'JSON Files', extensions: ['json'] }]
+      });
+      if (filePath) {
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+        return { success: true, path: filePath };
+      }
+      return { success: false, reason: 'cancelled' };
+    } catch (err) {
+      console.error('Export settings error:', err);
+      return { success: false, error: err.message };
+    }
+  });
+  
+  ipcMain.handle('import-settings', async () => {
+    try {
+      const { filePaths } = await dialog.showOpenDialog({
+        title: 'Import VibraLCE Settings',
+        filters: [{ name: 'JSON Files', extensions: ['json'] }],
+        properties: ['openFile']
+      });
+      if (filePaths && filePaths.length > 0) {
+        const content = fs.readFileSync(filePaths[0], 'utf-8');
+        const data = JSON.parse(content);
+        return { success: true, data, path: filePaths[0] };
+      }
+      return { success: false, reason: 'cancelled' };
+    } catch (err) {
+      console.error('Import settings error:', err);
+      return { success: false, error: err.message };
+    }
+  });
+  
   // UI Zoom/Scale handler
   ipcMain.handle('set-zoom-factor', (event, factor) => {
     mainWindow.webContents.setZoomFactor(factor);
@@ -152,6 +190,20 @@ function createWindow() {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory', 'createDirectory']
     });
+    return result.filePaths[0];
+  });
+
+  ipcMain.handle('select-background-file', async () => {
+    const result = await dialog.showOpenDialog({
+      title: 'Select Background Image',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Image Files', extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'] }
+      ]
+    });
+    if (result.canceled || result.filePaths.length === 0) {
+      return null;
+    }
     return result.filePaths[0];
   });
  

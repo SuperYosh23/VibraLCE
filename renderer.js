@@ -959,6 +959,7 @@ window.onload = async () => {
         updateMainMenuUsername();
         initUiScaleSlider();
         initTheme();
+        initLogoAndBackground();
         
         // Apply start in fullscreen setting
         const startFullscreen = await Store.get('start_in_fullscreen', false);
@@ -977,6 +978,12 @@ window.onload = async () => {
         const disablePanoramaCheck = document.getElementById('disable-panorama-checkbox');
         if (disablePanoramaCheck) {
             disablePanoramaCheck.checked = disablePanorama;
+            // Update custom background label based on panorama mode
+            updateCustomBackgroundLabel(disablePanorama);
+            // Listen for changes to update the label dynamically
+            disablePanoramaCheck.addEventListener('change', (e) => {
+                updateCustomBackgroundLabel(e.target.checked);
+            });
         }
         applyPanoramaSetting(disablePanorama);
 
@@ -1891,6 +1898,8 @@ async function saveOptions() {
     const newInstallPath = document.getElementById('install-path-input').value.trim();
     const startFullscreen = document.getElementById('start-fullscreen-checkbox')?.checked || false;
     const disablePanorama = document.getElementById('disable-panorama-checkbox')?.checked || false;
+    const customBgPath = document.getElementById('custom-bg-path-input')?.value.trim() || '';
+    const logoStyle = document.getElementById('logo-select')?.value || 'vibra';
     const oldInstallPath = currentInstance.installPath;
     if (newInstallPath && newInstallPath !== oldInstallPath) {
         if (fs.existsSync(oldInstallPath)) {
@@ -1916,7 +1925,11 @@ async function saveOptions() {
     await Store.set('legacy_controller_layout_mode', controllerLayoutMode);
     await Store.set('start_in_fullscreen', startFullscreen);
     await Store.set('disable_panorama', disablePanorama);
+    await Store.set('launcher_custom_bg_path', customBgPath);
+    await Store.set('launcher_logo_style', logoStyle);
     applyPanoramaSetting(disablePanorama);
+    applyCustomBackgroundStyles(customBgPath);
+    document.body.setAttribute('data-logo', logoStyle);
     GamepadManager.setControlLayoutMode(controllerLayoutMode);
     applyControllerLayoutPresetState(controllerLayoutMode);
     await saveInstancesToStore(); toggleOptions(false); fetchGitHubData(); updatePlayButtonText(); showToast("Settings Saved");
@@ -2088,7 +2101,7 @@ async function initTheme() {
             removeCustomCssStyles();
         }
         
-        showToast(`Theme changed to ${newTheme === 'vibra' ? 'Vibra' : newTheme === 'classic' ? 'OreUI' : 'Custom CSS'}`);
+        showToast(`Theme changed to ${newTheme === 'vibra' ? 'Vibra' : newTheme === 'classic' ? 'OreUI' : newTheme === 'legacy' ? 'Legacy' : newTheme === 'material' ? 'Material' : newTheme === 'material-dark' ? 'Material Dark' : 'Custom CSS'}`);
     };
 }
 
@@ -2162,6 +2175,91 @@ function removeCustomCssStyles() {
     const styleEl = document.getElementById('custom-theme-style');
     if (styleEl) {
         styleEl.textContent = '';
+    }
+}
+
+// Custom Background and Logo Management
+async function browseCustomBackground() {
+    const filePath = await ipcRenderer.invoke('select-background-file');
+    if (filePath) {
+        document.getElementById('custom-bg-path-input').value = filePath;
+    }
+}
+
+function updateCustomBackgroundLabel(isStaticMode) {
+    const label = document.getElementById('custom-bg-label');
+    const hint = document.getElementById('custom-bg-hint');
+    const input = document.getElementById('custom-bg-path-input');
+    
+    if (isStaticMode) {
+        // Static background mode
+        if (label) label.textContent = 'Custom Background (Static Image):';
+        if (hint) hint.textContent = 'For best results, use a 1920x1080 or larger image';
+        if (input) input.placeholder = 'Select a static background image...';
+    } else {
+        // Panorama mode
+        if (label) label.textContent = 'Custom Background (Panorama Image):';
+        if (hint) hint.textContent = 'For best results, use a wide image (4096px+ width recommended)';
+        if (input) input.placeholder = 'Select a wide panorama image...';
+    }
+}
+
+async function applyCustomBackground() {
+    const bgPath = document.getElementById('custom-bg-path-input').value.trim();
+    if (!bgPath) {
+        showToast('Please select a background image first');
+        return;
+    }
+    
+    if (!fs.existsSync(bgPath)) {
+        showToast('Background file not found');
+        return;
+    }
+    
+    await Store.set('launcher_custom_bg_path', bgPath);
+    applyCustomBackgroundStyles(bgPath);
+    showToast('Custom background applied!');
+}
+
+async function resetCustomBackground() {
+    document.getElementById('custom-bg-path-input').value = '';
+    await Store.set('launcher_custom_bg_path', '');
+    document.body.removeAttribute('data-custom-bg');
+    document.body.style.removeProperty('--custom-bg-url');
+    showToast('Custom background reset to default');
+}
+
+function applyCustomBackgroundStyles(bgPath) {
+    if (!bgPath) return;
+    document.body.setAttribute('data-custom-bg', 'true');
+    document.body.style.setProperty('--custom-bg-url', `url('file://${bgPath.replace(/\\/g, '/')}')`);
+}
+
+async function initLogoAndBackground() {
+    // Load and apply custom background
+    const customBgPath = await Store.get('launcher_custom_bg_path', '');
+    const bgInput = document.getElementById('custom-bg-path-input');
+    if (bgInput && customBgPath) {
+        bgInput.value = customBgPath;
+        applyCustomBackgroundStyles(customBgPath);
+    }
+    
+    // Load and apply logo preference
+    const logoStyle = await Store.get('launcher_logo_style', 'vibra');
+    const logoSelect = document.getElementById('logo-select');
+    if (logoSelect) {
+        logoSelect.value = logoStyle;
+    }
+    document.body.setAttribute('data-logo', logoStyle);
+    
+    // Handle logo change
+    if (logoSelect) {
+        logoSelect.onchange = async () => {
+            const newLogo = logoSelect.value;
+            document.body.setAttribute('data-logo', newLogo);
+            await Store.set('launcher_logo_style', newLogo);
+            showToast(`Logo changed to ${newLogo === 'vibra' ? 'Vibra' : 'LCE'}`);
+        };
     }
 }
 
@@ -2537,6 +2635,107 @@ function toggleQuitModal(show) {
     }
 }
 
+async function exportSettings() {
+    UiSoundManager.play('select');
+    try {
+        // Gather all settings from Store
+        const exportData = {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            settings: {
+                legacy_username: await Store.get('legacy_username', ''),
+                legacy_playtime: await Store.get('legacy_playtime', 0),
+                ui_scale: await Store.get('ui_scale', 1.0),
+                launcher_theme: await Store.get('launcher_theme', 'vibra'),
+                launcher_custom_css: await Store.get('launcher_custom_css', ''),
+                launcher_custom_bg_path: await Store.get('launcher_custom_bg_path', ''),
+                launcher_logo_style: await Store.get('launcher_logo_style', 'vibra'),
+                legacy_controller_layout_mode: await Store.get('legacy_controller_layout_mode', 'auto'),
+                start_in_fullscreen: await Store.get('start_in_fullscreen', false),
+                disable_panorama: await Store.get('disable_panorama', false),
+                legacy_sfx_volume: await Store.get('legacy_sfx_volume', 1.0),
+                legacy_music_enabled: await Store.get('legacy_music_enabled', true),
+                legacy_music_volume: await Store.get('legacy_music_volume', 0.5)
+            },
+            instances: await Store.get('legacy_instances', []),
+            currentInstanceId: await Store.get('legacy_current_instance_id', null)
+        };
+        
+        const result = await ipcRenderer.invoke('export-settings', exportData);
+        if (result.success) {
+            showToast(`Settings exported to: ${path.basename(result.path)}`);
+        } else if (result.reason !== 'cancelled') {
+            showToast('Export failed: ' + (result.error || 'Unknown error'));
+        }
+    } catch (e) {
+        console.error('Export settings error:', e);
+        showToast('Export failed: ' + e.message);
+    }
+}
+
+async function importSettings() {
+    UiSoundManager.play('select');
+    try {
+        const result = await ipcRenderer.invoke('import-settings');
+        if (!result.success) {
+            if (result.reason !== 'cancelled') {
+                showToast('Import failed: ' + (result.error || 'Unknown error'));
+            }
+            return;
+        }
+        
+        // Validate the imported data
+        const data = result.data;
+        if (!data.settings || !data.instances) {
+            showToast('Invalid settings file format');
+            return;
+        }
+        
+        // Confirm before overwriting current settings
+        if (!confirm(`Import settings from ${path.basename(result.path)}?\n\nThis will overwrite your current launcher settings, instances, and preferences.\nYour game files and screenshots will NOT be affected.`)) {
+            return;
+        }
+        
+        // Import all settings
+        const s = data.settings;
+        if (s.legacy_username !== undefined) await Store.set('legacy_username', s.legacy_username);
+        if (s.legacy_playtime !== undefined) await Store.set('legacy_playtime', s.legacy_playtime);
+        if (s.ui_scale !== undefined) await Store.set('ui_scale', s.ui_scale);
+        if (s.launcher_theme !== undefined) await Store.set('launcher_theme', s.launcher_theme);
+        if (s.launcher_custom_css !== undefined) await Store.set('launcher_custom_css', s.launcher_custom_css);
+        if (s.launcher_custom_bg_path !== undefined) await Store.set('launcher_custom_bg_path', s.launcher_custom_bg_path);
+        if (s.launcher_logo_style !== undefined) await Store.set('launcher_logo_style', s.launcher_logo_style);
+        if (s.legacy_controller_layout_mode !== undefined) await Store.set('legacy_controller_layout_mode', s.legacy_controller_layout_mode);
+        if (s.start_in_fullscreen !== undefined) await Store.set('start_in_fullscreen', s.start_in_fullscreen);
+        if (s.disable_panorama !== undefined) await Store.set('disable_panorama', s.disable_panorama);
+        if (s.legacy_sfx_volume !== undefined) await Store.set('legacy_sfx_volume', s.legacy_sfx_volume);
+        if (s.legacy_music_enabled !== undefined) await Store.set('legacy_music_enabled', s.legacy_music_enabled);
+        if (s.legacy_music_volume !== undefined) await Store.set('legacy_music_volume', s.legacy_music_volume);
+        
+        // Import instances
+        if (data.instances) {
+            instances = data.instances;
+            await Store.set('legacy_instances', instances);
+        }
+        if (data.currentInstanceId) {
+            currentInstanceId = data.currentInstanceId;
+            await Store.set('legacy_current_instance_id', currentInstanceId);
+            currentInstance = instances.find(i => i.id === currentInstanceId) || instances[0];
+        }
+        
+        showToast('Settings imported successfully! Restarting launcher...');
+        
+        // Reload the page to apply all settings
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+        
+    } catch (e) {
+        console.error('Import settings error:', e);
+        showToast('Import failed: ' + e.message);
+    }
+}
+
 // Global functions for HTML onclick
 window.minimizeWindow = minimizeWindow;
 window.toggleMaximize = toggleMaximize;
@@ -2573,7 +2772,12 @@ window.toggleSnapshots = toggleSnapshots;
 window.switchOptionsTab = switchOptionsTab;
 window.applyCustomCss = applyCustomCss;
 window.resetCustomCss = resetCustomCss;
+window.browseCustomBackground = browseCustomBackground;
+window.applyCustomBackground = applyCustomBackground;
+window.resetCustomBackground = resetCustomBackground;
 window.toggleQuitModal = toggleQuitModal;
+window.exportSettings = exportSettings;
+window.importSettings = importSettings;
 
 // Desktop shortcut for Linux AppImage
 function ensureDesktopShortcut() {

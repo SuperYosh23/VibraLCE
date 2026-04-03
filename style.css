@@ -2625,3 +2625,1370 @@ select.mc-input.nav-item:focus {
     opacity: 1;
     visibility: visible;
 }
+
+/* =============================================
+   MATERIAL UI THEME
+   Clean, modern Material Design aesthetic
+   ============================================= */
+
+/* Material Theme - Base */
+[data-theme="material"] {
+    --material-primary: #6200ee;
+    --material-primary-variant: #3700b3;
+    --material-secondary: #03dac6;
+    --material-bg: #f5f5f5;
+    --material-surface: #ffffff;
+    --material-error: #b00020;
+    --material-text-primary: #212121;
+    --material-text-secondary: #757575;
+    --material-elevation-1: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 3px 0 rgba(0,0,0,0.12);
+    --material-elevation-2: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
+    --material-elevation-4: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+    --material-elevation-8: 0 5px 5px -3px rgba(0,0,0,0.2), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
+}
+
+[data-theme="material"] body {
+    background: var(--material-bg);
+    font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+}
+
+[data-theme="material"] body::before {
+    background: 
+        linear-gradient(135deg, rgba(98, 0, 238, 0.05) 0%, rgba(3, 218, 198, 0.05) 100%),
+        url('pano/pano.png');
+    background-size: cover, auto 100%;
+    filter: brightness(0.9) saturate(0.8);
+}
+
+[data-theme="material"].static-bg body::before {
+    background: 
+        linear-gradient(135deg, rgba(98, 0, 238, 0.1) 0%, rgba(3, 218, 198, 0.1) 100%),
+        url('minecraft.jpg');
+    animation: none;
+}
+
+/* Material Theme - Title Bar */
+[data-theme="material"] .title-bar {
+    background: var(--material-surface);
+    border-bottom: none;
+    box-shadow: var(--material-elevation-2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+[data-theme="material"] .title-bar-text {
+    color: var(--material-text-primary);
+    font-weight: 500;
+    font-size: 16px;
+}
+
+[data-theme="material"] .title-bar-text::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--material-primary);
+    border-radius: 50%;
+    color: transparent;
+}
+
+[data-theme="material"] .win-btn {
+    border-radius: 50%;
+    color: var(--material-text-secondary);
+    transition: all 0.2s ease;
+}
+
+[data-theme="material"] .win-btn:hover {
+    background: rgba(0,0,0,0.08);
+    color: var(--material-text-primary);
+    transform: scale(1);
+}
+
+[data-theme="material"] .win-btn.close:hover {
+    background: var(--material-error);
+    color: white;
+}
+
+/* Material Theme - Buttons */
+[data-theme="material"] .btn-mc {
+    background: var(--material-surface);
+    color: var(--material-primary);
+    border: none;
+    border-radius: 4px;
+    box-shadow: var(--material-elevation-1);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    text-shadow: none;
+}
+
+[data-theme="material"] .btn-mc:hover:not(.disabled) {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    transform: translateY(-1px);
+    color: var(--material-primary);
+}
+
+[data-theme="material"] .btn-mc.nav-item:focus {
+    box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.25), var(--material-elevation-2);
+    outline: none;
+}
+
+[data-theme="material"] .btn-mc.disabled,
+[data-theme="material"] .btn-mc.running {
+    background: rgba(0,0,0,0.12);
+    color: rgba(0,0,0,0.38);
+    box-shadow: none;
+}
+
+[data-theme="material"] .btn-mc.running {
+    color: var(--material-primary);
+}
+
+/* Material Theme - Play button */
+[data-theme="material"] .play-btn {
+    background: var(--material-primary);
+    color: white;
+    border: none;
+    border-radius: 28px;
+    box-shadow: var(--material-elevation-4);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: none;
+}
+
+[data-theme="material"] .play-btn:hover:not(.disabled) {
+    background: var(--material-primary-variant);
+    box-shadow: var(--material-elevation-8);
+    transform: translateY(-2px);
+}
+
+/* Material Theme - Menu buttons */
+[data-theme="material"] .menu-btn {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-secondary);
+}
+
+[data-theme="material"] .menu-btn:hover {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    color: var(--material-primary);
+    transform: translateX(-4px);
+}
+
+[data-theme="material"] .menu-btn svg,
+[data-theme="material"] .menu-btn i {
+    color: currentColor;
+}
+
+/* Material Theme - Version selector */
+[data-theme="material"] .top-left-controls .version-select-box {
+    background: var(--material-surface);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 4px;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-primary);
+}
+
+[data-theme="material"] .top-left-controls .version-select-box:hover {
+    background: var(--material-surface);
+    border-color: rgba(0,0,0,0.24);
+}
+
+[data-theme="material"] .refresh-btn {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 50%;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-secondary);
+}
+
+[data-theme="material"] .refresh-btn:hover {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    color: var(--material-primary);
+    transform: rotate(180deg);
+}
+
+/* Material Theme - Inputs */
+[data-theme="material"] .mc-input {
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.24);
+    border-radius: 4px 4px 0 0;
+    border-bottom: 2px solid rgba(0,0,0,0.6);
+    color: var(--material-text-primary);
+    box-shadow: none;
+    transition: all 0.2s ease;
+}
+
+[data-theme="material"] .mc-input:focus,
+[data-theme="material"] .mc-input.focused {
+    border-bottom-color: var(--material-primary);
+    background: rgba(98, 0, 238, 0.04);
+    box-shadow: none;
+}
+
+[data-theme="material"] .mc-label {
+    color: var(--material-text-secondary);
+    text-transform: none;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* Material Theme - Checkboxes */
+[data-theme="material"] input[type="checkbox"].nav-item,
+[data-theme="material"] .mc-checkbox-label input[type="checkbox"] {
+    background: rgba(0,0,0,0.04);
+    border: 2px solid rgba(0,0,0,0.54);
+    border-radius: 2px;
+    box-shadow: none;
+    position: relative;
+}
+
+[data-theme="material"] input[type="checkbox"].nav-item:checked,
+[data-theme="material"] .mc-checkbox-label input[type="checkbox"]:checked {
+    background: var(--material-secondary);
+    border-color: var(--material-secondary);
+    box-shadow: none;
+}
+
+[data-theme="material"] input[type="checkbox"].nav-item:checked::after,
+[data-theme="material"] .mc-checkbox-label input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--material-text-primary);
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: none;
+}
+
+[data-theme="material"] input[type="checkbox"].nav-item:focus,
+[data-theme="material"] .mc-checkbox-label input[type="checkbox"]:focus {
+    box-shadow: 0 0 0 3px rgba(3, 218, 198, 0.25);
+}
+
+/* Material Theme - Checkbox label text color */
+[data-theme="material"] .mc-checkbox-label {
+    color: var(--material-text-primary);
+}
+
+[data-theme="material"] .mc-checkbox-label span {
+    color: var(--material-text-primary);
+}
+
+/* Material Theme - Modal boxes */
+[data-theme="material"] .modal-overlay {
+    background: rgba(0,0,0,0.32);
+    backdrop-filter: blur(4px);
+}
+
+[data-theme="material"] .modal-box {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--material-elevation-8);
+}
+
+[data-theme="material"] .modal-title {
+    color: var(--material-text-primary);
+    font-weight: 400;
+    letter-spacing: 0.25px;
+    text-shadow: none;
+}
+
+[data-theme="material"] .modal-title::before,
+[data-theme="material"] .modal-title::after {
+    display: none;
+}
+
+[data-theme="material"] .modal-body-text {
+    color: var(--material-text-secondary);
+    text-shadow: none;
+}
+
+[data-theme="material"] .modal-close-btn {
+    color: var(--material-text-secondary);
+}
+
+[data-theme="material"] .modal-close-btn:hover {
+    color: var(--material-error);
+    text-shadow: none;
+}
+
+/* Material Theme - Options overlay */
+[data-theme="material"] .options-container {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--material-elevation-8);
+}
+
+[data-theme="material"] .options-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+}
+
+[data-theme="material"] .options-title {
+    color: var(--material-text-primary);
+    font-weight: 500;
+    text-shadow: none;
+}
+
+[data-theme="material"] .options-title::before {
+    color: var(--material-primary);
+}
+
+[data-theme="material"] .options-tabs {
+    background: transparent;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+}
+
+[data-theme="material"] .options-tab {
+    color: var(--material-text-secondary);
+    border: none;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+}
+
+[data-theme="material"] .options-tab:hover {
+    background: rgba(98, 0, 238, 0.04);
+    color: var(--material-text-primary);
+}
+
+[data-theme="material"] .options-tab.active {
+    color: var(--material-primary);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--material-primary);
+}
+
+[data-theme="material"] .options-footer {
+    background: transparent;
+    border-top: 1px solid rgba(0,0,0,0.12);
+}
+
+/* Material Theme - Progress bar */
+[data-theme="material"] .progress-container {
+    background: var(--material-surface);
+    border-top: none;
+    backdrop-filter: none;
+    box-shadow: var(--material-elevation-2);
+}
+
+[data-theme="material"] .progress-bar-bg {
+    background: rgba(0,0,0,0.12);
+    border: none;
+    border-radius: 4px;
+}
+
+[data-theme="material"] .progress-bar-fill {
+    background: var(--material-secondary);
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+[data-theme="material"] .progress-text {
+    color: var(--material-text-primary);
+    text-shadow: none;
+    font-weight: 500;
+}
+
+[data-theme="material"] #progress-spinner {
+    border: 3px solid rgba(0,0,0,0.12);
+    border-top-color: var(--material-secondary);
+}
+
+/* Material Theme - Skin viewer */
+[data-theme="material"] .skin-viewer-container {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--material-elevation-2);
+}
+
+[data-theme="material"] .skin-render-toggle {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 50%;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-secondary);
+}
+
+[data-theme="material"] .skin-render-toggle:hover {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    color: var(--material-primary);
+}
+
+/* Material Theme - Sliders */
+[data-theme="material"] .mc-slider-container {
+    background: rgba(0,0,0,0.04);
+    border: none;
+    border-radius: 4px 4px 0 0;
+    border-bottom: 2px solid rgba(0,0,0,0.6);
+}
+
+[data-theme="material"] .mc-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+}
+
+[data-theme="material"] .mc-slider::-webkit-slider-runnable-track {
+    background: rgba(0,0,0,0.24);
+    height: 4px;
+    border-radius: 2px;
+}
+
+[data-theme="material"] .mc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--material-primary);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: var(--material-elevation-1);
+    margin-top: -6px;
+    transition: transform 0.2s ease;
+}
+
+[data-theme="material"] .mc-slider:focus::-webkit-slider-thumb {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px rgba(98, 0, 238, 0.12);
+}
+
+[data-theme="material"] .mc-slider-container:focus-within {
+    box-shadow: none;
+    border-bottom-color: var(--material-primary);
+}
+
+[data-theme="material"] select.mc-input.nav-item:focus {
+    box-shadow: none;
+    border-bottom-color: var(--material-primary);
+}
+
+[data-theme="material"] .mc-slider-percent {
+    color: var(--material-text-secondary);
+    text-shadow: none;
+    font-size: 14px;
+}
+
+/* Material Theme - Scrollbars */
+[data-theme="material"] ::-webkit-scrollbar {
+    width: 8px;
+}
+
+[data-theme="material"] ::-webkit-scrollbar-track {
+    background: transparent;
+    border-left: none;
+}
+
+[data-theme="material"] ::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.24);
+    border: none;
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+[data-theme="material"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.38);
+}
+
+/* Material Theme - Toast */
+[data-theme="material"] #toast {
+    background: #323232;
+    border: none;
+    border-radius: 4px;
+    box-shadow: var(--material-elevation-4);
+    color: white;
+    font-weight: 400;
+}
+
+/* Material Theme - Music button */
+[data-theme="material"] .music-btn {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 50%;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-secondary);
+    backdrop-filter: none;
+}
+
+[data-theme="material"] .music-btn:hover:not(.disabled) {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    color: var(--material-primary);
+}
+
+[data-theme="material"] .music-btn.muted {
+    opacity: 1;
+    background: rgba(0,0,0,0.04);
+    color: rgba(0,0,0,0.38);
+}
+
+/* Material Theme - Loader */
+[data-theme="material"] #loader {
+    background: var(--material-bg);
+    background-size: cover;
+}
+
+[data-theme="material"] #loader::before {
+    background: rgba(255,255,255,0.9);
+}
+
+[data-theme="material"] .loader-spinner {
+    border: 3px solid rgba(0,0,0,0.12);
+    border-top: 3px solid var(--material-primary);
+}
+
+[data-theme="material"] #loader-text {
+    color: var(--material-text-primary);
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+/* Material Theme - Logo and Splash */
+[data-theme="material"] .mc-logo-img {
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+
+[data-theme="material"] .splash-text {
+    color: var(--material-secondary);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-weight: 500;
+}
+
+/* Material Theme - Gallery */
+[data-theme="material"] .gallery-item {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--material-elevation-1);
+    overflow: hidden;
+}
+
+[data-theme="material"] .gallery-item:hover,
+[data-theme="material"] .gallery-item:focus {
+    border: none;
+    box-shadow: var(--material-elevation-2);
+}
+
+[data-theme="material"] .gallery-action-btn {
+    color: var(--material-primary);
+    font-weight: 500;
+}
+
+[data-theme="material"] .gallery-action-btn:hover {
+    color: var(--material-primary-variant);
+    text-shadow: none;
+}
+
+[data-theme="material"] .gallery-action-btn.delete {
+    color: var(--material-error);
+}
+
+[data-theme="material"] .gallery-action-btn.delete:hover {
+    color: var(--material-error);
+}
+
+/* Material Theme - Controller layouts */
+[data-theme="material"] .controller-layout-preset {
+    background: var(--material-surface);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    color: var(--material-text-secondary);
+    box-shadow: var(--material-elevation-1);
+}
+
+[data-theme="material"] .controller-layout-preset:hover,
+[data-theme="material"] .controller-layout-preset:focus {
+    border-color: var(--material-primary);
+    box-shadow: var(--material-elevation-2);
+}
+
+[data-theme="material"] .controller-layout-preset.active {
+    border-color: var(--material-primary);
+    background: rgba(98, 0, 238, 0.08);
+    box-shadow: 0 0 0 2px rgba(98, 0, 238, 0.12);
+}
+
+/* Material Theme - Username display */
+[data-theme="material"] #username-display {
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.3) !important;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+/* Material Theme - Tooltips */
+[data-theme="material"] .menu-btn[data-tooltip]::after {
+    background: rgba(50,50,50,0.95);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    box-shadow: var(--material-elevation-2);
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 8px 12px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-theme="material"] .menu-btn[data-tooltip]:hover::after,
+[data-theme="material"] .menu-btn[data-tooltip]:focus::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+[data-theme="material"] .menu-btn[data-tooltip]::before {
+    border-left-color: rgba(50,50,50,0.95);
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-theme="material"] .menu-btn[data-tooltip]:hover::before,
+[data-theme="material"] .menu-btn[data-tooltip]:focus::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Material Theme - Loading dots */
+[data-theme="material"] .loading-dots span {
+    color: var(--material-primary);
+}
+
+/* Material Theme - Version label */
+[data-theme="material"] .version-label {
+    color: var(--material-text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Material Theme - Select arrow */
+[data-theme="material"] .select-arrow {
+    color: var(--material-text-secondary);
+}
+
+/* =============================================
+   CUSTOM BACKGROUND AND LOGO STYLES
+   ============================================= */
+
+/* Custom background support - High specificity to override themes */
+body[data-custom-bg="true"]::before {
+    background: var(--custom-bg-url) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+/* Override for static background mode */
+body[data-custom-bg="true"].static-bg::before {
+    animation: none !important;
+}
+
+/* Override theme-specific backgrounds when custom is set */
+[data-theme="material"][data-custom-bg="true"] body::before,
+[data-theme="material-dark"][data-custom-bg="true"] body::before,
+[data-theme="classic"][data-custom-bg="true"] body::before,
+[data-theme="legacy"][data-custom-bg="true"] body::before {
+    background: var(--custom-bg-url) !important;
+    background-size: cover !important;
+    background-position: center !important;
+    filter: none !important;
+}
+
+/* LCE Logo support */
+[data-logo="lce"] .mc-logo-img {
+    content: url('lce.png');
+}
+
+/* LCE Logo in specific themes */
+[data-theme="classic"][data-logo="lce"] .mc-logo-img,
+[data-theme="legacy"][data-logo="lce"] .mc-logo-img {
+    content: url('lce.png');
+}
+
+/* Custom background container indicator */
+#custom-bg-preview {
+    width: 100%;
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid var(--glass-border);
+    border-radius: 4px;
+    margin-top: 8px;
+    display: none;
+}
+
+#custom-bg-preview.active {
+    display: block;
+}
+
+/* Material Dark Theme - Base */
+[data-theme="material-dark"] {
+    --material-primary: #bb86fc;
+    --material-primary-variant: #3700b3;
+    --material-secondary: #03dac6;
+    --material-bg: #121212;
+    --material-surface: #1e1e1e;
+    --material-error: #cf6679;
+    --material-text-primary: #ffffff;
+    --material-text-secondary: rgba(255,255,255,0.7);
+    --material-elevation-1: 0 2px 1px -1px rgba(0,0,0,0.4), 0 1px 1px 0 rgba(0,0,0,0.28), 0 1px 3px 0 rgba(0,0,0,0.24);
+    --material-elevation-2: 0 3px 1px -2px rgba(0,0,0,0.4), 0 2px 2px 0 rgba(0,0,0,0.28), 0 1px 5px 0 rgba(0,0,0,0.24);
+    --material-elevation-4: 0 2px 4px -1px rgba(0,0,0,0.4), 0 4px 5px 0 rgba(0,0,0,0.28), 0 1px 10px 0 rgba(0,0,0,0.24);
+    --material-elevation-8: 0 5px 5px -3px rgba(0,0,0,0.4), 0 8px 10px 1px rgba(0,0,0,0.28), 0 3px 14px 2px rgba(0,0,0,0.24);
+}
+
+[data-theme="material-dark"] body {
+    background: var(--material-bg);
+    font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+}
+
+[data-theme="material-dark"] body::before {
+    background: 
+        linear-gradient(135deg, rgba(187, 134, 252, 0.08) 0%, rgba(3, 218, 198, 0.05) 100%),
+        url('pano/pano.png');
+    background-size: cover, auto 100%;
+    filter: brightness(0.5) saturate(0.7);
+}
+
+[data-theme="material-dark"].static-bg body::before {
+    background: 
+        linear-gradient(135deg, rgba(187, 134, 252, 0.1) 0%, rgba(3, 218, 198, 0.08) 100%),
+        url('minecraft.jpg');
+    animation: none;
+}
+
+/* Material Dark Theme - Title Bar */
+[data-theme="material-dark"] .title-bar {
+    background: var(--material-surface);
+    border-bottom: none;
+    box-shadow: var(--material-elevation-2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+[data-theme="material-dark"] .title-bar-text {
+    color: var(--material-text-primary);
+    font-weight: 500;
+    font-size: 16px;
+}
+
+[data-theme="material-dark"] .title-bar-text::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--material-primary);
+    border-radius: 50%;
+    color: transparent;
+}
+
+[data-theme="material-dark"] .win-btn {
+    border-radius: 50%;
+    color: var(--material-text-secondary);
+    transition: all 0.2s ease;
+}
+
+[data-theme="material-dark"] .win-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--material-text-primary);
+    transform: scale(1);
+}
+
+[data-theme="material-dark"] .win-btn.close:hover {
+    background: var(--material-error);
+    color: white;
+}
+
+/* Material Dark Theme - Buttons */
+[data-theme="material-dark"] .btn-mc {
+    background: var(--material-surface);
+    color: var(--material-primary);
+    border: none;
+    border-radius: 4px;
+    box-shadow: var(--material-elevation-1);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    text-shadow: none;
+}
+
+[data-theme="material-dark"] .btn-mc:hover:not(.disabled) {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    transform: translateY(-1px);
+    color: var(--material-primary);
+}
+
+[data-theme="material-dark"] .btn-mc.nav-item:focus {
+    box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.25), var(--material-elevation-2);
+    outline: none;
+}
+
+[data-theme="material-dark"] .btn-mc.disabled,
+[data-theme="material-dark"] .btn-mc.running {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.3);
+    box-shadow: none;
+}
+
+[data-theme="material-dark"] .btn-mc.running {
+    color: var(--material-primary);
+}
+
+/* Material Dark Theme - Play button */
+[data-theme="material-dark"] .play-btn {
+    background: var(--material-primary);
+    color: black;
+    border: none;
+    border-radius: 28px;
+    box-shadow: var(--material-elevation-4);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: none;
+}
+
+[data-theme="material-dark"] .play-btn:hover:not(.disabled) {
+    background: #c49efc;
+    box-shadow: var(--material-elevation-8);
+    transform: translateY(-2px);
+}
+
+/* Material Dark Theme - Menu buttons */
+[data-theme="material-dark"] .menu-btn {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-secondary);
+}
+
+[data-theme="material-dark"] .menu-btn:hover {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    color: var(--material-primary);
+    transform: translateX(-4px);
+}
+
+[data-theme="material-dark"] .menu-btn svg,
+[data-theme="material-dark"] .menu-btn i {
+    color: currentColor;
+}
+
+/* Material Dark Theme - Version selector */
+[data-theme="material-dark"] .top-left-controls .version-select-box {
+    background: var(--material-surface);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-primary);
+}
+
+[data-theme="material-dark"] .top-left-controls .version-select-box:hover {
+    background: var(--material-surface);
+    border-color: rgba(255,255,255,0.24);
+}
+
+[data-theme="material-dark"] .refresh-btn {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 50%;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-secondary);
+}
+
+[data-theme="material-dark"] .refresh-btn:hover {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    color: var(--material-primary);
+    transform: rotate(180deg);
+}
+
+/* Material Dark Theme - Inputs */
+[data-theme="material-dark"] .mc-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px 4px 0 0;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    color: var(--material-text-primary);
+    box-shadow: none;
+    transition: all 0.2s ease;
+}
+
+[data-theme="material-dark"] .mc-input:focus,
+[data-theme="material-dark"] .mc-input.focused {
+    border-bottom-color: var(--material-primary);
+    background: rgba(187, 134, 252, 0.08);
+    box-shadow: none;
+}
+
+[data-theme="material-dark"] .mc-label {
+    color: var(--material-text-secondary);
+    text-transform: none;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* Material Dark Theme - Checkboxes */
+[data-theme="material-dark"] input[type="checkbox"].nav-item,
+[data-theme="material-dark"] .mc-checkbox-label input[type="checkbox"] {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.54);
+    border-radius: 2px;
+    box-shadow: none;
+    position: relative;
+}
+
+[data-theme="material-dark"] input[type="checkbox"].nav-item:checked,
+[data-theme="material-dark"] .mc-checkbox-label input[type="checkbox"]:checked {
+    background: var(--material-secondary);
+    border-color: var(--material-secondary);
+    box-shadow: none;
+}
+
+[data-theme="material-dark"] input[type="checkbox"].nav-item:checked::after,
+[data-theme="material-dark"] .mc-checkbox-label input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: none;
+}
+
+[data-theme="material-dark"] input[type="checkbox"].nav-item:focus,
+[data-theme="material-dark"] .mc-checkbox-label input[type="checkbox"]:focus {
+    box-shadow: 0 0 0 3px rgba(3, 218, 198, 0.25);
+}
+
+/* Material Dark Theme - Checkbox label text color */
+[data-theme="material-dark"] .mc-checkbox-label {
+    color: var(--material-text-primary);
+}
+
+[data-theme="material-dark"] .mc-checkbox-label span {
+    color: var(--material-text-primary);
+}
+
+/* Material Dark Theme - Modal boxes */
+[data-theme="material-dark"] .modal-overlay {
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+}
+
+[data-theme="material-dark"] .modal-box {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--material-elevation-8);
+}
+
+[data-theme="material-dark"] .modal-title {
+    color: var(--material-text-primary);
+    font-weight: 400;
+    letter-spacing: 0.25px;
+    text-shadow: none;
+}
+
+[data-theme="material-dark"] .modal-title::before,
+[data-theme="material-dark"] .modal-title::after {
+    display: none;
+}
+
+[data-theme="material-dark"] .modal-body-text {
+    color: var(--material-text-secondary);
+    text-shadow: none;
+}
+
+[data-theme="material-dark"] .modal-close-btn {
+    color: var(--material-text-secondary);
+}
+
+[data-theme="material-dark"] .modal-close-btn:hover {
+    color: var(--material-error);
+    text-shadow: none;
+}
+
+/* Material Dark Theme - Options overlay */
+[data-theme="material-dark"] .options-container {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--material-elevation-8);
+}
+
+[data-theme="material-dark"] .options-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+[data-theme="material-dark"] .options-title {
+    color: var(--material-text-primary);
+    font-weight: 500;
+    text-shadow: none;
+}
+
+[data-theme="material-dark"] .options-title::before {
+    color: var(--material-primary);
+}
+
+[data-theme="material-dark"] .options-tabs {
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+[data-theme="material-dark"] .options-tab {
+    color: var(--material-text-secondary);
+    border: none;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+}
+
+[data-theme="material-dark"] .options-tab:hover {
+    background: rgba(187, 134, 252, 0.08);
+    color: var(--material-text-primary);
+}
+
+[data-theme="material-dark"] .options-tab.active {
+    color: var(--material-primary);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--material-primary);
+}
+
+[data-theme="material-dark"] .options-footer {
+    background: transparent;
+    border-top: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Material Dark Theme - Progress bar */
+[data-theme="material-dark"] .progress-container {
+    background: var(--material-surface);
+    border-top: none;
+    backdrop-filter: none;
+    box-shadow: var(--material-elevation-2);
+}
+
+[data-theme="material-dark"] .progress-bar-bg {
+    background: rgba(255,255,255,0.12);
+    border: none;
+    border-radius: 4px;
+}
+
+[data-theme="material-dark"] .progress-bar-fill {
+    background: var(--material-secondary);
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+[data-theme="material-dark"] .progress-text {
+    color: var(--material-text-primary);
+    text-shadow: none;
+    font-weight: 500;
+}
+
+[data-theme="material-dark"] #progress-spinner {
+    border: 3px solid rgba(255,255,255,0.12);
+    border-top-color: var(--material-secondary);
+}
+
+/* Material Dark Theme - Skin viewer */
+[data-theme="material-dark"] .skin-viewer-container {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--material-elevation-2);
+}
+
+[data-theme="material-dark"] .skin-render-toggle {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 50%;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-secondary);
+}
+
+[data-theme="material-dark"] .skin-render-toggle:hover {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    color: var(--material-primary);
+}
+
+/* Material Dark Theme - Sliders */
+[data-theme="material-dark"] .mc-slider-container {
+    background: rgba(255,255,255,0.05);
+    border: none;
+    border-radius: 4px 4px 0 0;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+}
+
+[data-theme="material-dark"] .mc-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+}
+
+[data-theme="material-dark"] .mc-slider::-webkit-slider-runnable-track {
+    background: rgba(255,255,255,0.24);
+    height: 4px;
+    border-radius: 2px;
+}
+
+[data-theme="material-dark"] .mc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--material-primary);
+    border-radius: 50%;
+    border: 2px solid var(--material-bg);
+    box-shadow: var(--material-elevation-1);
+    margin-top: -6px;
+    transition: transform 0.2s ease;
+}
+
+[data-theme="material-dark"] .mc-slider:focus::-webkit-slider-thumb {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px rgba(187, 134, 252, 0.12);
+}
+
+[data-theme="material-dark"] .mc-slider-container:focus-within {
+    box-shadow: none;
+    border-bottom-color: var(--material-primary);
+}
+
+[data-theme="material-dark"] select.mc-input.nav-item:focus {
+    box-shadow: none;
+    border-bottom-color: var(--material-primary);
+}
+
+[data-theme="material-dark"] .mc-slider-percent {
+    color: var(--material-text-secondary);
+    text-shadow: none;
+    font-size: 14px;
+}
+
+/* Material Dark Theme - Scrollbars */
+[data-theme="material-dark"] ::-webkit-scrollbar {
+    width: 8px;
+}
+
+[data-theme="material-dark"] ::-webkit-scrollbar-track {
+    background: transparent;
+    border-left: none;
+}
+
+[data-theme="material-dark"] ::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.24);
+    border: none;
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+[data-theme="material-dark"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.38);
+}
+
+/* Material Dark Theme - Toast */
+[data-theme="material-dark"] #toast {
+    background: #323232;
+    border: none;
+    border-radius: 4px;
+    box-shadow: var(--material-elevation-4);
+    color: white;
+    font-weight: 400;
+}
+
+/* Material Dark Theme - Music button */
+[data-theme="material-dark"] .music-btn {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 50%;
+    box-shadow: var(--material-elevation-1);
+    color: var(--material-text-secondary);
+    backdrop-filter: none;
+}
+
+[data-theme="material-dark"] .music-btn:hover:not(.disabled) {
+    background: var(--material-surface);
+    box-shadow: var(--material-elevation-2);
+    color: var(--material-primary);
+}
+
+[data-theme="material-dark"] .music-btn.muted {
+    opacity: 1;
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.3);
+}
+
+/* Material Dark Theme - Loader */
+[data-theme="material-dark"] #loader {
+    background: var(--material-bg);
+    background-size: cover;
+}
+
+[data-theme="material-dark"] #loader::before {
+    background: rgba(18,18,18,0.9);
+}
+
+[data-theme="material-dark"] .loader-spinner {
+    border: 3px solid rgba(255,255,255,0.12);
+    border-top: 3px solid var(--material-primary);
+}
+
+[data-theme="material-dark"] #loader-text {
+    color: var(--material-text-primary);
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+/* Material Dark Theme - Logo and Splash */
+[data-theme="material-dark"] .mc-logo-img {
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+}
+
+[data-theme="material-dark"] .splash-text {
+    color: var(--material-secondary);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    font-weight: 500;
+}
+
+/* Material Dark Theme - Gallery */
+[data-theme="material-dark"] .gallery-item {
+    background: var(--material-surface);
+    border: none;
+    border-radius: 8px;
+    box-shadow: var(--material-elevation-1);
+    overflow: hidden;
+}
+
+[data-theme="material-dark"] .gallery-item:hover,
+[data-theme="material-dark"] .gallery-item:focus {
+    border: none;
+    box-shadow: var(--material-elevation-2);
+}
+
+[data-theme="material-dark"] .gallery-action-btn {
+    color: var(--material-primary);
+    font-weight: 500;
+}
+
+[data-theme="material-dark"] .gallery-action-btn:hover {
+    color: #c49efc;
+    text-shadow: none;
+}
+
+[data-theme="material-dark"] .gallery-action-btn.delete {
+    color: var(--material-error);
+}
+
+[data-theme="material-dark"] .gallery-action-btn.delete:hover {
+    color: var(--material-error);
+}
+
+/* Material Dark Theme - Controller layouts */
+[data-theme="material-dark"] .controller-layout-preset {
+    background: var(--material-surface);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: var(--material-text-secondary);
+    box-shadow: var(--material-elevation-1);
+}
+
+[data-theme="material-dark"] .controller-layout-preset:hover,
+[data-theme="material-dark"] .controller-layout-preset:focus {
+    border-color: var(--material-primary);
+    box-shadow: var(--material-elevation-2);
+}
+
+[data-theme="material-dark"] .controller-layout-preset.active {
+    border-color: var(--material-primary);
+    background: rgba(187, 134, 252, 0.12);
+    box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.15);
+}
+
+/* Material Dark Theme - Username display */
+[data-theme="material-dark"] #username-display {
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4) !important;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+/* Material Dark Theme - Tooltips */
+[data-theme="material-dark"] .menu-btn[data-tooltip]::after {
+    background: rgba(50,50,50,0.98);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    box-shadow: var(--material-elevation-2);
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 8px 12px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-theme="material-dark"] .menu-btn[data-tooltip]:hover::after,
+[data-theme="material-dark"] .menu-btn[data-tooltip]:focus::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+[data-theme="material-dark"] .menu-btn[data-tooltip]::before {
+    border-left-color: rgba(50,50,50,0.98);
+    opacity: 0;
+    visibility: hidden;
+}
+
+[data-theme="material-dark"] .menu-btn[data-tooltip]:hover::before,
+[data-theme="material-dark"] .menu-btn[data-tooltip]:focus::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Material Dark Theme - Loading dots */
+[data-theme="material-dark"] .loading-dots span {
+    color: var(--material-primary);
+}
+
+/* Material Dark Theme - Version label */
+[data-theme="material-dark"] .version-label {
+    color: var(--material-text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Material Dark Theme - Select arrow */
+[data-theme="material-dark"] .select-arrow {
+    color: var(--material-text-secondary);
+}
+
+/* Material Dark Theme - Online/Offline indicator */
+[data-theme="material-dark"] #offline-indicator {
+    background: #2d2318;
+    color: #ff9800;
+    border: none;
+    border-radius: 4px;
+    box-shadow: var(--material-elevation-1);
+}
