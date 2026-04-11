@@ -139,7 +139,24 @@ async function loadMainMenuSkin() {
             };
             img.src = url;
         } else {
-            console.log("No skin found at " + skinPath);
+            console.log("No skin found at " + skinPath + ", using default steve.png");
+            
+            // Load default steve.png from default_skins folder
+            const defaultSkinPath = path.join(__dirname, 'default_skins', 'steve.png');
+            if (fs.existsSync(defaultSkinPath)) {
+                const defaultSkinData = fs.readFileSync(defaultSkinPath);
+                const blob = new Blob([defaultSkinData]);
+                const url = URL.createObjectURL(blob);
+                
+                const img = new Image();
+                img.onload = () => {
+                    const isLegacy = img.height === 32;
+                    updateSkinModel(img.src, isLegacy, mainMenuPlayerGroup, mainMenuSkinRenderMode);
+                };
+                img.src = url;
+            } else {
+                console.error("Default skin steve.png not found at " + defaultSkinPath);
+            }
         }
     } catch (e) {
         console.warn("Could not load main menu skin (startup race condition?):", e);
