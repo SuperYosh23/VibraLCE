@@ -958,6 +958,7 @@ window.onload = async () => {
         UiSoundManager.init();
         updateMainMenuUsername();
         initUiScaleSlider();
+        initBgDimSlider();
         initTheme();
         initLogoAndBackground();
         
@@ -1997,6 +1998,37 @@ async function initUiScaleSlider() {
     };
 }
 
+async function initBgDimSlider() {
+    const slider = document.getElementById('bg-dim-slider');
+    const percentText = document.getElementById('bg-dim-percent');
+    
+    if (!slider) return;
+    
+    const savedDim = await Store.get('bg_dim', 40);
+    slider.value = savedDim;
+    
+    // Apply saved dim on startup (convert to decimal for CSS)
+    const dimDecimal = savedDim / 100;
+    document.documentElement.style.setProperty('--bg-dim-amount', dimDecimal);
+    
+    const updatePercent = () => {
+        if (percentText) {
+            percentText.textContent = slider.value + '%';
+        }
+    };
+    
+    updatePercent();
+    
+    slider.oninput = async () => {
+        const dimValue = slider.value;
+        updatePercent();
+        // Convert to decimal for CSS (0.4 for 40%)
+        const dimDecimal = dimValue / 100;
+        document.documentElement.style.setProperty('--bg-dim-amount', dimDecimal);
+        await Store.set('bg_dim', dimValue);
+    };
+}
+
 // Theme Management
 async function initTheme() {
     const themeSelect = document.getElementById('theme-select');
@@ -2101,7 +2133,7 @@ async function initTheme() {
             removeCustomCssStyles();
         }
         
-        showToast(`Theme changed to ${newTheme === 'vibra' ? 'Vibra' : newTheme === 'classic' ? 'OreUI' : newTheme === 'legacy' ? 'Legacy' : newTheme === 'material' ? 'Material' : newTheme === 'material-dark' ? 'Material Dark' : 'Custom CSS'}`);
+        showToast(`Theme changed to ${newTheme === 'vibra' ? 'Vibra' : newTheme === 'classic' ? 'OreUI' : newTheme === 'legacy' ? 'Legacy' : newTheme === 'material' ? 'Material 2 Light' : newTheme === 'material-dark' ? 'Material 2 Dark' : 'Custom CSS'}`);
     };
 }
 

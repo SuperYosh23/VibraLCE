@@ -40,6 +40,9 @@
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
     --shadow-glow: 0 0 20px var(--vibra-accent-glow);
     
+    /* Background dimming */
+    --bg-dim-amount: 40%;
+    
     /* Animation timing */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -78,7 +81,7 @@ body::before {
     position: absolute;
     inset: 0;
     background: 
-        radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%),
+        radial-gradient(ellipse at center, rgba(0, 0, 0, calc(var(--bg-dim-amount) * 0.5)) 0%, rgba(0, 0, 0, var(--bg-dim-amount)) 100%),
         url('pano/pano.png');
     background-size: cover, auto 100%;
     background-position: center, 0% center;
@@ -90,7 +93,7 @@ body::before {
 /* Static background when panorama is disabled */
 body.static-bg::before {
     background: 
-        radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%),
+        radial-gradient(ellipse at center, rgba(0, 0, 0, calc(var(--bg-dim-amount) * 0.5)) 0%, rgba(0, 0, 0, var(--bg-dim-amount)) 100%),
         url('minecraft.jpg');
     background-size: cover, cover;
     background-position: center, center;
@@ -190,7 +193,13 @@ body.fullscreen-mode .title-bar,
 .win-btn:hover {
     background: var(--vibra-bg-tertiary);
     color: var(--vibra-text-primary);
-    transform: scale(1.1);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(61, 220, 132, 0.2);
+}
+
+.win-btn:active {
+    transform: scale(0.98);
+    transition: transform 50ms ease;
 }
 
 .win-btn.close:hover {
@@ -360,6 +369,12 @@ body.fullscreen-mode .title-bar,
     background: rgba(0, 0, 0, 0.7);
     border-color: var(--vibra-accent);
     transform: translateX(-4px);
+    box-shadow: 0 4px 16px rgba(61, 220, 132, 0.15);
+}
+
+.menu-btn:active {
+    transform: translateX(-2px) scale(0.98);
+    transition: transform 100ms ease;
 }
 
 .menu-btn:hover svg,
@@ -614,8 +629,8 @@ body.fullscreen-mode .title-bar,
     background: linear-gradient(145deg, var(--vibra-bg-secondary), var(--vibra-bg-tertiary));
     border-color: var(--vibra-accent);
     color: var(--vibra-accent);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-md), 0 0 20px rgba(61, 220, 132, 0.1);
 }
 
 .btn-mc:active {
@@ -880,6 +895,18 @@ body.fullscreen-mode .title-bar,
     overflow-y: auto;
 }
 
+[data-theme="vibra"] .modal-box .modal-title {
+    animation: slideInUp 0.3s ease-out 0.1s both;
+}
+
+[data-theme="vibra"] .modal-box .modal-body-text {
+    animation: slideInUp 0.3s ease-out 0.15s both;
+}
+
+[data-theme="vibra"] .modal-box .btn-mc {
+    animation: slideInUp 0.3s ease-out 0.2s both;
+}
+
 .modal-box::-webkit-scrollbar {
     width: 6px;
 }
@@ -894,8 +921,32 @@ body.fullscreen-mode .title-bar,
 }
 
 @keyframes modalPop {
-    from { transform: scale(0.9) translateY(20px); opacity: 0; }
-    to { transform: scale(1) translateY(0); opacity: 1; }
+    0% { 
+        transform: scale(0.8) translateY(30px); 
+        opacity: 0; 
+        filter: blur(4px);
+    }
+    50% { 
+        transform: scale(1.02) translateY(-5px); 
+        opacity: 0.8;
+        filter: blur(1px);
+    }
+    100% { 
+        transform: scale(1) translateY(0); 
+        opacity: 1; 
+        filter: blur(0);
+    }
+}
+
+@keyframes modalFadeOut {
+    from { 
+        transform: scale(1) translateY(0); 
+        opacity: 1; 
+    }
+    to { 
+        transform: scale(0.9) translateY(-20px); 
+        opacity: 0; 
+    }
 }
 
 .modal-close-btn {
@@ -918,6 +969,11 @@ body.fullscreen-mode .title-bar,
 .modal-close-btn:hover {
     color: var(--vibra-red);
     background: rgba(248, 81, 73, 0.1);
+    transform: rotate(90deg);
+}
+
+.modal-close-btn:active {
+    transform: rotate(90deg) scale(0.9);
 }
 
 .modal-title {
@@ -1353,6 +1409,7 @@ select.mc-input option {
     z-index: 2;
     cursor: pointer;
     margin: 0;
+    will-change: transform;
 }
 
 .mc-slider::-webkit-slider-runnable-track {
@@ -1369,12 +1426,18 @@ select.mc-input option {
     background: var(--vibra-accent);
     border-radius: 4px;
     box-shadow: 0 0 10px var(--vibra-accent-glow);
-    transition: all var(--transition-fast);
+    transition: transform 0.05s ease-out, background 0.15s ease, box-shadow 0.15s ease;
+    will-change: transform;
 }
 
 .mc-slider::-webkit-slider-thumb:hover {
-    transform: scaleX(1.2);
+    transform: scaleX(1.15);
     background: #4ade80;
+}
+
+.mc-slider:active::-webkit-slider-thumb {
+    transform: scaleX(1.25) scaleY(1.05);
+    cursor: grabbing;
 }
 
 .mc-slider:focus::-webkit-slider-thumb {
@@ -2627,249 +2690,662 @@ select.mc-input.nav-item:focus {
 }
 
 /* =============================================
-   MATERIAL UI THEME
-   Clean, modern Material Design aesthetic
+   ENHANCED LOADING ANIMATIONS
    ============================================= */
 
-/* Material Theme - Base */
-[data-theme="material"] {
-    --material-primary: #6200ee;
-    --material-primary-variant: #3700b3;
-    --material-secondary: #03dac6;
-    --material-bg: #f5f5f5;
-    --material-surface: #ffffff;
-    --material-error: #b00020;
-    --material-text-primary: #212121;
-    --material-text-secondary: #757575;
-    --material-elevation-1: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 3px 0 rgba(0,0,0,0.12);
-    --material-elevation-2: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
-    --material-elevation-4: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
-    --material-elevation-8: 0 5px 5px -3px rgba(0,0,0,0.2), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--glass-border);
+    border-top: 2px solid var(--vibra-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-dots {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    background: var(--vibra-accent);
+    border-radius: 50%;
+    animation: loadingDot 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes loadingDot {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+.progress-bar-animated {
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar-animated::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent
+    );
+    animation: progressShimmer 2s infinite;
+}
+
+@keyframes progressShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* =============================================
+   SUBTLE BACKGROUND ANIMATIONS
+   ============================================= */
+
+[data-theme="vibra"] .floating-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+[data-theme="vibra"] .particle {
+    position: absolute;
+    background: var(--vibra-accent);
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: float 20s infinite linear;
+}
+
+[data-theme="vibra"] .particle:nth-child(1) { 
+    width: 4px; height: 4px; 
+    left: 10%; animation-delay: 0s; 
+}
+[data-theme="vibra"] .particle:nth-child(2) { 
+    width: 6px; height: 6px; 
+    left: 30%; animation-delay: 3s; 
+}
+[data-theme="vibra"] .particle:nth-child(3) { 
+    width: 3px; height: 3px; 
+    left: 50%; animation-delay: 7s; 
+}
+[data-theme="vibra"] .particle:nth-child(4) { 
+    width: 5px; height: 5px; 
+    left: 70%; animation-delay: 12s; 
+}
+[data-theme="vibra"] .particle:nth-child(5) { 
+    width: 4px; height: 4px; 
+    left: 90%; animation-delay: 16s; 
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.1;
+    }
+    90% {
+        opacity: 0.1;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* =============================================
+   ENHANCED MICRO-INTERACTIONS
+   ============================================= */
+
+.pulse-on-hover:hover {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(61, 220, 132, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(61, 220, 132, 0);
+    }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.5s ease-out;
+}
+
+.slide-in-up {
+    animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Enhanced focus states */
+.focus-glow:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--vibra-accent-glow);
+    animation: focusPulse 1.5s ease-in-out;
+}
+
+@keyframes focusPulse {
+    0% {
+        box-shadow: 0 0 0 0 var(--vibra-accent-glow);
+    }
+    50% {
+        box-shadow: 0 0 0 6px var(--vibra-accent-glow);
+    }
+    100% {
+        box-shadow: 0 0 0 3px var(--vibra-accent-glow);
+    }
+}
+
+/* =============================================
+   MATERIAL DESIGN 2 - LIGHT THEME
+   Strict compliance with Material 2 Design Language
+   https://m2.material.io/design
+   ============================================= */
+
+/* Material 2 Light Theme - Color System & Variables */
+[data-theme="material"] {
+    /* Primary Colors - Purple 500/700 per Material 2 spec */
+    --m2-primary: #6200EE;
+    --m2-primary-variant: #3700B3;
+    --m2-on-primary: #FFFFFF;
+    
+    /* Secondary Colors - Teal 200 per Material 2 spec */
+    --m2-secondary: #03DAC6;
+    --m2-secondary-variant: #018786;
+    --m2-on-secondary: #000000;
+    
+    /* Background & Surface - White per Material 2 spec */
+    --m2-background: #FFFFFF;
+    --m2-surface: #FFFFFF;
+    --m2-on-background: #212121;
+    --m2-on-surface: #212121;
+    
+    /* Error - Red 700 per Material 2 spec */
+    --m2-error: #B00020;
+    --m2-on-error: #FFFFFF;
+    
+    /* Text Opacity - Material 2 accessibility guidelines */
+    --m2-text-high: rgba(0, 0, 0, 0.87);
+    --m2-text-medium: rgba(0, 0, 0, 0.60);
+    --m2-text-disabled: rgba(0, 0, 0, 0.38);
+    
+    /* Surface Overlay - For elevation on light surfaces */
+    --m2-surface-overlay: rgba(0, 0, 0, 1);
+    
+    /* States - Material 2 state overlay opacities */
+    --m2-state-hover: rgba(0, 0, 0, 0.04);
+    --m2-state-focus: rgba(0, 0, 0, 0.12);
+    --m2-state-pressed: rgba(0, 0, 0, 0.08);
+    --m2-state-drag: rgba(0, 0, 0, 0.16);
+    --m2-state-disabled-container: rgba(0, 0, 0, 0.12);
+    --m2-state-disabled-text: rgba(0, 0, 0, 0.38);
+    
+    /* Elevation Shadows - Material 2 elevation system (0dp, 1dp, 2dp, 4dp, 8dp, 16dp, 24dp) */
+    --m2-shadow-0: none;
+    --m2-shadow-1: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 3px 0 rgba(0,0,0,0.12);
+    --m2-shadow-2: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
+    --m2-shadow-4: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+    --m2-shadow-8: 0 5px 5px -3px rgba(0,0,0,0.2), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
+    --m2-shadow-16: 0 8px 10px -5px rgba(0,0,0,0.2), 0 16px 24px 2px rgba(0,0,0,0.14), 0 6px 30px 5px rgba(0,0,0,0.12);
+    --m2-shadow-24: 0 11px 15px -7px rgba(0,0,0,0.2), 0 24px 38px 3px rgba(0,0,0,0.14), 0 9px 46px 8px rgba(0,0,0,0.12);
+    
+    /* Shape - Material 2 shape system (4dp default) */
+    --m2-shape-small: 4px;
+    --m2-shape-medium: 8px;
+    --m2-shape-large: 16px;
+    --m2-shape-round: 50%;
+    
+    /* Typography - Roboto per Material 2 spec */
+    --m2-font-family: 'Roboto', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Spacing - 8dp baseline grid */
+    --m2-spacing-unit: 8px;
+    --m2-spacing-1: 8px;
+    --m2-spacing-2: 16px;
+    --m2-spacing-3: 24px;
+    --m2-spacing-4: 32px;
+    --m2-spacing-5: 40px;
+    --m2-spacing-6: 48px;
+    
+    /* Animation - Material 2 motion guidelines */
+    --m2-duration-instant: 0ms;
+    --m2-duration-fast: 150ms;
+    --m2-duration-normal: 200ms;
+    --m2-duration-slow: 300ms;
+    --m2-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --m2-easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+    --m2-easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+    --m2-easing-sharp: cubic-bezier(0.4, 0.0, 0.6, 1);
+}
+
+/* Material 2 Light - Base Body Styles */
 [data-theme="material"] body {
-    background: var(--material-bg);
-    font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+    font-family: var(--m2-font-family);
+    background-color: var(--m2-background);
+    color: var(--m2-on-background);
 }
 
 [data-theme="material"] body::before {
-    background: 
-        linear-gradient(135deg, rgba(98, 0, 238, 0.05) 0%, rgba(3, 218, 198, 0.05) 100%),
-        url('pano/pano.png');
-    background-size: cover, auto 100%;
-    filter: brightness(0.9) saturate(0.8);
+    background: var(--m2-background);
+    filter: none;
 }
 
-[data-theme="material"].static-bg body::before {
-    background: 
-        linear-gradient(135deg, rgba(98, 0, 238, 0.1) 0%, rgba(3, 218, 198, 0.1) 100%),
-        url('minecraft.jpg');
-    animation: none;
+/* Material 2 Light - Typography Scale */
+[data-theme="material"] .title-bar-text {
+    font-family: var(--m2-font-family);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    color: var(--m2-text-high);
 }
 
-/* Material Theme - Title Bar */
+[data-theme="material"] .modal-title {
+    font-family: var(--m2-font-family);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    color: var(--m2-text-high);
+    text-transform: none;
+}
+
+[data-theme="material"] .options-title {
+    font-family: var(--m2-font-family);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    color: var(--m2-text-high);
+    text-transform: none;
+}
+
+[data-theme="material"] .version-label {
+    font-family: var(--m2-font-family);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+[data-theme="material"] .mc-label {
+    font-family: var(--m2-font-family);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    color: var(--m2-text-medium);
+    text-transform: none;
+}
+
+[data-theme="material"] .progress-text,
+[data-theme="material"] #loader-text {
+    font-family: var(--m2-font-family);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.25px;
+    color: var(--m2-text-high);
+}
+
+[data-theme="material"] #username-display {
+    font-family: var(--m2-font-family);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: #FFFFFF !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+}
+
+/* Material 2 Light - Elevation & Surfaces */
 [data-theme="material"] .title-bar {
-    background: var(--material-surface);
+    background-color: var(--m2-surface);
+    box-shadow: var(--m2-shadow-2);
     border-bottom: none;
-    box-shadow: var(--material-elevation-2);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
 }
 
-[data-theme="material"] .title-bar-text {
-    color: var(--material-text-primary);
-    font-weight: 500;
-    font-size: 16px;
-}
-
-[data-theme="material"] .title-bar-text::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: var(--material-primary);
-    border-radius: 50%;
-    color: transparent;
-}
-
-[data-theme="material"] .win-btn {
-    border-radius: 50%;
-    color: var(--material-text-secondary);
-    transition: all 0.2s ease;
-}
-
-[data-theme="material"] .win-btn:hover {
-    background: rgba(0,0,0,0.08);
-    color: var(--material-text-primary);
-    transform: scale(1);
-}
-
-[data-theme="material"] .win-btn.close:hover {
-    background: var(--material-error);
-    color: white;
-}
-
-/* Material Theme - Buttons */
-[data-theme="material"] .btn-mc {
-    background: var(--material-surface);
-    color: var(--material-primary);
+[data-theme="material"] .modal-box {
+    background-color: var(--m2-surface);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-24);
     border: none;
-    border-radius: 4px;
-    box-shadow: var(--material-elevation-1);
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+}
+
+[data-theme="material"] .options-container {
+    background-color: var(--m2-surface);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-24);
+    border: none;
+}
+
+[data-theme="material"] .progress-container {
+    background-color: var(--m2-surface);
+    box-shadow: var(--m2-shadow-4);
+    border-top: none;
+    backdrop-filter: none;
+}
+
+[data-theme="material"] .skin-viewer-container {
+    background-color: var(--m2-surface);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-2);
+    border: none;
+}
+
+[data-theme="material"] .gallery-item {
+    background-color: var(--m2-surface);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-1);
+    border: none;
+}
+
+[data-theme="material"] .gallery-item:hover,
+[data-theme="material"] .gallery-item:focus {
+    box-shadow: var(--m2-shadow-2);
+}
+
+[data-theme="material"] .controller-layout-preset {
+    background-color: var(--m2-surface);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-1);
+    border: 1px solid rgba(0,0,0,0.12);
+    color: var(--m2-text-medium);
+}
+
+[data-theme="material"] .controller-layout-preset:hover,
+[data-theme="material"] .controller-layout-preset:focus {
+    border-color: var(--m2-primary);
+    box-shadow: var(--m2-shadow-2);
+}
+
+[data-theme="material"] .controller-layout-preset.active {
+    border-color: var(--m2-primary);
+    background-color: rgba(98, 0, 238, 0.08);
+}
+
+/* Material 2 Light - Buttons (contained, outlined, text styles) */
+[data-theme="material"] .btn-mc {
+    font-family: var(--m2-font-family);
     font-size: 14px;
-    transition: all 0.2s ease;
+    font-weight: 500;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    border-radius: var(--m2-shape-small);
+    padding: 10px 24px;
+    min-height: 36px;
+    box-shadow: var(--m2-shadow-1);
+    background-color: var(--m2-surface);
+    color: var(--m2-primary);
+    border: none;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
     text-shadow: none;
 }
 
 [data-theme="material"] .btn-mc:hover:not(.disabled) {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    transform: translateY(-1px);
-    color: var(--material-primary);
+    background-color: var(--m2-state-hover);
+    box-shadow: var(--m2-shadow-2);
+}
+
+[data-theme="material"] .btn-mc:active:not(.disabled) {
+    background-color: var(--m2-state-pressed);
 }
 
 [data-theme="material"] .btn-mc.nav-item:focus {
-    box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.25), var(--material-elevation-2);
+    background-color: var(--m2-state-focus);
     outline: none;
+    box-shadow: var(--m2-shadow-2), 0 0 0 3px rgba(98, 0, 238, 0.25);
 }
 
 [data-theme="material"] .btn-mc.disabled,
 [data-theme="material"] .btn-mc.running {
-    background: rgba(0,0,0,0.12);
-    color: rgba(0,0,0,0.38);
+    background-color: var(--m2-state-disabled-container);
+    color: var(--m2-state-disabled-text);
     box-shadow: none;
 }
 
-[data-theme="material"] .btn-mc.running {
-    color: var(--material-primary);
-}
-
-/* Material Theme - Play button */
+/* Material 2 Light - Floating Action Button (FAB) - Play Button */
 [data-theme="material"] .play-btn {
-    background: var(--material-primary);
-    color: white;
-    border: none;
-    border-radius: 28px;
-    box-shadow: var(--material-elevation-4);
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--m2-font-family);
+    font-size: 14px;
     font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: none;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    border-radius: var(--m2-shape-medium);
+    padding: 16px 36px;
+    min-height: 56px;
+    min-width: 56px;
+    width: auto;
+    height: auto;
+    background-color: var(--m2-secondary);
+    color: var(--m2-on-secondary);
+    box-shadow: var(--m2-shadow-4);
+    border: none;
+    transition: all var(--m2-duration-normal) var(--m2-easing-standard);
+    text-shadow: none;
 }
 
 [data-theme="material"] .play-btn:hover:not(.disabled) {
-    background: var(--material-primary-variant);
-    box-shadow: var(--material-elevation-8);
-    transform: translateY(-2px);
+    background-color: var(--m2-secondary);
+    box-shadow: var(--m2-shadow-8);
+    transform: translateY(-1px);
 }
 
-/* Material Theme - Menu buttons */
+[data-theme="material"] .play-btn:active:not(.disabled) {
+    box-shadow: var(--m2-shadow-8);
+}
+
+/* Material 2 Light - Icon Buttons (Menu Buttons) */
 [data-theme="material"] .menu-btn {
-    background: var(--material-surface);
+    background-color: transparent;
+    border-radius: var(--m2-shape-round);
+    box-shadow: none;
+    color: #FFFFFF;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     border: none;
-    border-radius: 12px;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-secondary);
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
 }
 
 [data-theme="material"] .menu-btn:hover {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    color: var(--material-primary);
-    transform: translateX(-4px);
+    background-color: var(--m2-state-hover);
+    color: var(--m2-primary);
+    text-shadow: none;
+    transform: none;
+    box-shadow: none;
 }
 
-[data-theme="material"] .menu-btn svg,
-[data-theme="material"] .menu-btn i {
+[data-theme="material"] .menu-btn:active {
+    background-color: var(--m2-state-pressed);
+}
+
+[data-theme="material"] .menu-btn i,
+[data-theme="material"] .menu-btn svg {
     color: currentColor;
 }
 
-/* Material Theme - Version selector */
-[data-theme="material"] .top-left-controls .version-select-box {
-    background: var(--material-surface);
-    border: 1px solid rgba(0,0,0,0.12);
-    border-radius: 4px;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-primary);
-}
-
-[data-theme="material"] .top-left-controls .version-select-box:hover {
-    background: var(--material-surface);
-    border-color: rgba(0,0,0,0.24);
-}
-
+/* Material 2 Light - Icon Button (Refresh) */
 [data-theme="material"] .refresh-btn {
-    background: var(--material-surface);
+    background-color: transparent;
+    border-radius: var(--m2-shape-round);
+    box-shadow: none;
+    color: var(--m2-text-medium);
     border: none;
-    border-radius: 50%;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-secondary);
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
 }
 
 [data-theme="material"] .refresh-btn:hover {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    color: var(--material-primary);
+    background-color: var(--m2-state-hover);
+    color: var(--m2-primary);
     transform: rotate(180deg);
+    box-shadow: none;
 }
 
-/* Material Theme - Inputs */
+/* Material 2 Light - Window Controls */
+[data-theme="material"] .win-btn {
+    background-color: transparent;
+    border-radius: var(--m2-shape-round);
+    color: var(--m2-text-medium);
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material"] .win-btn:hover {
+    background-color: var(--m2-state-hover);
+    color: var(--m2-text-high);
+    transform: none;
+}
+
+[data-theme="material"] .win-btn.close:hover {
+    background-color: var(--m2-error);
+    color: var(--m2-on-error);
+}
+
+/* Material 2 Light - Text Fields (Filled style per Material 2) */
 [data-theme="material"] .mc-input {
-    background: rgba(0,0,0,0.04);
-    border: 1px solid rgba(0,0,0,0.24);
-    border-radius: 4px 4px 0 0;
-    border-bottom: 2px solid rgba(0,0,0,0.6);
-    color: var(--material-text-primary);
+    font-family: var(--m2-font-family);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    background-color: rgba(0, 0, 0, 0.04);
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+    border-radius: var(--m2-shape-small) var(--m2-shape-small) 0 0;
+    color: var(--m2-text-high);
+    padding: 12px 16px;
     box-shadow: none;
-    transition: all 0.2s ease;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material"] .mc-input:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+    border-bottom-color: rgba(0, 0, 0, 0.87);
 }
 
 [data-theme="material"] .mc-input:focus,
 [data-theme="material"] .mc-input.focused {
-    border-bottom-color: var(--material-primary);
-    background: rgba(98, 0, 238, 0.04);
+    background-color: rgba(0, 0, 0, 0.04);
+    border-bottom: 2px solid var(--m2-primary);
     box-shadow: none;
 }
 
-[data-theme="material"] .mc-label {
-    color: var(--material-text-secondary);
-    text-transform: none;
-    font-size: 12px;
+/* Material 2 Light - Select/Version Selector */
+[data-theme="material"] .version-select-box {
+    font-family: var(--m2-font-family);
+    font-size: 16px;
     font-weight: 400;
+    background-color: rgba(0, 0, 0, 0.04);
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+    border-radius: var(--m2-shape-small) var(--m2-shape-small) 0 0;
+    color: var(--m2-text-high);
+    box-shadow: none;
 }
 
-/* Material Theme - Checkboxes */
+[data-theme="material"] .version-select-box:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+    border-bottom-color: rgba(0, 0, 0, 0.87);
+}
+
+[data-theme="material"] .select-arrow {
+    color: var(--m2-text-medium);
+}
+
+/* Material 2 Light - Selection Controls (Checkbox) */
 [data-theme="material"] input[type="checkbox"].nav-item,
 [data-theme="material"] .mc-checkbox-label input[type="checkbox"] {
-    background: rgba(0,0,0,0.04);
-    border: 2px solid rgba(0,0,0,0.54);
+    width: 18px;
+    height: 18px;
+    background-color: transparent;
+    border: 2px solid rgba(0, 0, 0, 0.54);
     border-radius: 2px;
     box-shadow: none;
-    position: relative;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material"] input[type="checkbox"].nav-item:hover,
+[data-theme="material"] .mc-checkbox-label input[type="checkbox"]:hover {
+    border-color: rgba(0, 0, 0, 0.87);
 }
 
 [data-theme="material"] input[type="checkbox"].nav-item:checked,
 [data-theme="material"] .mc-checkbox-label input[type="checkbox"]:checked {
-    background: var(--material-secondary);
-    border-color: var(--material-secondary);
-    box-shadow: none;
+    background-color: var(--m2-secondary);
+    border-color: var(--m2-secondary);
 }
 
 [data-theme="material"] input[type="checkbox"].nav-item:checked::after,
 [data-theme="material"] .mc-checkbox-label input[type="checkbox"]:checked::after {
-    content: '✓';
+    content: '';
     position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--material-text-primary);
-    font-size: 14px;
-    font-weight: bold;
-    text-shadow: none;
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--m2-on-secondary);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
 }
 
 [data-theme="material"] input[type="checkbox"].nav-item:focus,
@@ -2877,165 +3353,20 @@ select.mc-input.nav-item:focus {
     box-shadow: 0 0 0 3px rgba(3, 218, 198, 0.25);
 }
 
-/* Material Theme - Checkbox label text color */
 [data-theme="material"] .mc-checkbox-label {
-    color: var(--material-text-primary);
-}
-
-[data-theme="material"] .mc-checkbox-label span {
-    color: var(--material-text-primary);
-}
-
-/* Material Theme - Modal boxes */
-[data-theme="material"] .modal-overlay {
-    background: rgba(0,0,0,0.32);
-    backdrop-filter: blur(4px);
-}
-
-[data-theme="material"] .modal-box {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 8px;
-    box-shadow: var(--material-elevation-8);
-}
-
-[data-theme="material"] .modal-title {
-    color: var(--material-text-primary);
+    color: var(--m2-text-high);
+    font-family: var(--m2-font-family);
+    font-size: 14px;
     font-weight: 400;
     letter-spacing: 0.25px;
-    text-shadow: none;
 }
 
-[data-theme="material"] .modal-title::before,
-[data-theme="material"] .modal-title::after {
-    display: none;
-}
-
-[data-theme="material"] .modal-body-text {
-    color: var(--material-text-secondary);
-    text-shadow: none;
-}
-
-[data-theme="material"] .modal-close-btn {
-    color: var(--material-text-secondary);
-}
-
-[data-theme="material"] .modal-close-btn:hover {
-    color: var(--material-error);
-    text-shadow: none;
-}
-
-/* Material Theme - Options overlay */
-[data-theme="material"] .options-container {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 8px;
-    box-shadow: var(--material-elevation-8);
-}
-
-[data-theme="material"] .options-header {
-    background: transparent;
-    border-bottom: 1px solid rgba(0,0,0,0.12);
-}
-
-[data-theme="material"] .options-title {
-    color: var(--material-text-primary);
-    font-weight: 500;
-    text-shadow: none;
-}
-
-[data-theme="material"] .options-title::before {
-    color: var(--material-primary);
-}
-
-[data-theme="material"] .options-tabs {
-    background: transparent;
-    border-bottom: 1px solid rgba(0,0,0,0.12);
-}
-
-[data-theme="material"] .options-tab {
-    color: var(--material-text-secondary);
+/* Material 2 Light - Sliders */
+[data-theme="material"] .mc-slider-container {
+    background-color: transparent;
     border: none;
     border-radius: 0;
-    border-bottom: 2px solid transparent;
-}
-
-[data-theme="material"] .options-tab:hover {
-    background: rgba(98, 0, 238, 0.04);
-    color: var(--material-text-primary);
-}
-
-[data-theme="material"] .options-tab.active {
-    color: var(--material-primary);
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid var(--material-primary);
-}
-
-[data-theme="material"] .options-footer {
-    background: transparent;
-    border-top: 1px solid rgba(0,0,0,0.12);
-}
-
-/* Material Theme - Progress bar */
-[data-theme="material"] .progress-container {
-    background: var(--material-surface);
-    border-top: none;
-    backdrop-filter: none;
-    box-shadow: var(--material-elevation-2);
-}
-
-[data-theme="material"] .progress-bar-bg {
-    background: rgba(0,0,0,0.12);
-    border: none;
-    border-radius: 4px;
-}
-
-[data-theme="material"] .progress-bar-fill {
-    background: var(--material-secondary);
-    border-radius: 4px;
     box-shadow: none;
-}
-
-[data-theme="material"] .progress-text {
-    color: var(--material-text-primary);
-    text-shadow: none;
-    font-weight: 500;
-}
-
-[data-theme="material"] #progress-spinner {
-    border: 3px solid rgba(0,0,0,0.12);
-    border-top-color: var(--material-secondary);
-}
-
-/* Material Theme - Skin viewer */
-[data-theme="material"] .skin-viewer-container {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 8px;
-    box-shadow: var(--material-elevation-2);
-}
-
-[data-theme="material"] .skin-render-toggle {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 50%;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-secondary);
-}
-
-[data-theme="material"] .skin-render-toggle:hover {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    color: var(--material-primary);
-}
-
-/* Material Theme - Sliders */
-[data-theme="material"] .mc-slider-container {
-    background: rgba(0,0,0,0.04);
-    border: none;
-    border-radius: 4px 4px 0 0;
-    border-bottom: 2px solid rgba(0,0,0,0.6);
 }
 
 [data-theme="material"] .mc-slider {
@@ -3045,535 +3376,743 @@ select.mc-input.nav-item:focus {
 }
 
 [data-theme="material"] .mc-slider::-webkit-slider-runnable-track {
-    background: rgba(0,0,0,0.24);
-    height: 4px;
-    border-radius: 2px;
+    height: 2px;
+    background-color: rgba(0, 0, 0, 0.26);
+    border-radius: 1px;
 }
 
 [data-theme="material"] .mc-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: var(--material-primary);
-    border-radius: 50%;
-    border: 2px solid white;
-    box-shadow: var(--material-elevation-1);
-    margin-top: -6px;
-    transition: transform 0.2s ease;
+    width: 12px;
+    height: 12px;
+    background-color: var(--m2-secondary);
+    border-radius: var(--m2-shape-round);
+    border: 2px solid var(--m2-secondary);
+    margin-top: -5px;
+    box-shadow: none;
+    transition: transform 0.05s ease-out, box-shadow 0.15s ease;
+    will-change: transform;
+}
+
+[data-theme="material"] .mc-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px rgba(3, 218, 198, 0.12);
+}
+
+[data-theme="material"] .mc-slider:active::-webkit-slider-thumb {
+    transform: scale(1.3);
+    box-shadow: 0 0 0 12px rgba(3, 218, 198, 0.20);
+    cursor: grabbing;
 }
 
 [data-theme="material"] .mc-slider:focus::-webkit-slider-thumb {
     transform: scale(1.2);
-    box-shadow: 0 0 0 8px rgba(98, 0, 238, 0.12);
-}
-
-[data-theme="material"] .mc-slider-container:focus-within {
-    box-shadow: none;
-    border-bottom-color: var(--material-primary);
-}
-
-[data-theme="material"] select.mc-input.nav-item:focus {
-    box-shadow: none;
-    border-bottom-color: var(--material-primary);
+    box-shadow: 0 0 0 12px rgba(3, 218, 198, 0.20);
 }
 
 [data-theme="material"] .mc-slider-percent {
-    color: var(--material-text-secondary);
-    text-shadow: none;
+    font-family: var(--m2-font-family);
     font-size: 14px;
+    font-weight: 400;
+    color: var(--m2-text-medium);
+    text-shadow: none;
 }
 
-/* Material Theme - Scrollbars */
-[data-theme="material"] ::-webkit-scrollbar {
-    width: 8px;
-}
-
-[data-theme="material"] ::-webkit-scrollbar-track {
-    background: transparent;
-    border-left: none;
-}
-
-[data-theme="material"] ::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.24);
+/* Material 2 Light - Progress Indicators */
+[data-theme="material"] .progress-bar-bg {
+    height: 4px;
+    background-color: rgba(0, 0, 0, 0.12);
+    border-radius: 2px;
     border: none;
-    border-radius: 4px;
+}
+
+[data-theme="material"] .progress-bar-fill {
+    background-color: var(--m2-secondary);
+    border-radius: 2px;
     box-shadow: none;
 }
 
-[data-theme="material"] ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0,0,0,0.38);
+[data-theme="material"] #progress-spinner,
+[data-theme="material"] .loader-spinner {
+    border: 3px solid rgba(0, 0, 0, 0.12);
+    border-top-color: var(--m2-primary);
 }
 
-/* Material Theme - Toast */
+/* Material 2 Light - Tabs */
+[data-theme="material"] .options-tabs {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="material"] .options-tab {
+    font-family: var(--m2-font-family);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    color: var(--m2-text-medium);
+    padding: 16px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background-color: transparent;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material"] .options-tab:hover {
+    background-color: var(--m2-state-hover);
+    color: var(--m2-text-high);
+}
+
+[data-theme="material"] .options-tab.active {
+    color: var(--m2-primary);
+    border-bottom-color: var(--m2-primary);
+    background-color: transparent;
+}
+
+[data-theme="material"] .options-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="material"] .options-footer {
+    background-color: transparent;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* Material 2 Light - Toast/Snackbar */
 [data-theme="material"] #toast {
-    background: #323232;
-    border: none;
-    border-radius: 4px;
-    box-shadow: var(--material-elevation-4);
-    color: white;
+    font-family: var(--m2-font-family);
+    font-size: 14px;
     font-weight: 400;
+    letter-spacing: 0.25px;
+    background-color: #323232;
+    color: #FFFFFF;
+    border-radius: var(--m2-shape-small);
+    box-shadow: var(--m2-shadow-4);
+    border: none;
+    padding: 14px 16px;
 }
 
-/* Material Theme - Music button */
+/* Material 2 Light - Music Button (FAB style) */
 [data-theme="material"] .music-btn {
-    background: var(--material-surface);
+    background-color: var(--m2-surface);
+    color: var(--m2-text-medium);
+    border-radius: var(--m2-shape-round);
+    box-shadow: var(--m2-shadow-2);
     border: none;
-    border-radius: 50%;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-secondary);
     backdrop-filter: none;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
 }
 
 [data-theme="material"] .music-btn:hover:not(.disabled) {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    color: var(--material-primary);
+    background-color: var(--m2-surface);
+    box-shadow: var(--m2-shadow-4);
+    color: var(--m2-primary);
+    transform: scale(1.05);
 }
 
 [data-theme="material"] .music-btn.muted {
-    opacity: 1;
-    background: rgba(0,0,0,0.04);
-    color: rgba(0,0,0,0.38);
+    background-color: var(--m2-state-disabled-container);
+    color: var(--m2-state-disabled-text);
+    box-shadow: none;
 }
 
-/* Material Theme - Loader */
+/* Material 2 Light - Loader */
 [data-theme="material"] #loader {
-    background: var(--material-bg);
-    background-size: cover;
+    background-color: var(--m2-background);
 }
 
 [data-theme="material"] #loader::before {
-    background: rgba(255,255,255,0.9);
+    display: none;
 }
 
-[data-theme="material"] .loader-spinner {
-    border: 3px solid rgba(0,0,0,0.12);
-    border-top: 3px solid var(--material-primary);
-}
-
-[data-theme="material"] #loader-text {
-    color: var(--material-text-primary);
-    font-weight: 500;
-    letter-spacing: 1px;
-}
-
-/* Material Theme - Logo and Splash */
-[data-theme="material"] .mc-logo-img {
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
-}
-
-[data-theme="material"] .splash-text {
-    color: var(--material-secondary);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    font-weight: 500;
-}
-
-/* Material Theme - Gallery */
-[data-theme="material"] .gallery-item {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 8px;
-    box-shadow: var(--material-elevation-1);
-    overflow: hidden;
-}
-
-[data-theme="material"] .gallery-item:hover,
-[data-theme="material"] .gallery-item:focus {
-    border: none;
-    box-shadow: var(--material-elevation-2);
-}
-
+/* Material 2 Light - Gallery Actions */
 [data-theme="material"] .gallery-action-btn {
-    color: var(--material-primary);
+    font-family: var(--m2-font-family);
+    font-size: 14px;
     font-weight: 500;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    color: var(--m2-primary);
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
 }
 
 [data-theme="material"] .gallery-action-btn:hover {
-    color: var(--material-primary-variant);
+    background-color: var(--m2-state-hover);
+    color: var(--m2-primary-variant);
     text-shadow: none;
 }
 
 [data-theme="material"] .gallery-action-btn.delete {
-    color: var(--material-error);
+    color: var(--m2-error);
 }
 
 [data-theme="material"] .gallery-action-btn.delete:hover {
-    color: var(--material-error);
+    color: var(--m2-error);
+    background-color: rgba(176, 0, 32, 0.04);
 }
 
-/* Material Theme - Controller layouts */
-[data-theme="material"] .controller-layout-preset {
-    background: var(--material-surface);
-    border: 1px solid rgba(0,0,0,0.12);
-    border-radius: 8px;
-    color: var(--material-text-secondary);
-    box-shadow: var(--material-elevation-1);
-}
-
-[data-theme="material"] .controller-layout-preset:hover,
-[data-theme="material"] .controller-layout-preset:focus {
-    border-color: var(--material-primary);
-    box-shadow: var(--material-elevation-2);
-}
-
-[data-theme="material"] .controller-layout-preset.active {
-    border-color: var(--material-primary);
-    background: rgba(98, 0, 238, 0.08);
-    box-shadow: 0 0 0 2px rgba(98, 0, 238, 0.12);
-}
-
-/* Material Theme - Username display */
-[data-theme="material"] #username-display {
-    color: white !important;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.3) !important;
-    font-weight: 600;
-    font-size: 20px;
-}
-
-/* Material Theme - Tooltips */
-[data-theme="material"] .menu-btn[data-tooltip]::after {
-    background: rgba(50,50,50,0.95);
-    color: white;
+/* Material 2 Light - Skin Render Toggle */
+[data-theme="material"] .skin-render-toggle {
+    background-color: var(--m2-surface);
+    color: var(--m2-text-medium);
+    border-radius: var(--m2-shape-round);
+    box-shadow: var(--m2-shadow-1);
     border: none;
-    border-radius: 4px;
-    box-shadow: var(--material-elevation-2);
-    font-family: 'Roboto', sans-serif;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material"] .skin-render-toggle:hover {
+    background-color: var(--m2-surface);
+    box-shadow: var(--m2-shadow-2);
+    color: var(--m2-primary);
+}
+
+/* Material 2 Light - Tooltip */
+[data-theme="material"] .menu-btn[data-tooltip]::after {
+    font-family: var(--m2-font-family);
     font-size: 12px;
     font-weight: 400;
+    letter-spacing: 0.4px;
+    background-color: rgba(50, 50, 50, 0.95);
+    color: #FFFFFF;
+    border-radius: var(--m2-shape-small);
+    box-shadow: var(--m2-shadow-2);
     padding: 8px 12px;
-    opacity: 0;
-    visibility: hidden;
-}
-
-[data-theme="material"] .menu-btn[data-tooltip]:hover::after,
-[data-theme="material"] .menu-btn[data-tooltip]:focus::after {
-    opacity: 1;
-    visibility: visible;
+    border: none;
 }
 
 [data-theme="material"] .menu-btn[data-tooltip]::before {
-    border-left-color: rgba(50,50,50,0.95);
-    opacity: 0;
-    visibility: hidden;
+    border-left-color: rgba(50, 50, 50, 0.95);
 }
 
-[data-theme="material"] .menu-btn[data-tooltip]:hover::before,
-[data-theme="material"] .menu-btn[data-tooltip]:focus::before {
-    opacity: 1;
-    visibility: visible;
+/* Material 2 Light - Scrollbars */
+[data-theme="material"] ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
 }
 
-/* Material Theme - Loading dots */
+[data-theme="material"] ::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+[data-theme="material"] ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.24);
+    border-radius: 4px;
+    border: none;
+    box-shadow: none;
+}
+
+[data-theme="material"] ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.38);
+}
+
+/* Material 2 Light - Modal Overlay */
+[data-theme="material"] .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.32);
+    backdrop-filter: blur(4px);
+}
+
+[data-theme="material"] .modal-close-btn {
+    color: var(--m2-text-medium);
+    transition: color var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material"] .modal-close-btn:hover {
+    color: var(--m2-error);
+    text-shadow: none;
+}
+
+[data-theme="material"] .modal-body-text {
+    color: var(--m2-text-medium);
+    text-shadow: none;
+}
+
+/* Material 2 Light - Loading Dots */
 [data-theme="material"] .loading-dots span {
-    color: var(--material-primary);
+    background-color: var(--m2-primary);
 }
 
-/* Material Theme - Version label */
-[data-theme="material"] .version-label {
-    color: var(--material-text-secondary);
+/* Material 2 Light - Logo & Splash */
+[data-theme="material"] .mc-logo-img {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+[data-theme="material"] .splash-text {
+    color: var(--m2-secondary);
+    text-shadow: none;
+    font-family: var(--m2-font-family);
+    font-weight: 500;
+}
+
+/* Material 2 Light - Offline Indicator */
+[data-theme="material"] #offline-indicator {
+    font-family: var(--m2-font-family);
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.5px;
-}
-
-/* Material Theme - Select arrow */
-[data-theme="material"] .select-arrow {
-    color: var(--material-text-secondary);
+    text-transform: uppercase;
+    background-color: #FFF3E0;
+    color: #E65100;
+    border-radius: var(--m2-shape-small);
+    box-shadow: var(--m2-shadow-1);
+    border: none;
+    padding: 8px 16px;
 }
 
 /* =============================================
-   CUSTOM BACKGROUND AND LOGO STYLES
+   MATERIAL DESIGN 2 - DARK THEME
+   Strict compliance with Material 2 Design Language
+   https://m2.material.io/design/color/dark-theme.html
    ============================================= */
 
-/* Custom background support - High specificity to override themes */
-body[data-custom-bg="true"]::before {
-    background: var(--custom-bg-url) !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-}
-
-/* Override for static background mode */
-body[data-custom-bg="true"].static-bg::before {
-    animation: none !important;
-}
-
-/* Override theme-specific backgrounds when custom is set */
-[data-theme="material"][data-custom-bg="true"] body::before,
-[data-theme="material-dark"][data-custom-bg="true"] body::before,
-[data-theme="classic"][data-custom-bg="true"] body::before,
-[data-theme="legacy"][data-custom-bg="true"] body::before {
-    background: var(--custom-bg-url) !important;
-    background-size: cover !important;
-    background-position: center !important;
-    filter: none !important;
-}
-
-/* LCE Logo support */
-[data-logo="lce"] .mc-logo-img {
-    content: url('lce.png');
-}
-
-/* LCE Logo in specific themes */
-[data-theme="classic"][data-logo="lce"] .mc-logo-img,
-[data-theme="legacy"][data-logo="lce"] .mc-logo-img {
-    content: url('lce.png');
-}
-
-/* Custom background container indicator */
-#custom-bg-preview {
-    width: 100%;
-    height: 100px;
-    background-size: cover;
-    background-position: center;
-    border: 2px solid var(--glass-border);
-    border-radius: 4px;
-    margin-top: 8px;
-    display: none;
-}
-
-#custom-bg-preview.active {
-    display: block;
-}
-
-/* Material Dark Theme - Base */
+/* Material 2 Dark Theme - Color System & Variables */
 [data-theme="material-dark"] {
-    --material-primary: #bb86fc;
-    --material-primary-variant: #3700b3;
-    --material-secondary: #03dac6;
-    --material-bg: #121212;
-    --material-surface: #1e1e1e;
-    --material-error: #cf6679;
-    --material-text-primary: #ffffff;
-    --material-text-secondary: rgba(255,255,255,0.7);
-    --material-elevation-1: 0 2px 1px -1px rgba(0,0,0,0.4), 0 1px 1px 0 rgba(0,0,0,0.28), 0 1px 3px 0 rgba(0,0,0,0.24);
-    --material-elevation-2: 0 3px 1px -2px rgba(0,0,0,0.4), 0 2px 2px 0 rgba(0,0,0,0.28), 0 1px 5px 0 rgba(0,0,0,0.24);
-    --material-elevation-4: 0 2px 4px -1px rgba(0,0,0,0.4), 0 4px 5px 0 rgba(0,0,0,0.28), 0 1px 10px 0 rgba(0,0,0,0.24);
-    --material-elevation-8: 0 5px 5px -3px rgba(0,0,0,0.4), 0 8px 10px 1px rgba(0,0,0,0.28), 0 3px 14px 2px rgba(0,0,0,0.24);
+    /* Primary Colors - Light purple for dark surfaces per Material 2 spec */
+    --m2-primary: #BB86FC;
+    --m2-primary-variant: #3700B3;
+    --m2-on-primary: #000000;
+    
+    /* Secondary Colors - Teal 200 per Material 2 spec */
+    --m2-secondary: #03DAC6;
+    --m2-secondary-variant: #03DAC6;
+    --m2-on-secondary: #000000;
+    
+    /* Background & Surface - Dark theme elevation overlay per Material 2 spec */
+    --m2-background: #121212;
+    --m2-surface: #1E1E1E;
+    --m2-on-background: #FFFFFF;
+    --m2-on-surface: #FFFFFF;
+    
+    /* Error - Light red for dark surfaces per Material 2 spec */
+    --m2-error: #CF6679;
+    --m2-on-error: #000000;
+    
+    /* Text Opacity - Material 2 dark theme accessibility guidelines */
+    --m2-text-high: rgba(255, 255, 255, 0.87);
+    --m2-text-medium: rgba(255, 255, 255, 0.60);
+    --m2-text-disabled: rgba(255, 255, 255, 0.38);
+    
+    /* Surface Overlay - For elevation on dark surfaces (white overlay at different opacities) */
+    --m2-surface-overlay: rgba(255, 255, 255, 1);
+    
+    /* Elevation Surface Colors - Per Material 2 dark theme spec */
+    --m2-surface-0: #121212;
+    --m2-surface-1: #1E1E1E;
+    --m2-surface-2: #222222;
+    --m2-surface-3: #242424;
+    --m2-surface-4: #272727;
+    --m2-surface-6: #2C2C2C;
+    --m2-surface-8: #2E2E2E;
+    --m2-surface-12: #333333;
+    --m2-surface-16: #343434;
+    --m2-surface-24: #383838;
+    
+    /* States - Material 2 dark theme state overlay opacities (white overlays) */
+    --m2-state-hover: rgba(255, 255, 255, 0.04);
+    --m2-state-focus: rgba(255, 255, 255, 0.12);
+    --m2-state-pressed: rgba(255, 255, 255, 0.08);
+    --m2-state-drag: rgba(255, 255, 255, 0.16);
+    --m2-state-disabled-container: rgba(255, 255, 255, 0.12);
+    --m2-state-disabled-text: rgba(255, 255, 255, 0.38);
+    
+    /* Elevation Shadows - Material 2 elevation system for dark theme (stronger shadows) */
+    --m2-shadow-0: none;
+    --m2-shadow-1: 0 2px 1px -1px rgba(0,0,0,0.4), 0 1px 1px 0 rgba(0,0,0,0.28), 0 1px 3px 0 rgba(0,0,0,0.24);
+    --m2-shadow-2: 0 3px 1px -2px rgba(0,0,0,0.4), 0 2px 2px 0 rgba(0,0,0,0.28), 0 1px 5px 0 rgba(0,0,0,0.24);
+    --m2-shadow-4: 0 2px 4px -1px rgba(0,0,0,0.4), 0 4px 5px 0 rgba(0,0,0,0.28), 0 1px 10px 0 rgba(0,0,0,0.24);
+    --m2-shadow-8: 0 5px 5px -3px rgba(0,0,0,0.4), 0 8px 10px 1px rgba(0,0,0,0.28), 0 3px 14px 2px rgba(0,0,0,0.24);
+    --m2-shadow-16: 0 8px 10px -5px rgba(0,0,0,0.4), 0 16px 24px 2px rgba(0,0,0,0.28), 0 6px 30px 5px rgba(0,0,0,0.24);
+    --m2-shadow-24: 0 11px 15px -7px rgba(0,0,0,0.4), 0 24px 38px 3px rgba(0,0,0,0.28), 0 9px 46px 8px rgba(0,0,0,0.24);
+    
+    /* Shape - Material 2 shape system */
+    --m2-shape-small: 4px;
+    --m2-shape-medium: 8px;
+    --m2-shape-large: 16px;
+    --m2-shape-round: 50%;
+    
+    /* Typography - Roboto per Material 2 spec */
+    --m2-font-family: 'Roboto', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Spacing - 8dp baseline grid */
+    --m2-spacing-unit: 8px;
+    --m2-spacing-1: 8px;
+    --m2-spacing-2: 16px;
+    --m2-spacing-3: 24px;
+    --m2-spacing-4: 32px;
+    --m2-spacing-5: 40px;
+    --m2-spacing-6: 48px;
+    
+    /* Animation - Material 2 motion guidelines */
+    --m2-duration-instant: 0ms;
+    --m2-duration-fast: 150ms;
+    --m2-duration-normal: 200ms;
+    --m2-duration-slow: 300ms;
+    --m2-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --m2-easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+    --m2-easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+    --m2-easing-sharp: cubic-bezier(0.4, 0.0, 0.6, 1);
 }
 
+/* Material 2 Dark - Base Body Styles */
 [data-theme="material-dark"] body {
-    background: var(--material-bg);
-    font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+    font-family: var(--m2-font-family);
+    background-color: var(--m2-background);
+    color: var(--m2-on-background);
 }
 
 [data-theme="material-dark"] body::before {
-    background: 
-        linear-gradient(135deg, rgba(187, 134, 252, 0.08) 0%, rgba(3, 218, 198, 0.05) 100%),
-        url('pano/pano.png');
-    background-size: cover, auto 100%;
-    filter: brightness(0.5) saturate(0.7);
+    background-color: var(--m2-background);
+    filter: none;
 }
 
-[data-theme="material-dark"].static-bg body::before {
-    background: 
-        linear-gradient(135deg, rgba(187, 134, 252, 0.1) 0%, rgba(3, 218, 198, 0.08) 100%),
-        url('minecraft.jpg');
-    animation: none;
+/* Material 2 Dark - Typography Scale */
+[data-theme="material-dark"] .title-bar-text {
+    font-family: var(--m2-font-family);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    color: var(--m2-text-high);
 }
 
-/* Material Dark Theme - Title Bar */
+[data-theme="material-dark"] .modal-title {
+    font-family: var(--m2-font-family);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    color: var(--m2-text-high);
+    text-transform: none;
+}
+
+[data-theme="material-dark"] .options-title {
+    font-family: var(--m2-font-family);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+    color: var(--m2-text-high);
+    text-transform: none;
+}
+
+[data-theme="material-dark"] .version-label {
+    font-family: var(--m2-font-family);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--m2-text-medium);
+}
+
+[data-theme="material-dark"] .mc-label {
+    font-family: var(--m2-font-family);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    color: var(--m2-text-medium);
+    text-transform: none;
+}
+
+[data-theme="material-dark"] .progress-text,
+[data-theme="material-dark"] #loader-text {
+    font-family: var(--m2-font-family);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.25px;
+    color: var(--m2-text-high);
+}
+
+[data-theme="material-dark"] #username-display {
+    font-family: var(--m2-font-family);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: var(--m2-text-high) !important;
+    text-shadow: none !important;
+}
+
+/* Material 2 Dark - Elevation & Surfaces (Surface colors with elevation overlays) */
 [data-theme="material-dark"] .title-bar {
-    background: var(--material-surface);
+    background-color: var(--m2-surface-4);
+    box-shadow: var(--m2-shadow-2);
     border-bottom: none;
-    box-shadow: var(--material-elevation-2);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
 }
 
-[data-theme="material-dark"] .title-bar-text {
-    color: var(--material-text-primary);
-    font-weight: 500;
-    font-size: 16px;
-}
-
-[data-theme="material-dark"] .title-bar-text::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: var(--material-primary);
-    border-radius: 50%;
-    color: transparent;
-}
-
-[data-theme="material-dark"] .win-btn {
-    border-radius: 50%;
-    color: var(--material-text-secondary);
-    transition: all 0.2s ease;
-}
-
-[data-theme="material-dark"] .win-btn:hover {
-    background: rgba(255,255,255,0.1);
-    color: var(--material-text-primary);
-    transform: scale(1);
-}
-
-[data-theme="material-dark"] .win-btn.close:hover {
-    background: var(--material-error);
-    color: white;
-}
-
-/* Material Dark Theme - Buttons */
-[data-theme="material-dark"] .btn-mc {
-    background: var(--material-surface);
-    color: var(--material-primary);
+[data-theme="material-dark"] .modal-box {
+    background-color: var(--m2-surface-24);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-24);
     border: none;
-    border-radius: 4px;
-    box-shadow: var(--material-elevation-1);
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+}
+
+[data-theme="material-dark"] .options-container {
+    background-color: var(--m2-surface-24);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-24);
+    border: none;
+}
+
+[data-theme="material-dark"] .progress-container {
+    background-color: var(--m2-surface-4);
+    box-shadow: var(--m2-shadow-4);
+    border-top: none;
+    backdrop-filter: none;
+}
+
+[data-theme="material-dark"] .skin-viewer-container {
+    background-color: var(--m2-surface-2);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-2);
+    border: none;
+}
+
+[data-theme="material-dark"] .gallery-item {
+    background-color: var(--m2-surface-2);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-1);
+    border: none;
+}
+
+[data-theme="material-dark"] .gallery-item:hover,
+[data-theme="material-dark"] .gallery-item:focus {
+    box-shadow: var(--m2-shadow-2);
+}
+
+[data-theme="material-dark"] .controller-layout-preset {
+    background-color: var(--m2-surface-2);
+    border-radius: var(--m2-shape-medium);
+    box-shadow: var(--m2-shadow-1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--m2-text-medium);
+}
+
+[data-theme="material-dark"] .controller-layout-preset:hover,
+[data-theme="material-dark"] .controller-layout-preset:focus {
+    border-color: var(--m2-primary);
+    box-shadow: var(--m2-shadow-2);
+}
+
+[data-theme="material-dark"] .controller-layout-preset.active {
+    border-color: var(--m2-primary);
+    background-color: rgba(187, 134, 252, 0.12);
+}
+
+/* Material 2 Dark - Buttons */
+[data-theme="material-dark"] .btn-mc {
+    font-family: var(--m2-font-family);
     font-size: 14px;
-    transition: all 0.2s ease;
+    font-weight: 500;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    border-radius: var(--m2-shape-small);
+    padding: 10px 24px;
+    min-height: 36px;
+    box-shadow: var(--m2-shadow-1);
+    background-color: var(--m2-surface-2);
+    color: var(--m2-primary);
+    border: none;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
     text-shadow: none;
 }
 
 [data-theme="material-dark"] .btn-mc:hover:not(.disabled) {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    transform: translateY(-1px);
-    color: var(--material-primary);
+    background-color: var(--m2-state-hover);
+    box-shadow: var(--m2-shadow-2);
+}
+
+[data-theme="material-dark"] .btn-mc:active:not(.disabled) {
+    background-color: var(--m2-state-pressed);
 }
 
 [data-theme="material-dark"] .btn-mc.nav-item:focus {
-    box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.25), var(--material-elevation-2);
+    background-color: var(--m2-state-focus);
     outline: none;
+    box-shadow: var(--m2-shadow-2), 0 0 0 3px rgba(187, 134, 252, 0.25);
 }
 
 [data-theme="material-dark"] .btn-mc.disabled,
 [data-theme="material-dark"] .btn-mc.running {
-    background: rgba(255,255,255,0.08);
-    color: rgba(255,255,255,0.3);
+    background-color: var(--m2-state-disabled-container);
+    color: var(--m2-state-disabled-text);
     box-shadow: none;
 }
 
-[data-theme="material-dark"] .btn-mc.running {
-    color: var(--material-primary);
-}
-
-/* Material Dark Theme - Play button */
+/* Material 2 Dark - Floating Action Button (FAB) - Play Button */
 [data-theme="material-dark"] .play-btn {
-    background: var(--material-primary);
-    color: black;
+    font-family: var(--m2-font-family);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    border-radius: var(--m2-shape-medium);
+    padding: 16px 36px;
+    min-height: 56px;
+    min-width: 56px;
+    background-color: var(--m2-secondary);
+    color: var(--m2-on-secondary);
+    box-shadow: var(--m2-shadow-4);
     border: none;
-    border-radius: 28px;
-    box-shadow: var(--material-elevation-4);
-    font-family: 'Roboto', sans-serif;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: none;
+    transition: all var(--m2-duration-normal) var(--m2-easing-standard);
+    text-shadow: none;
 }
 
 [data-theme="material-dark"] .play-btn:hover:not(.disabled) {
-    background: #c49efc;
-    box-shadow: var(--material-elevation-8);
-    transform: translateY(-2px);
+    background-color: var(--m2-secondary);
+    box-shadow: var(--m2-shadow-8);
+    transform: translateY(-1px);
 }
 
-/* Material Dark Theme - Menu buttons */
+[data-theme="material-dark"] .play-btn:active:not(.disabled) {
+    box-shadow: var(--m2-shadow-8);
+}
+
+/* Material 2 Dark - Icon Buttons (Menu Buttons) */
 [data-theme="material-dark"] .menu-btn {
-    background: var(--material-surface);
+    background-color: transparent;
+    border-radius: var(--m2-shape-round);
+    box-shadow: none;
+    color: var(--m2-text-medium);
     border: none;
-    border-radius: 12px;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-secondary);
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
 }
 
 [data-theme="material-dark"] .menu-btn:hover {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    color: var(--material-primary);
-    transform: translateX(-4px);
+    background-color: var(--m2-state-hover);
+    color: var(--m2-primary);
+    transform: none;
+    box-shadow: none;
 }
 
-[data-theme="material-dark"] .menu-btn svg,
-[data-theme="material-dark"] .menu-btn i {
+[data-theme="material-dark"] .menu-btn:active {
+    background-color: var(--m2-state-pressed);
+}
+
+[data-theme="material-dark"] .menu-btn i,
+[data-theme="material-dark"] .menu-btn svg {
     color: currentColor;
 }
 
-/* Material Dark Theme - Version selector */
-[data-theme="material-dark"] .top-left-controls .version-select-box {
-    background: var(--material-surface);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 4px;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-primary);
-}
-
-[data-theme="material-dark"] .top-left-controls .version-select-box:hover {
-    background: var(--material-surface);
-    border-color: rgba(255,255,255,0.24);
-}
-
+/* Material 2 Dark - Icon Button (Refresh) */
 [data-theme="material-dark"] .refresh-btn {
-    background: var(--material-surface);
+    background-color: transparent;
+    border-radius: var(--m2-shape-round);
+    box-shadow: none;
+    color: var(--m2-text-medium);
     border: none;
-    border-radius: 50%;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-secondary);
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
 }
 
 [data-theme="material-dark"] .refresh-btn:hover {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    color: var(--material-primary);
+    background-color: var(--m2-state-hover);
+    color: var(--m2-primary);
     transform: rotate(180deg);
+    box-shadow: none;
 }
 
-/* Material Dark Theme - Inputs */
+/* Material 2 Dark - Window Controls */
+[data-theme="material-dark"] .win-btn {
+    background-color: transparent;
+    border-radius: var(--m2-shape-round);
+    color: var(--m2-text-medium);
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material-dark"] .win-btn:hover {
+    background-color: var(--m2-state-hover);
+    color: var(--m2-text-high);
+    transform: none;
+}
+
+[data-theme="material-dark"] .win-btn.close:hover {
+    background-color: var(--m2-error);
+    color: var(--m2-on-error);
+}
+
+/* Material 2 Dark - Text Fields (Filled style) */
 [data-theme="material-dark"] .mc-input {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 4px 4px 0 0;
-    border-bottom: 2px solid rgba(255,255,255,0.3);
-    color: var(--material-text-primary);
+    font-family: var(--m2-font-family);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: var(--m2-shape-small) var(--m2-shape-small) 0 0;
+    color: var(--m2-text-high);
+    padding: 12px 16px;
     box-shadow: none;
-    transition: all 0.2s ease;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material-dark"] .mc-input:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-bottom-color: rgba(255, 255, 255, 0.87);
 }
 
 [data-theme="material-dark"] .mc-input:focus,
 [data-theme="material-dark"] .mc-input.focused {
-    border-bottom-color: var(--material-primary);
-    background: rgba(187, 134, 252, 0.08);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 2px solid var(--m2-primary);
     box-shadow: none;
 }
 
-[data-theme="material-dark"] .mc-label {
-    color: var(--material-text-secondary);
-    text-transform: none;
-    font-size: 12px;
+/* Material 2 Dark - Select/Version Selector */
+[data-theme="material-dark"] .version-select-box {
+    font-family: var(--m2-font-family);
+    font-size: 16px;
     font-weight: 400;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: var(--m2-shape-small) var(--m2-shape-small) 0 0;
+    color: var(--m2-text-high);
+    box-shadow: none;
 }
 
-/* Material Dark Theme - Checkboxes */
+[data-theme="material-dark"] .version-select-box:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-bottom-color: rgba(255, 255, 255, 0.87);
+}
+
+[data-theme="material-dark"] .select-arrow {
+    color: var(--m2-text-medium);
+}
+
+/* Material 2 Dark - Selection Controls (Checkbox) */
 [data-theme="material-dark"] input[type="checkbox"].nav-item,
 [data-theme="material-dark"] .mc-checkbox-label input[type="checkbox"] {
-    background: rgba(255,255,255,0.05);
-    border: 2px solid rgba(255,255,255,0.54);
+    width: 18px;
+    height: 18px;
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.54);
     border-radius: 2px;
     box-shadow: none;
-    position: relative;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material-dark"] input[type="checkbox"].nav-item:hover,
+[data-theme="material-dark"] .mc-checkbox-label input[type="checkbox"]:hover {
+    border-color: rgba(255, 255, 255, 0.87);
 }
 
 [data-theme="material-dark"] input[type="checkbox"].nav-item:checked,
 [data-theme="material-dark"] .mc-checkbox-label input[type="checkbox"]:checked {
-    background: var(--material-secondary);
-    border-color: var(--material-secondary);
-    box-shadow: none;
+    background-color: var(--m2-secondary);
+    border-color: var(--m2-secondary);
 }
 
 [data-theme="material-dark"] input[type="checkbox"].nav-item:checked::after,
 [data-theme="material-dark"] .mc-checkbox-label input[type="checkbox"]:checked::after {
-    content: '✓';
+    content: '';
     position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: black;
-    font-size: 14px;
-    font-weight: bold;
-    text-shadow: none;
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--m2-on-secondary);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
 }
 
 [data-theme="material-dark"] input[type="checkbox"].nav-item:focus,
@@ -3581,165 +4120,20 @@ body[data-custom-bg="true"].static-bg::before {
     box-shadow: 0 0 0 3px rgba(3, 218, 198, 0.25);
 }
 
-/* Material Dark Theme - Checkbox label text color */
 [data-theme="material-dark"] .mc-checkbox-label {
-    color: var(--material-text-primary);
-}
-
-[data-theme="material-dark"] .mc-checkbox-label span {
-    color: var(--material-text-primary);
-}
-
-/* Material Dark Theme - Modal boxes */
-[data-theme="material-dark"] .modal-overlay {
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-}
-
-[data-theme="material-dark"] .modal-box {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 8px;
-    box-shadow: var(--material-elevation-8);
-}
-
-[data-theme="material-dark"] .modal-title {
-    color: var(--material-text-primary);
+    color: var(--m2-text-high);
+    font-family: var(--m2-font-family);
+    font-size: 14px;
     font-weight: 400;
     letter-spacing: 0.25px;
-    text-shadow: none;
 }
 
-[data-theme="material-dark"] .modal-title::before,
-[data-theme="material-dark"] .modal-title::after {
-    display: none;
-}
-
-[data-theme="material-dark"] .modal-body-text {
-    color: var(--material-text-secondary);
-    text-shadow: none;
-}
-
-[data-theme="material-dark"] .modal-close-btn {
-    color: var(--material-text-secondary);
-}
-
-[data-theme="material-dark"] .modal-close-btn:hover {
-    color: var(--material-error);
-    text-shadow: none;
-}
-
-/* Material Dark Theme - Options overlay */
-[data-theme="material-dark"] .options-container {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 8px;
-    box-shadow: var(--material-elevation-8);
-}
-
-[data-theme="material-dark"] .options-header {
-    background: transparent;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-}
-
-[data-theme="material-dark"] .options-title {
-    color: var(--material-text-primary);
-    font-weight: 500;
-    text-shadow: none;
-}
-
-[data-theme="material-dark"] .options-title::before {
-    color: var(--material-primary);
-}
-
-[data-theme="material-dark"] .options-tabs {
-    background: transparent;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-}
-
-[data-theme="material-dark"] .options-tab {
-    color: var(--material-text-secondary);
+/* Material 2 Dark - Sliders */
+[data-theme="material-dark"] .mc-slider-container {
+    background-color: transparent;
     border: none;
     border-radius: 0;
-    border-bottom: 2px solid transparent;
-}
-
-[data-theme="material-dark"] .options-tab:hover {
-    background: rgba(187, 134, 252, 0.08);
-    color: var(--material-text-primary);
-}
-
-[data-theme="material-dark"] .options-tab.active {
-    color: var(--material-primary);
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid var(--material-primary);
-}
-
-[data-theme="material-dark"] .options-footer {
-    background: transparent;
-    border-top: 1px solid rgba(255,255,255,0.12);
-}
-
-/* Material Dark Theme - Progress bar */
-[data-theme="material-dark"] .progress-container {
-    background: var(--material-surface);
-    border-top: none;
-    backdrop-filter: none;
-    box-shadow: var(--material-elevation-2);
-}
-
-[data-theme="material-dark"] .progress-bar-bg {
-    background: rgba(255,255,255,0.12);
-    border: none;
-    border-radius: 4px;
-}
-
-[data-theme="material-dark"] .progress-bar-fill {
-    background: var(--material-secondary);
-    border-radius: 4px;
     box-shadow: none;
-}
-
-[data-theme="material-dark"] .progress-text {
-    color: var(--material-text-primary);
-    text-shadow: none;
-    font-weight: 500;
-}
-
-[data-theme="material-dark"] #progress-spinner {
-    border: 3px solid rgba(255,255,255,0.12);
-    border-top-color: var(--material-secondary);
-}
-
-/* Material Dark Theme - Skin viewer */
-[data-theme="material-dark"] .skin-viewer-container {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 8px;
-    box-shadow: var(--material-elevation-2);
-}
-
-[data-theme="material-dark"] .skin-render-toggle {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 50%;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-secondary);
-}
-
-[data-theme="material-dark"] .skin-render-toggle:hover {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    color: var(--material-primary);
-}
-
-/* Material Dark Theme - Sliders */
-[data-theme="material-dark"] .mc-slider-container {
-    background: rgba(255,255,255,0.05);
-    border: none;
-    border-radius: 4px 4px 0 0;
-    border-bottom: 2px solid rgba(255,255,255,0.3);
 }
 
 [data-theme="material-dark"] .mc-slider {
@@ -3749,246 +4143,287 @@ body[data-custom-bg="true"].static-bg::before {
 }
 
 [data-theme="material-dark"] .mc-slider::-webkit-slider-runnable-track {
-    background: rgba(255,255,255,0.24);
-    height: 4px;
-    border-radius: 2px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.26);
+    border-radius: 1px;
 }
 
 [data-theme="material-dark"] .mc-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: var(--material-primary);
-    border-radius: 50%;
-    border: 2px solid var(--material-bg);
-    box-shadow: var(--material-elevation-1);
-    margin-top: -6px;
-    transition: transform 0.2s ease;
+    width: 12px;
+    height: 12px;
+    background-color: var(--m2-secondary);
+    border-radius: var(--m2-shape-round);
+    border: 2px solid var(--m2-secondary);
+    margin-top: -5px;
+    box-shadow: none;
+    transition: transform 0.05s ease-out, box-shadow 0.15s ease;
+    will-change: transform;
+}
+
+[data-theme="material-dark"] .mc-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px rgba(3, 218, 198, 0.12);
+}
+
+[data-theme="material-dark"] .mc-slider:active::-webkit-slider-thumb {
+    transform: scale(1.3);
+    box-shadow: 0 0 0 12px rgba(3, 218, 198, 0.20);
+    cursor: grabbing;
 }
 
 [data-theme="material-dark"] .mc-slider:focus::-webkit-slider-thumb {
     transform: scale(1.2);
-    box-shadow: 0 0 0 8px rgba(187, 134, 252, 0.12);
-}
-
-[data-theme="material-dark"] .mc-slider-container:focus-within {
-    box-shadow: none;
-    border-bottom-color: var(--material-primary);
-}
-
-[data-theme="material-dark"] select.mc-input.nav-item:focus {
-    box-shadow: none;
-    border-bottom-color: var(--material-primary);
+    box-shadow: 0 0 0 12px rgba(3, 218, 198, 0.20);
 }
 
 [data-theme="material-dark"] .mc-slider-percent {
-    color: var(--material-text-secondary);
-    text-shadow: none;
+    font-family: var(--m2-font-family);
     font-size: 14px;
+    font-weight: 400;
+    color: var(--m2-text-medium);
+    text-shadow: none;
 }
 
-/* Material Dark Theme - Scrollbars */
+/* Material 2 Dark - Progress Indicators */
+[data-theme="material-dark"] .progress-bar-bg {
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+    border: none;
+}
+
+[data-theme="material-dark"] .progress-bar-fill {
+    background-color: var(--m2-secondary);
+    border-radius: 2px;
+    box-shadow: none;
+}
+
+[data-theme="material-dark"] #progress-spinner,
+[data-theme="material-dark"] .loader-spinner {
+    border: 3px solid rgba(255, 255, 255, 0.12);
+    border-top-color: var(--m2-primary);
+}
+
+/* Material 2 Dark - Tabs */
+[data-theme="material-dark"] .options-tabs {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="material-dark"] .options-tab {
+    font-family: var(--m2-font-family);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    color: var(--m2-text-medium);
+    padding: 16px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background-color: transparent;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material-dark"] .options-tab:hover {
+    background-color: var(--m2-state-hover);
+    color: var(--m2-text-high);
+}
+
+[data-theme="material-dark"] .options-tab.active {
+    color: var(--m2-primary);
+    border-bottom-color: var(--m2-primary);
+    background-color: transparent;
+}
+
+[data-theme="material-dark"] .options-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="material-dark"] .options-footer {
+    background-color: transparent;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Material 2 Dark - Toast/Snackbar */
+[data-theme="material-dark"] #toast {
+    font-family: var(--m2-font-family);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.25px;
+    background-color: var(--m2-surface-6);
+    color: var(--m2-text-high);
+    border-radius: var(--m2-shape-small);
+    box-shadow: var(--m2-shadow-4);
+    border: none;
+    padding: 14px 16px;
+}
+
+/* Material 2 Dark - Music Button (FAB style) */
+[data-theme="material-dark"] .music-btn {
+    background-color: var(--m2-surface-6);
+    color: var(--m2-text-medium);
+    border-radius: var(--m2-shape-round);
+    box-shadow: var(--m2-shadow-2);
+    border: none;
+    backdrop-filter: none;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material-dark"] .music-btn:hover:not(.disabled) {
+    background-color: var(--m2-surface-8);
+    box-shadow: var(--m2-shadow-4);
+    color: var(--m2-primary);
+    transform: scale(1.05);
+}
+
+[data-theme="material-dark"] .music-btn.muted {
+    background-color: var(--m2-state-disabled-container);
+    color: var(--m2-state-disabled-text);
+    box-shadow: none;
+}
+
+/* Material 2 Dark - Loader */
+[data-theme="material-dark"] #loader {
+    background-color: var(--m2-background);
+}
+
+[data-theme="material-dark"] #loader::before {
+    display: none;
+}
+
+/* Material 2 Dark - Gallery Actions */
+[data-theme="material-dark"] .gallery-action-btn {
+    font-family: var(--m2-font-family);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    color: var(--m2-primary);
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material-dark"] .gallery-action-btn:hover {
+    background-color: var(--m2-state-hover);
+    color: #D4A5FF;
+    text-shadow: none;
+}
+
+[data-theme="material-dark"] .gallery-action-btn.delete {
+    color: var(--m2-error);
+}
+
+[data-theme="material-dark"] .gallery-action-btn.delete:hover {
+    color: var(--m2-error);
+    background-color: rgba(207, 102, 121, 0.08);
+}
+
+/* Material 2 Dark - Skin Render Toggle */
+[data-theme="material-dark"] .skin-render-toggle {
+    background-color: var(--m2-surface-6);
+    color: var(--m2-text-medium);
+    border-radius: var(--m2-shape-round);
+    box-shadow: var(--m2-shadow-1);
+    border: none;
+    transition: all var(--m2-duration-fast) var(--m2-easing-standard);
+}
+
+[data-theme="material-dark"] .skin-render-toggle:hover {
+    background-color: var(--m2-surface-8);
+    box-shadow: var(--m2-shadow-2);
+    color: var(--m2-primary);
+}
+
+/* Material 2 Dark - Tooltip */
+[data-theme="material-dark"] .menu-btn[data-tooltip]::after {
+    font-family: var(--m2-font-family);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #121212;
+    border-radius: var(--m2-shape-small);
+    box-shadow: var(--m2-shadow-2);
+    padding: 8px 12px;
+    border: none;
+}
+
+[data-theme="material-dark"] .menu-btn[data-tooltip]::before {
+    border-left-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Material 2 Dark - Scrollbars */
 [data-theme="material-dark"] ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
 }
 
 [data-theme="material-dark"] ::-webkit-scrollbar-track {
-    background: transparent;
-    border-left: none;
+    background-color: transparent;
 }
 
 [data-theme="material-dark"] ::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.24);
-    border: none;
+    background-color: rgba(255, 255, 255, 0.24);
     border-radius: 4px;
+    border: none;
     box-shadow: none;
 }
 
 [data-theme="material-dark"] ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.38);
+    background-color: rgba(255, 255, 255, 0.38);
 }
 
-/* Material Dark Theme - Toast */
-[data-theme="material-dark"] #toast {
-    background: #323232;
-    border: none;
-    border-radius: 4px;
-    box-shadow: var(--material-elevation-4);
-    color: white;
-    font-weight: 400;
+/* Material 2 Dark - Modal Overlay */
+[data-theme="material-dark"] .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.60);
+    backdrop-filter: blur(4px);
 }
 
-/* Material Dark Theme - Music button */
-[data-theme="material-dark"] .music-btn {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 50%;
-    box-shadow: var(--material-elevation-1);
-    color: var(--material-text-secondary);
-    backdrop-filter: none;
+[data-theme="material-dark"] .modal-close-btn {
+    color: var(--m2-text-medium);
+    transition: color var(--m2-duration-fast) var(--m2-easing-standard);
 }
 
-[data-theme="material-dark"] .music-btn:hover:not(.disabled) {
-    background: var(--material-surface);
-    box-shadow: var(--material-elevation-2);
-    color: var(--material-primary);
+[data-theme="material-dark"] .modal-close-btn:hover {
+    color: var(--m2-error);
+    text-shadow: none;
 }
 
-[data-theme="material-dark"] .music-btn.muted {
-    opacity: 1;
-    background: rgba(255,255,255,0.05);
-    color: rgba(255,255,255,0.3);
+[data-theme="material-dark"] .modal-body-text {
+    color: var(--m2-text-medium);
+    text-shadow: none;
 }
 
-/* Material Dark Theme - Loader */
-[data-theme="material-dark"] #loader {
-    background: var(--material-bg);
-    background-size: cover;
+/* Material 2 Dark - Loading Dots */
+[data-theme="material-dark"] .loading-dots span {
+    background-color: var(--m2-primary);
 }
 
-[data-theme="material-dark"] #loader::before {
-    background: rgba(18,18,18,0.9);
-}
-
-[data-theme="material-dark"] .loader-spinner {
-    border: 3px solid rgba(255,255,255,0.12);
-    border-top: 3px solid var(--material-primary);
-}
-
-[data-theme="material-dark"] #loader-text {
-    color: var(--material-text-primary);
-    font-weight: 500;
-    letter-spacing: 1px;
-}
-
-/* Material Dark Theme - Logo and Splash */
+/* Material 2 Dark - Logo & Splash */
 [data-theme="material-dark"] .mc-logo-img {
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
 }
 
 [data-theme="material-dark"] .splash-text {
-    color: var(--material-secondary);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    font-weight: 500;
-}
-
-/* Material Dark Theme - Gallery */
-[data-theme="material-dark"] .gallery-item {
-    background: var(--material-surface);
-    border: none;
-    border-radius: 8px;
-    box-shadow: var(--material-elevation-1);
-    overflow: hidden;
-}
-
-[data-theme="material-dark"] .gallery-item:hover,
-[data-theme="material-dark"] .gallery-item:focus {
-    border: none;
-    box-shadow: var(--material-elevation-2);
-}
-
-[data-theme="material-dark"] .gallery-action-btn {
-    color: var(--material-primary);
-    font-weight: 500;
-}
-
-[data-theme="material-dark"] .gallery-action-btn:hover {
-    color: #c49efc;
+    color: var(--m2-secondary);
     text-shadow: none;
+    font-family: var(--m2-font-family);
+    font-weight: 500;
 }
 
-[data-theme="material-dark"] .gallery-action-btn.delete {
-    color: var(--material-error);
-}
-
-[data-theme="material-dark"] .gallery-action-btn.delete:hover {
-    color: var(--material-error);
-}
-
-/* Material Dark Theme - Controller layouts */
-[data-theme="material-dark"] .controller-layout-preset {
-    background: var(--material-surface);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    color: var(--material-text-secondary);
-    box-shadow: var(--material-elevation-1);
-}
-
-[data-theme="material-dark"] .controller-layout-preset:hover,
-[data-theme="material-dark"] .controller-layout-preset:focus {
-    border-color: var(--material-primary);
-    box-shadow: var(--material-elevation-2);
-}
-
-[data-theme="material-dark"] .controller-layout-preset.active {
-    border-color: var(--material-primary);
-    background: rgba(187, 134, 252, 0.12);
-    box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.15);
-}
-
-/* Material Dark Theme - Username display */
-[data-theme="material-dark"] #username-display {
-    color: white !important;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4) !important;
-    font-weight: 600;
-    font-size: 20px;
-}
-
-/* Material Dark Theme - Tooltips */
-[data-theme="material-dark"] .menu-btn[data-tooltip]::after {
-    background: rgba(50,50,50,0.98);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    box-shadow: var(--material-elevation-2);
-    font-family: 'Roboto', sans-serif;
+/* Material 2 Dark - Offline Indicator */
+[data-theme="material-dark"] #offline-indicator {
+    font-family: var(--m2-font-family);
     font-size: 12px;
-    font-weight: 400;
-    padding: 8px 12px;
-    opacity: 0;
-    visibility: hidden;
-}
-
-[data-theme="material-dark"] .menu-btn[data-tooltip]:hover::after,
-[data-theme="material-dark"] .menu-btn[data-tooltip]:focus::after {
-    opacity: 1;
-    visibility: visible;
-}
-
-[data-theme="material-dark"] .menu-btn[data-tooltip]::before {
-    border-left-color: rgba(50,50,50,0.98);
-    opacity: 0;
-    visibility: hidden;
-}
-
-[data-theme="material-dark"] .menu-btn[data-tooltip]:hover::before,
-[data-theme="material-dark"] .menu-btn[data-tooltip]:focus::before {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Material Dark Theme - Loading dots */
-[data-theme="material-dark"] .loading-dots span {
-    color: var(--material-primary);
-}
-
-/* Material Dark Theme - Version label */
-[data-theme="material-dark"] .version-label {
-    color: var(--material-text-secondary);
     font-weight: 500;
     letter-spacing: 0.5px;
-}
-
-/* Material Dark Theme - Select arrow */
-[data-theme="material-dark"] .select-arrow {
-    color: var(--material-text-secondary);
-}
-
-/* Material Dark Theme - Online/Offline indicator */
-[data-theme="material-dark"] #offline-indicator {
-    background: #2d2318;
-    color: #ff9800;
+    text-transform: uppercase;
+    background-color: #2D2318;
+    color: #FF9800;
+    border-radius: var(--m2-shape-small);
+    box-shadow: var(--m2-shadow-1);
     border: none;
-    border-radius: 4px;
-    box-shadow: var(--material-elevation-1);
+    padding: 8px 16px;
 }

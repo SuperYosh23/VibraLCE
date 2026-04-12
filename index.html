@@ -33,6 +33,14 @@
 
     <!-- Main Content Area -->
     <div class="main-content">
+        <!-- Floating Particles Background -->
+        <div class="floating-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
         
         <!-- Top Left: Version Selector -->
         <div class="top-left-controls">
@@ -88,7 +96,7 @@
             </div>
 
             <!-- Play Button -->
-            <div id="btn-play-main" class="play-btn nav-item" onclick="launchGame()" tabindex="0">
+            <div id="btn-play-main" class="play-btn nav-item pulse-on-hover" onclick="launchGame()" tabindex="0">
                 PLAY
             </div>
         </div>
@@ -104,7 +112,7 @@
                 </div>
             </div>
             <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                <div class="progress-bar progress-bar-animated" id="progress-bar-fill"></div>
             </div>
         </div>
     </div>
@@ -231,7 +239,7 @@
                     <div class="mc-input-group">
                         <label class="mc-label">Installation Directory:</label>
                         <div class="flex gap-2 mb-2">
-                            <input type="text" id="install-path-input" class="mc-input nav-item !mb-0" placeholder="Default: Documents/LegacyClient" tabindex="0">
+                            <input type="text" id="install-path-input" class="mc-input nav-item focus-glow !mb-0" placeholder="Default: Documents/LegacyClient" tabindex="0">
                             <div class="btn-mc btn-mini nav-item !w-[60px] !h-[48px]" onclick="browseInstallDir()" tabindex="0">...</div>
                         </div>
                     </div>
@@ -260,7 +268,7 @@
                     <div class="mc-input-group">
                         <label class="mc-label">UI Scale:</label>
                         <div class="mc-slider-container">
-                            <input type="range" id="ui-scale-slider" min="0.5" max="2.0" step="0.05" value="1" class="mc-slider nav-item w-full" tabindex="0">
+                            <input type="range" id="ui-scale-slider" min="0.5" max="2.0" step="0.01" value="1" class="mc-slider nav-item w-full" tabindex="0">
                             <div id="ui-scale-percent" class="mc-slider-percent">100%</div>
                         </div>
                     </div>
@@ -270,8 +278,8 @@
                             <option value="vibra">Vibra</option>
                             <option value="classic">OreUI</option>
                             <option value="legacy">Legacy</option>
-                            <option value="material">Material</option>
-                            <option value="material-dark">Material Dark</option>
+                            <option value="material">Material 2 Light</option>
+                            <option value="material-dark">Material 2 Dark</option>
                             <option value="custom">Custom CSS</option>
                         </select>
                     </div>
@@ -294,6 +302,13 @@
                             <input type="checkbox" id="disable-panorama-checkbox" class="nav-item" tabindex="-1">
                             <span>Disable Panorama (Static Background)</span>
                         </label>
+                    </div>
+                    <div class="mc-input-group mt-4">
+                        <label class="mc-label">Background Dim:</label>
+                        <div class="mc-slider-container">
+                            <input type="range" id="bg-dim-slider" min="0" max="100" step="1" value="40" class="mc-slider nav-item w-full" tabindex="0">
+                            <div id="bg-dim-percent" class="mc-slider-percent">40%</div>
+                        </div>
                     </div>
                     <div class="mc-input-group mt-4">
                         <label class="mc-label" id="custom-bg-label">Custom Background (Static Image):</label>
