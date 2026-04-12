@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html data-theme="viso" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viso Design System - Example</title>
+    <link rel="stylesheet" href="viso.css">
+    <style>
+        /* Layout styles for the example page */
+        .section {
+            padding: 48px 0;
+        }
+        
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+        
+        .component-demo {
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .component-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--viso-text-muted);
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body style="min-height: 100vh;">
+    <!-- Header -->
+    <header style="border-bottom: 1px solid var(--glass-border); padding: 24px 0;">
+        <div class="viso-container">
+            <div class="viso-flex viso-items-center viso-gap-4">
+                <span style="color: var(--viso-accent); font-size: 24px;">◆</span>
+                <h1 class="viso-h1" style="margin: 0;">Viso Design System</h1>
+            </div>
+            <p class="viso-body" style="margin-top: 8px;">An open-source dark theme inspired by modern glassmorphism </p>
+        </div>
+    </header>
+
+    <main class="viso-container" style="padding: 48px 16px;">
+        
+        <!-- Typography Section -->
+        <section class="section">
+            <span class="viso-label">Typography</span>
+            <h2 class="viso-h2" style="margin-top: 8px;">Type Scale</h2>
+            
+            <div class="viso-card-solid" style="margin-top: 24px;">
+                <h1 class="viso-h1">Heading 1 - The quick brown fox</h1>
+                <h2 class="viso-h2" style="margin-top: 16px;">Heading 2 - The quick brown fox</h2>
+                <h3 class="viso-h3" style="margin-top: 16px;">Heading 3 - The quick brown fox</h3>
+                <p class="viso-body" style="margin-top: 16px;">Body text - The quick brown fox jumps over the lazy dog. This is how regular paragraph text appears in the Viso design system.</p>
+                <p class="viso-caption" style="margin-top: 16px;">Caption text - Smaller supporting text for labels and metadata.</p>
+            </div>
+        </section>
+
+        <div class="viso-divider"></div>
+
+        <!-- Buttons Section -->
+        <section class="section">
+            <span class="viso-label">Components</span>
+            <h2 class="viso-h2" style="margin-top: 8px;">Buttons</h2>
+            
+            <div class="component-grid">
+                <div class="component-demo">
+                    <div class="component-label">Button Variants</div>
+                    <div class="viso-flex viso-flex-col viso-gap-4">
+                        <button class="viso-btn viso-btn-primary">Primary Button</button>
+                        <button class="viso-btn viso-btn-secondary">Secondary Button</button>
+                        <button class="viso-btn viso-btn-ghost">Ghost Button</button>
+                        <button class="viso-btn viso-btn-danger">Danger Button</button>
+                    </div>
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-label">Button Sizes</div>
+                    <div class="viso-flex viso-flex-col viso-gap-4">
+                        <button class="viso-btn viso-btn-primary viso-btn-sm">Small Button</button>
+                        <button class="viso-btn viso-btn-primary">Default Button</button>
+                        <button class="viso-btn viso-btn-primary viso-btn-lg">Large Button</button>
+                    </div>
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-label">Icon Button</div>
+                    <div class="viso-flex viso-gap-4">
+                        <button class="viso-btn viso-btn-secondary viso-btn-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                        </button>
+                        <button class="viso-btn viso-btn-primary viso-btn-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="viso-divider"></div>
+
+        <!-- Cards Section -->
+        <section class="section">
+            <h2 class="viso-h2">Cards</h2>
+            
+            <div class="component-grid">
+                <div class="component-demo" style="background: transparent; border: none; padding: 0;">
+                    <div class="component-label">Glassmorphism Card</div>
+                    <div class="viso-card">
+                        <h3 class="viso-h3">Glass Card</h3>
+                        <p class="viso-body" style="margin-top: 12px;">This card uses the glassmorphism effect with backdrop blur for a modern, sleek appearance.</p>
+                        <button class="viso-btn viso-btn-primary" style="margin-top: 16px;">Action</button>
+                    </div>
+                </div>
+                
+                <div class="component-demo" style="background: transparent; border: none; padding: 0;">
+                    <div class="component-label">Solid Card</div>
+                    <div class="viso-card-solid">
+                        <h3 class="viso-h3">Solid Card</h3>
+                        <p class="viso-body" style="margin-top: 12px;">This card uses a solid background color for better content readability.</p>
+                        <button class="viso-btn viso-btn-secondary" style="margin-top: 16px;">Action</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="viso-divider"></div>
+
+        <!-- Form Elements Section -->
+        <section class="section">
+            <h2 class="viso-h2">Form Elements</h2>
+            
+            <div class="component-grid">
+                <div class="component-demo">
+                    <div class="component-label">Text Input</div>
+                    <input type="text" class="viso-input" placeholder="Enter your name...">
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-label">Select Dropdown</div>
+                    <select class="viso-select">
+                        <option value="">Select an option</option>
+                        <option value="1">Option One</option>
+                        <option value="2">Option Two</option>
+                        <option value="3">Option Three</option>
+                    </select>
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-label">Checkbox</div>
+                    <label class="viso-checkbox-label">
+                        <input type="checkbox" checked>
+                        <span>Checked option</span>
+                    </label>
+                    <label class="viso-checkbox-label" style="margin-top: 8px;">
+                        <input type="checkbox">
+                        <span>Unchecked option</span>
+                    </label>
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-label">Slider</div>
+                    <div class="viso-slider-container">
+                        <input type="range" class="viso-slider" min="0" max="100" value="60" oninput="this.nextElementSibling.textContent = this.value + '%'">
+                        <div class="viso-slider-percent">60%</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="viso-divider"></div>
+
+        <!-- Progress & Badges Section -->
+        <section class="section">
+            <h2 class="viso-h2">Progress & Badges</h2>
+            
+            <div class="component-grid">
+                <div class="component-demo">
+                    <div class="component-label">Progress Bar</div>
+                    <div class="viso-progress">
+                        <div class="viso-progress-bar" style="width: 75%;"></div>
+                    </div>
+                    <div class="viso-progress" style="margin-top: 16px;">
+                        <div class="viso-progress-bar" style="width: 35%;"></div>
+                    </div>
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-label">Spinner</div>
+                    <div class="viso-spinner"></div>
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-label">Badges</div>
+                    <div class="viso-flex viso-gap-4">
+                        <span class="viso-badge">Default</span>
+                        <span class="viso-badge viso-badge-accent">Accent</span>
+                        <span class="viso-badge viso-badge-gold">Gold</span>
+                    </div>
+                </div>
+                
+                <div class="component-demo">
+                    <div class="component-label">Tooltip</div>
+                    <button class="viso-btn viso-btn-secondary viso-tooltip" data-tooltip="This is a helpful tooltip!">
+                        Hover for Tooltip
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="viso-divider"></div>
+
+        <!-- Colors Section -->
+        <section class="section">
+            <h2 class="viso-h2">Color Palette</h2>
+            
+            <div class="component-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="component-demo" style="background: var(--viso-bg-primary);">
+                    <div class="component-label">Background Primary</div>
+                    <code style="color: var(--viso-text-muted); font-size: 12px;">#0d1117</code>
+                </div>
+                <div class="component-demo" style="background: var(--viso-bg-secondary);">
+                    <div class="component-label">Background Secondary</div>
+                    <code style="color: var(--viso-text-muted); font-size: 12px;">#161b22</code>
+                </div>
+                <div class="component-demo" style="background: var(--viso-accent);">
+                    <div class="component-label" style="color: var(--viso-bg-primary);">Accent</div>
+                    <code style="color: var(--viso-bg-primary); font-size: 12px;">#3ddc84</code>
+                </div>
+                <div class="component-demo" style="background: var(--viso-gold);">
+                    <div class="component-label" style="color: var(--viso-bg-primary);">Gold</div>
+                    <code style="color: var(--viso-bg-primary); font-size: 12px;">#ffd700</code>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer style="border-top: 1px solid var(--glass-border); padding: 24px 0; margin-top: 48px;">
+        <div class="viso-container">
+            <p class="viso-caption" style="text-align: center;">
+                Viso Design System v1.0.0 • Open Source • Code is AI generated, design is human-made
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

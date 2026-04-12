@@ -1,0 +1,34 @@
+{
+  "name": "viso-design-system",
+  "version": "1.0.0",
+  "description": "An open-source dark theme design language with Minecraft-inspired accents",
+  "main": "viso.css",
+  "files": [
+    "viso.css",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "echo \"Open example.html in a browser to test the design system\""
+  },
+  "keywords": [
+    "css",
+    "design-system",
+    "dark-theme",
+    "minecraft",
+    "gaming-ui",
+    "glassmorphism",
+    "ui-kit",
+    "frontend"
+  ],
+  "author": "SuperYosh23",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SuperYosh23/viso-design-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SuperYosh23/viso-design-system/issues"
+  },
+  "homepage": "https://github.com/SuperYosh23/viso-design-system#readme"
+}

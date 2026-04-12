@@ -274,10 +274,6 @@ body.fullscreen-mode .title-bar,
     width: 100%;
 }
 
-.top-left-controls .version-select-box:hover {
-    border-color: var(--vibra-accent-dim);
-    background: rgba(0, 0, 0, 0.8);
-}
 
 .top-left-controls .version-select-box:focus-within {
     border-color: var(--vibra-accent);
@@ -895,15 +891,15 @@ body.fullscreen-mode .title-bar,
     overflow-y: auto;
 }
 
-[data-theme="vibra"] .modal-box .modal-title {
+[data-theme="viso"] .modal-box .modal-title {
     animation: slideInUp 0.3s ease-out 0.1s both;
 }
 
-[data-theme="vibra"] .modal-box .modal-body-text {
+[data-theme="viso"] .modal-box .modal-body-text {
     animation: slideInUp 0.3s ease-out 0.15s both;
 }
 
-[data-theme="vibra"] .modal-box .btn-mc {
+[data-theme="viso"] .modal-box .btn-mc {
     animation: slideInUp 0.3s ease-out 0.2s both;
 }
 
@@ -1426,7 +1422,7 @@ select.mc-input option {
     background: var(--vibra-accent);
     border-radius: 4px;
     box-shadow: 0 0 10px var(--vibra-accent-glow);
-    transition: transform 0.05s ease-out, background 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.05s ease-out, background 0.15s ease;
     will-change: transform;
 }
 
@@ -2766,7 +2762,7 @@ select.mc-input.nav-item:focus {
    SUBTLE BACKGROUND ANIMATIONS
    ============================================= */
 
-[data-theme="vibra"] .floating-particles {
+[data-theme="viso"] .floating-particles {
     position: absolute;
     inset: 0;
     overflow: hidden;
@@ -2774,7 +2770,7 @@ select.mc-input.nav-item:focus {
     z-index: 0;
 }
 
-[data-theme="vibra"] .particle {
+[data-theme="viso"] .particle {
     position: absolute;
     background: var(--vibra-accent);
     border-radius: 50%;
@@ -2782,23 +2778,23 @@ select.mc-input.nav-item:focus {
     animation: float 20s infinite linear;
 }
 
-[data-theme="vibra"] .particle:nth-child(1) { 
+[data-theme="viso"] .particle:nth-child(1) { 
     width: 4px; height: 4px; 
     left: 10%; animation-delay: 0s; 
 }
-[data-theme="vibra"] .particle:nth-child(2) { 
+[data-theme="viso"] .particle:nth-child(2) { 
     width: 6px; height: 6px; 
     left: 30%; animation-delay: 3s; 
 }
-[data-theme="vibra"] .particle:nth-child(3) { 
+[data-theme="viso"] .particle:nth-child(3) { 
     width: 3px; height: 3px; 
     left: 50%; animation-delay: 7s; 
 }
-[data-theme="vibra"] .particle:nth-child(4) { 
+[data-theme="viso"] .particle:nth-child(4) { 
     width: 5px; height: 5px; 
     left: 70%; animation-delay: 12s; 
 }
-[data-theme="vibra"] .particle:nth-child(5) { 
+[data-theme="viso"] .particle:nth-child(5) { 
     width: 4px; height: 4px; 
     left: 90%; animation-delay: 16s; 
 }

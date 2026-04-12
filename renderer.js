@@ -2037,7 +2037,7 @@ async function initTheme() {
     if (!themeSelect) return;
     
     // Load saved theme
-    const savedTheme = await Store.get('launcher_theme', 'vibra');
+    const savedTheme = await Store.get('launcher_theme', 'viso');
     document.body.setAttribute('data-theme', savedTheme);
     themeSelect.value = savedTheme;
     
@@ -2133,7 +2133,7 @@ async function initTheme() {
             removeCustomCssStyles();
         }
         
-        showToast(`Theme changed to ${newTheme === 'vibra' ? 'Vibra' : newTheme === 'classic' ? 'OreUI' : newTheme === 'legacy' ? 'Legacy' : newTheme === 'material' ? 'Material 2 Light' : newTheme === 'material-dark' ? 'Material 2 Dark' : 'Custom CSS'}`);
+        showToast(`Theme changed to ${newTheme === 'viso' ? 'Viso' : newTheme === 'classic' ? 'OreUI' : newTheme === 'legacy' ? 'Legacy' : newTheme === 'material' ? 'Material 2 Light' : newTheme === 'material-dark' ? 'Material 2 Dark' : 'Custom CSS'}`);
     };
 }
 
@@ -2678,10 +2678,10 @@ async function exportSettings() {
                 legacy_username: await Store.get('legacy_username', ''),
                 legacy_playtime: await Store.get('legacy_playtime', 0),
                 ui_scale: await Store.get('ui_scale', 1.0),
-                launcher_theme: await Store.get('launcher_theme', 'vibra'),
+                launcher_theme: await Store.get('launcher_theme', 'viso'),
                 launcher_custom_css: await Store.get('launcher_custom_css', ''),
                 launcher_custom_bg_path: await Store.get('launcher_custom_bg_path', ''),
-                launcher_logo_style: await Store.get('launcher_logo_style', 'vibra'),
+                launcher_logo_style: await Store.get('launcher_logo_style', 'viso'),
                 legacy_controller_layout_mode: await Store.get('legacy_controller_layout_mode', 'auto'),
                 start_in_fullscreen: await Store.get('start_in_fullscreen', false),
                 disable_panorama: await Store.get('disable_panorama', false),
